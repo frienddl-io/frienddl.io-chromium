@@ -1,0 +1,114 @@
+html,
+body
+{
+  width: 300px;
+  height: 150px;
+  background-image: url("../img/background.png");
+}
+
+body
+{
+  padding: 10px;
+}
+
+/* h1
+{
+
+  /* font-size: 26px; */
+  /* padding-bottom: 10px; */
+
+/* } */
+
+.center
+{
+  margin: auto;
+  text-align: center;
+}
+
+#instructions
+{
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+h1,
+h2,
+h3,
+p,
+th,
+td,
+span
+{
+  color: #fff;
+}
+
+#stats th
+{
+  font-weight: bold;
+  text-align: right;
+}
+
+#stats td
+{
+  font-weight: normal;
+}
+
+#main-button
+{
+  margin-bottom: 15px;
+}
+
+th
+{
+  width: 60%;
+}
+
+td
+{
+  width: 40%;
+}
+
+/* #add
+{
+margin-left: 5px;
+} */
+
+#friends button
+{
+  margin: 0 10px 10px 0;
+}
+
+.btn-outline-danger
+{
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+.btn-outline-danger:hover
+{
+  color: #fff !important;
+  background-color: #a35048 !important;
+  border-color: #a35048 !important;
+}
+
+.invalid-feedback
+{
+  color: rgb(255, 154, 154);
+}
+
+#friend-error
+{
+  margin-bottom: 5px;
+}
+
+#errors
+{
+  margin-bottom: 10px;
+}
+
+#found-friend h3,
+#found-friend span
+{
+  margin-bottom: 10px;
+  color: rgb(193, 255, 198);
+}

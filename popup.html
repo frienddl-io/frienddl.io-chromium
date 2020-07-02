@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Frienddlio</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <link href="https://fonts.fontself.com/gE309jx/gilbert-color-bold-preview5.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container-fluid">
+      <h1 class="h1 center">Frienddl.io</h1>
+      <p id="instructions">Enter your friends then search to find them on Scribbl.io</p>
+      <!-- <form class="form-inline">
+        <div class="form-group mx-sm-3 mb-2">
+          <input id="friend-name" type="input" class="form-control" placeholder="Friend name">
+        </div>
+        <button id="add" type="button" class="btn btn-secondary mb-2">Add</button>
+      </form> -->
+      <!-- <div id="friend-error" class="invalid-feedback" style="display: inline;">Please enter at least one friend.</div> -->
+      <div class="input-group mb-3">
+        <input id="friend-name" type="text" class="form-control" placeholder="Friend" aria-label="Friend" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+          <button id="add" class="btn btn-secondary" type="button">Add</button>
+        </div>
+      </div>
+
+      <div id="friends">
+      </div>
+      <button id="main-button" class="btn btn-success btn-lg btn-block" type="submit">Search</button>
+      <div id="errors" class="center">
+        <div id="friend-error" class="invalid-feedback" style="display: none;">Please enter at least one friend.</div>
+        <div id="character-error" class="invalid-feedback" style="display: none;">Please enter at least one character.</div>
+        <div id="duplicate-error" class="invalid-feedback" style="display: none;">Friend already added.</div>
+      </div>
+      <div class="d-flex justify-content-center">
+        <div id="spinner" class="spinner-border text-light" role="status" style="display: none;">
+          <span class="sr-only">Searching...</span>
+        </div>
+      </div>
+      <div id="found-friend" class="center" style="display: none;">
+        <h3 class="h3 center"><span id="found-friend-title">Friend</span> Found!</h3>
+        <p id="found-friend-p"></p>
+      </div>
+      <div id="stats" style="display: none;">
+      <!-- <div id="stats"> -->
+        <!-- <p>Number of Friends: <span id="number-of-friends"></span></p>
+        <p>Games Joined: <span id="games-joined"></span></p>
+        <p>Players Found: <span id="players-found"></span></p>
+        <p>Run Time: <span id="run-time"></span></p> -->
+
+        <table class="table table-borderless">
+          <!-- <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">First</th>
+              <th scope="col">Last</th>
+              <th scope="col">Handle</th>
+            </tr>
+          </thead> -->
+          <tbody>
+            <tr>
+              <th scope="row">Games Joined:</th>
+              <td><span id="games-joined"></span></td>
+            </tr>
+            <tr>
+              <th scope="row">Players Found:</th>
+              <td colspan="2"><span id="players-found"></span></td>
+            </tr>
+            <tr>
+              <th scope="row">Run Time:</th>
+              <td colspan="2"><span id="run-time"></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script src="js/popup.js" charset="utf-8"></script>
+    <script src="js/jquery-3.5.1.min.js"></script>
+  </body>
+</html>
