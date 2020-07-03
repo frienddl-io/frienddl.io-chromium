@@ -1,10 +1,6 @@
 const SKRIBBLIO_URL = "https://skribbl.io/";
-let STATUS = "stop";
-let LOCK = false;
-let WINDOW_ID = -1;
 
 document.addEventListener("DOMContentLoaded", function () {
-
   // Check for enter press on input
   $("#friend-name").keypress(
     function(event) {
@@ -71,62 +67,66 @@ document.addEventListener("DOMContentLoaded", function () {
     if (getFriendsArray().length === 0) {
       $("#friend-error").show();
     } else {
-      STATUS = "search";
-      $("#friend-error").hide();
+      chrome.storage.sync.set(
+        {
+          "status": "search"
+        },
+        function() {
+          $("#friend-error").hide();
 
-      $("#resume-col").hide();
-      $("#pause-col").show();
-      $("#stop-col").show();
-      $("#search-buttons").show();
-      $("#start-button").hide();
+          $("#resume-col").hide();
+          $("#pause-col").show();
+          $("#stop-col").show();
+          $("#search-buttons").show();
+          $("#start-button").hide();
 
-      $("#spinner").show();
+          $("#spinner").show();
 
-      $("#players-found").text(0);
-      $("#games-joined").text(0);
-      $("#run-time").text("00:00.0");
-      $("#stats").show();
+          $("#players-found").text(0);
+          $("#games-joined").text(0);
+          $("#run-time").text("00:00.0");
+          $("#stats").show();
 
 
-      chrome.storage.sync.get(
-        [
-          "totalTimesSearched"
-        ],
-        function(response) {
-          let newTotalTimesSearched = 1;
-          if (typeof response.totalTimesSearched !== 'undefined') {
-            newTotalTimesSearched += response.totalTimesSearched;
-          }
+          chrome.storage.sync.get(
+            [
+              "totalTimesSearched"
+            ],
+            function(response) {
+              let newTotalTimesSearched = 1;
+              if (typeof response.totalTimesSearched !== 'undefined') {
+                newTotalTimesSearched += response.totalTimesSearched;
+              }
 
-          chrome.storage.sync.set(
-            {
-              "totalTimesSearched": newTotalTimesSearched
+              chrome.storage.sync.set(
+                {
+                  "totalTimesSearched": newTotalTimesSearched
+                }
+              );
             }
           );
-        }
-      );
 
-      chrome.windows.create(
-        {
-          url: SKRIBBLIO_URL,
-          state: "minimized"
-        },
-        function(window) {
-          WINDOW_ID = window.id;
-          console.log("Window ID: " + WINDOW_ID);
-
-          let currentTime = new Date().getTime();
-          chrome.storage.sync.set(
+          chrome.windows.create(
             {
-              "gamesJoined": 0,
-              "startTime": currentTime,
-              "endTime": -1,
-              "runTime": -1,
-              "playersFound": []
-            }, function() {
-              let tabId = window.tabs[0].id;
-              console.log("tabId: " + tabId);
-              joinNewGame(tabId);
+              url: SKRIBBLIO_URL,
+              state: "minimized"
+            },
+            function(window) {
+              let currentTime = new Date().getTime();
+              chrome.storage.sync.set(
+                {
+                  "windowId": window.id,
+                  "gamesJoined": 0,
+                  "startTime": currentTime,
+                  "endTime": -1,
+                  "runTime": -1,
+                  "playersFound": []
+                }, function() {
+                  let tabId = window.tabs[0].id;
+                  console.log("tabId: " + tabId);
+                  joinNewGameAfterPageLoad(tabId);
+                }
+              );
             }
           );
         }
@@ -140,23 +140,28 @@ document.addEventListener("DOMContentLoaded", function () {
   // Steps to take when searching needs to be paused
   function pauseSearch() {
     this.blur();
-    STATUS = "pause";
+    chrome.storage.sync.set(
+      {
+        "status": "pause"
+      },
+      function() {
+        console.log("Pausing search");
 
-    console.log("Pausing search");
+        $("#spinner").hide();
+        $("#pause-col").hide();
+        $("#resume-col").show();
 
-    $("#spinner").hide();
-    $("#pause-col").hide();
-    $("#resume-col").show();
-
-    chrome.storage.sync.get(
-      [
-        "startTime"
-      ],
-      function(response) {
-        let currentTime = new Date().getTime();
-        chrome.storage.sync.set(
-          {
-            "runTime": currentTime - response.startTime
+          chrome.storage.sync.get(
+            [
+              "startTime"
+            ],
+            function(response) {
+            let currentTime = new Date().getTime();
+            chrome.storage.sync.set(
+              {
+                "runTime": currentTime - response.startTime
+              }
+            );
           }
         );
       }
@@ -169,36 +174,46 @@ document.addEventListener("DOMContentLoaded", function () {
   // Steps to take when searching needs to be resumed
   function resumeSearch() {
     this.blur();
-    STATUS = "search"
+    chrome.storage.sync.set(
+      {
+        "status": "search"
+      },
+      function() {
+        console.log("Resuming search");
 
-    console.log("Resuming search");
+        $("#character-error").hide();
+        $("#duplicate-error").hide();
 
-    $("#character-error").hide();
-    $("#duplicate-error").hide();
+        if (getFriendsArray().length === 0) {
+          $("#friend-error").show();
+        } else {
+          $("#friend-error").hide();
 
-    if (getFriendsArray().length === 0) {
-      $("#friend-error").show();
-    } else {
-      STATUS = "search";
-      $("#friend-error").hide();
+          $("#resume-col").hide();
+          $("#pause-col").show();
+          $("#spinner").show();
 
-      $("#resume-col").hide();
-      $("#pause-col").show();
-      $("#spinner").show();
-
-      chrome.windows.get(
-        WINDOW_ID,
-        {
-          "populate": true
-        },
-        function(window) {
-          let tabId = window.tabs[0].id;
-          console.log("tabId: " + tabId);
-          refreshTab(tabId);
-          joinNewGame(tabId);
+          chrome.storage.sync.get(
+            [
+              "windowId"
+            ],
+            function(response) {
+              chrome.windows.get(
+                response.windowId,
+                {
+                  "populate": true
+                },
+                function(window) {
+                  let tabId = window.tabs[0].id;
+                  console.log("tabId: " + tabId);
+                  refreshTab(tabId);
+                }
+              );
+            }
+          );
         }
-      );
-    }
+      }
+    );
   }
 
   // Listen for button that pauses search
@@ -207,54 +222,69 @@ document.addEventListener("DOMContentLoaded", function () {
   // Steps to take when searching needs to be stopped
   function stopSearch() {
     this.blur();
-    STATUS = "stop";
+    chrome.storage.sync.set(
+      {
+        "status": "stop"
+      },
+      function() {
+        console.log("Stopping search");
 
-    console.log("Stopping search");
+        $("#spinner").hide();
+        $("#search-buttons").hide();
+        $("#start-button").show();
 
-    $("#spinner").hide();
-    $("#search-buttons").hide();
-    $("#start-button").show();
-
-    chrome.storage.sync.get(
-      [
-        "startTime"
-      ],
-      function(response) {
-        let currentTime = new Date().getTime();
-        chrome.storage.sync.set(
-          {
-            "endTime": currentTime,
-            "runTime": currentTime - response.startTime
+        chrome.storage.sync.get(
+          [
+            "startTime",
+            "windowId"
+          ],
+          function(response) {
+            let currentTime = new Date().getTime();
+            chrome.storage.sync.set(
+              {
+                "endTime": currentTime,
+                "runTime": currentTime - response.startTime
+              }
+            );
+            chrome.windows.remove(response.windowId);
           }
         );
       }
     );
-
-    LOCK = false;
-    chrome.windows.remove(WINDOW_ID);
   }
 
   // Steps to take when a new game needs to be joined
-  function joinNewGame(correctTabId) {
+  function joinNewGameAfterPageLoad(correctTabId) {
+    let alive = true;
     chrome.tabs.onUpdated.addListener(
       function(tabId, changeInfo, tab) {
-        if (
-          STATUS === "search"
-          && LOCK === false
-          && tabId === correctTabId
-          && tab.url.indexOf(SKRIBBLIO_URL) != -1
-          && changeInfo.status == 'complete'
-        )
-        {
-          console.log("Sending message to join new game");
-          LOCK = true;
-          chrome.tabs.sendMessage(
-            tabId,
-            {
-              tabId: tabId
-            },
-            respondToContent
+        if (alive) {
+              chrome.storage.sync.get(
+                [
+                  "status"
+                ],
+                function(response) {
+              if (
+                response.status === "search"
+                && tabId === correctTabId
+                && tab.url.indexOf(SKRIBBLIO_URL) != -1
+                && changeInfo.status == 'complete'
+              )
+              {
+                console.log("Sending message to join new game");
+                alive = false;
+                chrome.tabs.sendMessage(
+                  tabId,
+                  {
+                    tabId: tabId
+                  },
+                  respondToContent
+                );
+              }
+            }
           );
+        } else {
+          return;
         }
       }
     );
@@ -266,22 +296,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (response === null) {
       console.log("Response was null");
-    } else if (STATUS === "stop") {
-      console.log("Stopping search");
-
-      if (typeof tabId !== 'undefined') {
-        console.log(`Closing tab: ${tabId}`);
-        chrome.tabs.remove(tabId);
-      } else {
-        console.log("Tab id not defined");
-      }
-    } else if (STATUS === "pause") {
-
     } else {
       console.log("Searching players for friends");
 
       let playersArray = response.players;
-      console.dir(playersArray);
+      console.dir(`playersArray: ${playersArray.toString()}`);
       let tabId = response.tabId;
 
       if (playersArray.length > 1) {
@@ -321,8 +340,6 @@ document.addEventListener("DOMContentLoaded", function () {
       function(response) {
         console.dir(response);
         let newGamesJoined = response.gamesJoined + 1;
-        console.log("response.gamesJoined: "+ response.gamesJoined);
-        console.log("Setting games joined to: "+ newGamesJoined);
         $("#games-joined").text(newGamesJoined);
 
         let startTime = response.startTime;
@@ -380,7 +397,6 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         );
 
-        console.log("Setting players found to " + totalPlayersFound.length);
         $("#players-found").text(totalPlayersFound.length);
       }
     );
@@ -402,14 +418,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Refreshes a tab
   function refreshTab(tabId) {
-    console.log("Refreshing");
-    chrome.tabs.reload(
-      tabId,
-      function() {
-        if (STATUS === "search") {
-          console.log("Sending message to start new game");
-          LOCK = false;
-          joinNewGame(tabId);
+    chrome.storage.sync.get(
+      [
+        "status"
+      ],
+      function(response) {
+        if (response.status !== "pause") {
+          console.log("Refreshing");
+          chrome.tabs.reload(
+            tabId,
+            function() {
+              console.log("Sending message to start new game");
+              joinNewGameAfterPageLoad(tabId);
+            }
+          );
         }
       }
     );
