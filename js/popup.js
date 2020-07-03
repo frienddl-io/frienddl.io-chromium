@@ -1,26 +1,7 @@
-const MAIN_BUTTON_ID = "#main-button";
 const SKRIBBLIO_URL = "https://skribbl.io/";
-// let TAB_ID = -1;
+let STATUS = "stop";
 let LOCK = false;
-// let STATS = {
-//   numberOfFriends: 0,
-//   gamesJoined: 0,
-//   startTime: -1,
-//   endTime: -1,
-//   runTime: "00:00.0",
-//   playersFound: []
-// };
-let ACTIVE = false;
-
-chrome.storage.sync.set(
-  {
-    "totalGamesJoined": 0,
-    "totalTimesSearched": 0,
-    "totalRunTime": 0,
-    "totalPlayersSeen": 0,
-    "totalFriendsFound": 0
-  }
-);
+let WINDOW_ID = -1;
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -38,10 +19,10 @@ document.addEventListener("DOMContentLoaded", function () {
   // Listen for Add button click
   $("#add").bind("click", addFriend);
 
+  // Steps to take when a friend is to be added
   function addFriend() {
     this.blur();
     $("#friend-error").hide();
-    $("#duplicate-error").hide();
 
     let friendName = $("#friend-name").val();
     if (friendName === "") {
@@ -54,6 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
       let exists = $(`#${id}`).length !== 0;
 
       if (!exists) {
+        $("#duplicate-error").hide();
         let btn = document.createElement("BUTTON");
 
         btn.id = id;
@@ -77,63 +59,74 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  $(MAIN_BUTTON_ID).bind("click", mainButtonPressed);
+  // Listen for buttons that start search
+  $("#start-button").bind("click", startSearch);
 
-  function mainButtonPressed() {
+  // Steps to take for searching needs to be started
+  function startSearch() {
     this.blur();
     $("#character-error").hide();
     $("#duplicate-error").hide();
 
-    let action = $(MAIN_BUTTON_ID).text();
-
-    if (action === "Search") {
-      if (getFriendsArray().length === 0) {
-        $("#friend-error").show();
-      } else {
-        ACTIVE = true;
-        $("#friend-error").hide();
-        toggleMainButton();
-
-        chrome.windows.create(
-          {
-            url: SKRIBBLIO_URL,
-            state: "minimized"
-          },
-          function(window) {
-            // WINDOW_ID = window.id;
-            TAB_ID = window.tabs[0].id;
-            console.log(window);
-            console.log(window.tabs);
-            console.log("Tab ID: " + TAB_ID);
-
-            let currentTime = new Date().getTime();
-            console.log("Setting start time to " + currentTime);
-            chrome.storage.sync.set(
-              {
-                "gamesJoined": 0,
-                "startTime": currentTime,
-                "endTime": -1,
-                "runTime": -1,
-                "playersFound": []
-              }
-            );
-            showSearchingContent();
-            startNewGame(window.tabs[0].id);
-          }
-        );
-      }
+    if (getFriendsArray().length === 0) {
+      $("#friend-error").show();
     } else {
-      stopSearch();
+      STATUS = "search";
+      $("#friend-error").hide();
+
+      $("#resume-col").hide();
+      $("#pause-col").show();
+      $("#stop-col").show();
+      $("#search-buttons").show();
+      $("#start-button").hide();
+
+      $("#spinner").show();
+
+      $("#players-found").text(0);
+      $("#games-joined").text(0);
+      $("#run-time").text("00:00.0");
+      $("#stats").show();
+
+
       chrome.storage.sync.get(
         [
-          "startTime"
+          "totalTimesSearched"
         ],
         function(response) {
+          let newTotalTimesSearched = 1;
+          if (typeof response.totalTimesSearched !== 'undefined') {
+            newTotalTimesSearched += response.totalTimesSearched;
+          }
+
+          chrome.storage.sync.set(
+            {
+              "totalTimesSearched": newTotalTimesSearched
+            }
+          );
+        }
+      );
+
+      chrome.windows.create(
+        {
+          url: SKRIBBLIO_URL,
+          state: "minimized"
+        },
+        function(window) {
+          WINDOW_ID = window.id;
+          console.log("Window ID: " + WINDOW_ID);
+
           let currentTime = new Date().getTime();
           chrome.storage.sync.set(
             {
-              "endTime": currentTime,
-              "runTime": currentTime - response.startTime
+              "gamesJoined": 0,
+              "startTime": currentTime,
+              "endTime": -1,
+              "runTime": -1,
+              "playersFound": []
+            }, function() {
+              let tabId = window.tabs[0].id;
+              console.log("tabId: " + tabId);
+              joinNewGame(tabId);
             }
           );
         }
@@ -141,119 +134,183 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  function stopSearch() {
-    ACTIVE = false;
-    toggleMainButton();
+  // Listen for button that pauses search
+  $("#pause-button").bind("click", pauseSearch);
+
+  // Steps to take when searching needs to be paused
+  function pauseSearch() {
+    this.blur();
+    STATUS = "pause";
+
+    console.log("Pausing search");
+
     $("#spinner").hide();
+    $("#pause-col").hide();
+    $("#resume-col").show();
+
+    chrome.storage.sync.get(
+      [
+        "startTime"
+      ],
+      function(response) {
+        let currentTime = new Date().getTime();
+        chrome.storage.sync.set(
+          {
+            "runTime": currentTime - response.startTime
+          }
+        );
+      }
+    );
   }
 
-  function startNewGame(correctTabId) {
+  // Listen for button that resumes search
+  $("#resume-button").bind("click", resumeSearch);
+
+  // Steps to take when searching needs to be resumed
+  function resumeSearch() {
+    this.blur();
+    STATUS = "search"
+
+    console.log("Resuming search");
+
+    $("#character-error").hide();
+    $("#duplicate-error").hide();
+
+    if (getFriendsArray().length === 0) {
+      $("#friend-error").show();
+    } else {
+      STATUS = "search";
+      $("#friend-error").hide();
+
+      $("#resume-col").hide();
+      $("#pause-col").show();
+      $("#spinner").show();
+
+      chrome.windows.get(
+        WINDOW_ID,
+        {
+          "populate": true
+        },
+        function(window) {
+          let tabId = window.tabs[0].id;
+          console.log("tabId: " + tabId);
+          refreshTab(tabId);
+          joinNewGame(tabId);
+        }
+      );
+    }
+  }
+
+  // Listen for button that pauses search
+  $("#stop-button").bind("click", stopSearch);
+
+  // Steps to take when searching needs to be stopped
+  function stopSearch() {
+    this.blur();
+    STATUS = "stop";
+
+    console.log("Stopping search");
+
+    $("#spinner").hide();
+    $("#search-buttons").hide();
+    $("#start-button").show();
+
+    chrome.storage.sync.get(
+      [
+        "startTime"
+      ],
+      function(response) {
+        let currentTime = new Date().getTime();
+        chrome.storage.sync.set(
+          {
+            "endTime": currentTime,
+            "runTime": currentTime - response.startTime
+          }
+        );
+      }
+    );
+
+    LOCK = false;
+    chrome.windows.remove(WINDOW_ID);
+  }
+
+  // Steps to take when a new game needs to be joined
+  function joinNewGame(correctTabId) {
     chrome.tabs.onUpdated.addListener(
       function(tabId, changeInfo, tab) {
-        // console.log("Tab ID: " + tabId);
         if (
-          ACTIVE
+          STATUS === "search"
           && LOCK === false
           && tabId === correctTabId
           && tab.url.indexOf(SKRIBBLIO_URL) != -1
           && changeInfo.status == 'complete'
         )
         {
-          console.log("Tab ID matches, sending message to start new game");
-          // wait(5000);
-          // console.dir(STATS);
+          console.log("Sending message to join new game");
           LOCK = true;
           chrome.tabs.sendMessage(
             tabId,
             {
               tabId: tabId
             },
-            searchPlayersForFriends
+            respondToContent
           );
-        } //else {
-          // console.log("Tab ID doesn't match");
-        //}
+        }
       }
     );
   }
 
-  function showSearchingContent() {
-    // $("#number-of-friends").innerText = getFriendsArray().length;
-    // $("#number-of-friends").val(getFriendsArray().length);
-    $("#spinner").show();
-    $("#players-found").text(0);
-    updateStats();
-    $("#stats").show();
-  }
+  // Processes the response from the content of a game
+  function respondToContent(response) {
+    updateStorage();
 
-  // Retrieves the friends entered
-  function getFriendsArray() {
-    let friendsArray = []
-    Array.from(document.querySelector("#friends").children).forEach(
-      (item, index) => {
-        let friend = item.innerText.split(" ").slice(0, -1).join(" ");
-        friendsArray.push(friend);
+    if (response === null) {
+      console.log("Response was null");
+    } else if (STATUS === "stop") {
+      console.log("Stopping search");
+
+      if (typeof tabId !== 'undefined') {
+        console.log(`Closing tab: ${tabId}`);
+        chrome.tabs.remove(tabId);
+      } else {
+        console.log("Tab id not defined");
       }
-    )
+    } else if (STATUS === "pause") {
 
-    return friendsArray;
-  }
-
-  function toggleMainButton() {
-    let btn = document.querySelector(MAIN_BUTTON_ID);
-    if (btn.innerHTML == "Search") {
-      btn.innerHTML = "Stop";
-      btn.classList.add("btn-danger");
-      btn.classList.remove("btn-success");
     } else {
-      btn.innerHTML = "Search";
-      btn.classList.add("btn-success");
-      btn.classList.remove("btn-danger");
+      console.log("Searching players for friends");
+
+      let playersArray = response.players;
+      console.dir(playersArray);
+      let tabId = response.tabId;
+
+      if (playersArray.length > 1) {
+        updatePlayersFound(playersArray);
+
+        let friendsFound = [];
+        let friendsArray = getFriendsArray();
+
+        for (const friend of friendsArray) {
+          if (playersArray.includes(friend)) {
+            friendsFound.push(friend);
+          }
+        }
+
+        if (friendsFound.length === 0) {
+          console.log("No friends found");
+          refreshTab(tabId);
+        } else {
+          foundFriend(friendsFound, tabId);
+        }
+      } else {
+        console.log("Only 1 players was found");
+        refreshTab(tabId);
+      }
     }
   }
 
-  // function getPlayers(res) {
-  //   console.log("Inside getPlayers");
-  //   console.log("res: " + res);
-  //   console.dir(res);
-
-  //   // let friendsArray = getIDs("#friends")
-  //   // console.log("friendsArray: " + friendsArray);
-  // }
-
-  function refreshTab(tabId) {
-    console.log("Refreshing");
-    // wait(5000);
-    chrome.tabs.reload(
-      tabId,
-      function() {
-        console.log("Sending message to start new game");
-        LOCK = false;
-        // wait(5000);
-        startNewGame(tabId);
-        // chrome.tabs.sendMessage(
-        //   tabId,
-        //   {
-        //     tabId: tabId
-        //   },
-        //   searchPlayersForFriends
-        // )
-      }
-    );
-  }
-
-  function msToTime(duration) {
-    let milliseconds = parseInt((duration % 1000) / 100);
-    let seconds = Math.floor((duration / 1000) % 60);
-    let minutes = Math.floor((duration / (1000 * 60)) % 60);
-
-    minutes = (minutes < 10) ? "0" + minutes : minutes;
-    seconds = (seconds < 10) ? "0" + seconds : seconds;
-
-    return minutes + ":" + seconds + "." + milliseconds;
-  }
-
-  function updateStats() {
+  // Updates values in storage
+  function updateStorage() {
     chrome.storage.sync.get(
       [
         "gamesJoined",
@@ -264,33 +321,36 @@ document.addEventListener("DOMContentLoaded", function () {
       function(response) {
         console.dir(response);
         let newGamesJoined = response.gamesJoined + 1;
-        let newTotalGamesJoined = response.totalGamesJoined + 1;
-        chrome.storage.sync.set(
-          {
-            "gamesJoined": newGamesJoined,
-            "totalGamesJoined": newTotalGamesJoined
-          }
-        );
+        console.log("response.gamesJoined: "+ response.gamesJoined);
+        console.log("Setting games joined to: "+ newGamesJoined);
         $("#games-joined").text(newGamesJoined);
 
         let startTime = response.startTime;
-        console.log("Start time: " + startTime);
         let newRunTime = new Date().getTime() - startTime;
+        $("#run-time").text(msToTime(newRunTime));
+
+        let newTotalGamesJoined = 1;
+        if (typeof response.totalGamesJoined !== 'undefined') {
+          newTotalGamesJoined += response.totalGamesJoined;
+        }
+
         chrome.storage.sync.set(
           {
+            "gamesJoined": newGamesJoined,
+            "totalGamesJoined": newTotalGamesJoined,
             "runTime": newRunTime
           }
         );
-        console.log("Setting run time to " + msToTime(newRunTime));
-        $("#run-time").text(msToTime(newRunTime));
       }
     );
   }
 
+  // Updates the values in storage related to players found or seen
   function updatePlayersFound(playersArray) {
     chrome.storage.sync.get(
       [
-        "playersFound"
+        "playersFound",
+        "totalPlayersSeen"
       ],
       function(response) {
         console.dir(response);
@@ -308,9 +368,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let totalPlayersFound = newPlayersFound.concat(playersFound);
 
+        let newTotalPlayersSeen = playersArray.length;
+        if (typeof response.totalPlayersSeen !== 'undefined') {
+          newTotalPlayersSeen += response.totalPlayersSeen;
+        }
+
         chrome.storage.sync.set(
           {
-            "playersFound": totalPlayersFound
+            "playersFound": totalPlayersFound,
+            "totalPlayersSeen": newTotalPlayersSeen
           }
         );
 
@@ -320,7 +386,37 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
-  function foundFriend(friendsArray) {
+  // Retrieves the friends entered
+  function getFriendsArray() {
+    let friendsArray = []
+    Array.from(document.querySelector("#friends").children).forEach(
+      (item, index) => {
+        let friend = item.innerText.split(" ").slice(0, -1).join(" ");
+        friendsArray.push(friend);
+      }
+    )
+
+    return friendsArray;
+  }
+
+
+  // Refreshes a tab
+  function refreshTab(tabId) {
+    console.log("Refreshing");
+    chrome.tabs.reload(
+      tabId,
+      function() {
+        if (STATUS === "search") {
+          console.log("Sending message to start new game");
+          LOCK = false;
+          joinNewGame(tabId);
+        }
+      }
+    );
+  }
+
+  // Steps to take when one or more friends are found
+  function foundFriend(friendsArray, tabId) {
     stopSearch();
     console.log(`Friend(s) found: ${friendsArray.to_s}`);
 
@@ -334,79 +430,61 @@ document.addEventListener("DOMContentLoaded", function () {
       [
         "startTime",
         "runTime",
-        "totalFriendsFound"
+        "totalFriendsFound",
+        "totalRunTime"
       ],
       function(response) {
         let currentTime = new Date().getTime();
         let finalRunTime = currentTime - response.startTime;
+
+        let newTotalFriendsFound = 1;
+        if (typeof response.totalFriendsFound !== 'undefined') {
+          newTotalFriendsFound += response.totalFriendsFound;
+        }
+
+        let newTotalRunTime = finalRunTime;
+        if (typeof response.totalRunTime !== 'undefined') {
+          newTotalRunTime += totalRunTime;
+        }
+
         chrome.storage.sync.set(
           {
             "runTime": finalRunTime,
             "endTime": currentTime,
-            "totalFriendsFound": response.totalFriendsFound + 1
+            "totalFriendsFound": newTotalFriendsFound,
+            "totalRunTime": newTotalRunTime
           }
         );
-        console.log("Setting run time to " + msToTime(finalRunTime));
         $("#run-time").text(msToTime(finalRunTime));
+      }
+    );
+
+    chrome.tabs.update(
+      tabId,
+      {
+        active: true
       }
     );
   }
 
-  function searchPlayersForFriends(response) {
-    // console.dir(response);
-    updateStats();
+  // Converts ms to a readable time format (MM:SS.M)
+  function msToTime(duration) {
+    let milliseconds = parseInt((duration % 1000) / 100);
+    let seconds = Math.floor((duration / 1000) % 60);
+    let minutes = Math.floor((duration / (1000 * 60)) % 60);
 
-    if (response === null) {
-      console.log("Response was null");
-      // console.log("Sending message to start new game");
-      // wait(5000);
-      // startNewGame();
-    } else if (!ACTIVE) {
-      console.log("Active: " + ACTIVE);
-      if (typeof response.tabId !== 'undefined') {
-        console.log(`Closing tab: ${tabId}`);
-        chrome.tabs.remove(response.tabId);
-      } else {
-        console.log("Tab id not defined");
-      }
-    } else {
-      console.log("Searching players for friends");
+    minutes = (minutes < 10) ? "0" + minutes : minutes;
+    seconds = (seconds < 10) ? "0" + seconds : seconds;
 
-      let playersArray = response.players;
-      let tabId = response.tabId;
-
-      if (playersArray.length > 1) {
-        updatePlayersFound(playersArray);
-
-        let friendsFound = [];
-        let friendsArray = getFriendsArray();
-        console.log("friendsArray: " + friendsArray);
-
-        for (const friend of friendsArray) {
-          console.log(`Checking if ${friend} is in playersArray`);
-          if (playersArray.includes(friend)) {
-            friendsFound.push(friend);
-          }
-        }
-
-        if (foundFriend.length === 0) {
-          console.log("No friends found");
-          refreshTab(tabId);
-        } else {
-          foundFriend(friendsFound);
-        }
-      } else {
-        console.log("Only 1 players was found");
-        refreshTab(tabId);
-      }
-    }
+    return minutes + ":" + seconds + "." + milliseconds;
   }
 
-  // function wait(ms){
-  //   var start = new Date().getTime();
-  //   var end = start;
-  //   while(end < start + ms) {
-  //     end = new Date().getTime();
-  //   }
-  // }
+  function wait(ms) {
+    console.log("Waiting");
+    var start = new Date().getTime();
+    var end = start;
+    while(end < start + ms) {
+      end = new Date().getTime();
+    }
+  }
 }, false);

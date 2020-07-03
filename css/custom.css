@@ -11,13 +11,17 @@ body
   padding: 10px;
 }
 
-/* h1
+h1,
+h2,
+h3,
+p,
+th,
+td,
+span,
+#spinner
 {
-
-  /* font-size: 26px; */
-  /* padding-bottom: 10px; */
-
-/* } */
+  color: #fff;
+}
 
 .center
 {
@@ -31,17 +35,6 @@ body
   margin-bottom: 10px;
 }
 
-h1,
-h2,
-h3,
-p,
-th,
-td,
-span
-{
-  color: #fff;
-}
-
 #stats th
 {
   font-weight: bold;
@@ -53,7 +46,10 @@ span
   font-weight: normal;
 }
 
-#main-button
+#start-button,
+#resume-button,
+#pause-button,
+#stop-button
 {
   margin-bottom: 15px;
 }
@@ -67,11 +63,6 @@ td
 {
   width: 40%;
 }
-
-/* #add
-{
-margin-left: 5px;
-} */
 
 #friends button
 {
@@ -101,7 +92,7 @@ margin-left: 5px;
   margin-bottom: 5px;
 }
 
-#errors
+#errors div
 {
   margin-bottom: 10px;
 }
@@ -111,4 +102,15 @@ margin-left: 5px;
 {
   margin-bottom: 10px;
   color: rgb(193, 255, 198);
+}
+
+.table td,
+.table th
+{
+  padding: .4rem;
+}
+
+#spinner
+{
+  font-size: 20px;
 }
