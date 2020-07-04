@@ -1,5 +1,152 @@
 const SKRIBBLIO_URL = "https://skribbl.io/";
 
+let backgroundPort = chrome.runtime.connect(
+  {
+    name: "p2b"
+  }
+);
+
+// chrome.runtime.onConnect.addListener(
+//   function(port) {
+//     if (port.name !== "b2p") {
+//       console.log("Port is not b2p: " + port.name);
+//     } else {
+//       console.log("Port is b2p");
+//       port.onMessage.addListener(
+//         function(message) {
+//           console.dir(message);
+
+//           if (message.task === "getFriendsArray") {
+//             return getFriendsArray();
+//           }
+//         }
+//       );
+//     }
+//   }
+// );
+
+chrome.storage.onChanged.addListener(
+  function(changes, namespace) {
+    for (let key in changes) {
+      let storageChange = changes[key];
+        console.log('Storage key "%s" in namespace "%s" changed. ' +
+                    'Old value was "%s", new value is "%s".',
+                    key,
+                    namespace,
+                    storageChange.oldValue,
+                    storageChange.newValue);
+      let updated = false;
+      switch(key) {
+        case "gamesJoined":
+          console.log("Updating games joined");
+          $("#games-joined").text(storageChange.newValue);
+          updated = true;
+          break;
+        case "runTime":
+          console.log("Updating run time");
+          $("#run-time").text(msToTime(storageChange.newValue));
+          updated = true;
+          break;
+        case "playersFound":
+          console.log("Updating players found");
+          $("#players-found").text(storageChange.newValue.length);
+          updated = true;
+          break;
+      }
+
+      // if (updated) {
+      //   chrome.browserAction.setPopup(
+      //     {
+      //       popup: "popup.html"
+      //     }
+      //   );
+      // }
+    }
+  }
+);
+
+// chrome.runtime.onMessage.addListener(receiveRequest);
+
+// function receiveRequest(request, sender, sendResponse) {
+//   console.log("Request received");
+//   console.dir(request);
+
+//   if (request.task === "foundFriend") {
+//     foundFriend(request.friendsArray);
+//   } else if (request.task === "updateStats") {
+//     updateStats();
+//   }
+// }
+
+// function updateStats() {
+//   chrome.storage.sync.get(
+//     [
+//       "gamesJoined",
+//       "runTime",
+//       "playersFound"
+//     ],
+//     function(response) {
+//       $("#games-joined").text(response.gamesJoined);
+//       $("#run-time").text(msToTime(response.runTime));
+//       $("#players-found").text(playersFound.length);
+//     }
+//   );
+// }
+
+// Steps to take when one or more friends are found
+function foundFriend(friendsArray) {
+  if (friendsArray.length > 1) {
+    $("#found-friend-title").text("Friends");
+  }
+  $("#found-friend-p").text(friendsArray.join(", "));
+  $("#found-friend").show();
+
+  chrome.storage.sync.get(
+    [
+      "startTime",
+      "runTime",
+      "totalFriendsFound",
+      "totalRunTime"
+    ],
+    function(response) {
+      let currentTime = new Date().getTime();
+      let finalRunTime = currentTime - response.startTime;
+
+      let newTotalFriendsFound = 1;
+      if (typeof response.totalFriendsFound !== 'undefined') {
+        newTotalFriendsFound += response.totalFriendsFound;
+      }
+
+      let newTotalRunTime = finalRunTime;
+      if (typeof response.totalRunTime !== 'undefined') {
+        newTotalRunTime += totalRunTime;
+      }
+
+      chrome.storage.sync.set(
+        {
+          "runTime": finalRunTime,
+          "endTime": currentTime,
+          "totalFriendsFound": newTotalFriendsFound,
+          "totalRunTime": newTotalRunTime
+        }
+      );
+      $("#run-time").text(msToTime(finalRunTime));
+    }
+  );
+}
+
+// Converts ms to a readable time format (MM:SS.M)
+function msToTime(duration) {
+  let milliseconds = parseInt((duration % 1000) / 100);
+  let seconds = Math.floor((duration / 1000) % 60);
+  let minutes = Math.floor((duration / (1000 * 60)) % 60);
+
+  minutes = (minutes < 10) ? "0" + minutes : minutes;
+  seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+  return minutes + ":" + seconds + "." + milliseconds;
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   // Check for enter press on input
   $("#friend-name").keypress(
@@ -64,12 +211,19 @@ document.addEventListener("DOMContentLoaded", function () {
     $("#character-error").hide();
     $("#duplicate-error").hide();
 
-    if (getFriendsArray().length === 0) {
+    let friendsArray = getFriendsEntered();
+
+    if (friendsArray === 0) {
       $("#friend-error").show();
     } else {
       chrome.storage.sync.set(
         {
-          "status": "search"
+          "friends": friendsArray,
+          "status": "search",
+          "gamesJoined": 0,
+          "endTime": -1,
+          "runTime": -1,
+          "playersFound": []
         },
         function() {
           $("#friend-error").hide();
@@ -108,23 +262,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
           chrome.windows.create(
             {
-              url: SKRIBBLIO_URL,
-              state: "minimized"
+              // state: "minimized"
             },
             function(window) {
               let currentTime = new Date().getTime();
               chrome.storage.sync.set(
                 {
                   "windowId": window.id,
-                  "gamesJoined": 0,
-                  "startTime": currentTime,
-                  "endTime": -1,
-                  "runTime": -1,
-                  "playersFound": []
-                }, function() {
-                  let tabId = window.tabs[0].id;
-                  console.log("tabId: " + tabId);
-                  joinNewGameAfterPageLoad(tabId);
+                  "startTime": currentTime
+                },
+                function() {
+                  joinNewGame(window.tabs[0].id);
                 }
               );
             }
@@ -184,34 +332,67 @@ document.addEventListener("DOMContentLoaded", function () {
         $("#character-error").hide();
         $("#duplicate-error").hide();
 
-        if (getFriendsArray().length === 0) {
+        let friendsArray = getFriendsEntered();
+
+        if (friendsArray === 0) {
           $("#friend-error").show();
         } else {
-          $("#friend-error").hide();
+          chrome.storage.sync.set(
+            {
+              "friends": friendsArray
+            },
+            function() {
+              $("#friend-error").hide();
 
-          $("#resume-col").hide();
-          $("#pause-col").show();
-          $("#spinner").show();
+              $("#resume-col").hide();
+              $("#pause-col").show();
+              $("#spinner").show();
 
-          chrome.storage.sync.get(
-            [
-              "windowId"
-            ],
-            function(response) {
-              chrome.windows.get(
-                response.windowId,
-                {
-                  "populate": true
-                },
-                function(window) {
-                  let tabId = window.tabs[0].id;
-                  console.log("tabId: " + tabId);
-                  refreshTab(tabId);
+              chrome.storage.sync.get(
+                [
+                  "windowId"
+                ],
+                function(response) {
+                  chrome.windows.get(
+                    response.windowId,
+                    {
+                      "populate": true
+                    },
+                    function(window) {
+                      let tabId = window.tabs[0].id;
+                      console.log("tabId: " + tabId);
+                      joinNewGame(tabId);
+                    }
+                  );
                 }
               );
             }
           );
         }
+      }
+    );
+  }
+
+  // Retrieves the friends entered
+  function getFriendsEntered() {
+    let friendsArray = []
+    Array.from(document.querySelector("#friends").children).forEach(
+      (item, index) => {
+        let friend = item.innerText.split(" ").slice(0, -1).join(" ");
+        friendsArray.push(friend);
+      }
+    )
+
+    return friendsArray;
+  }
+
+  // Steps to take when a new game needs to be joined
+  function joinNewGame(tabId) {
+    console.log("Sending join new game message");
+    backgroundPort.postMessage(
+      {
+        tabId: tabId,
+        task: "joinNewGame"
       }
     );
   }
@@ -252,253 +433,29 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     );
   }
-
-  // Steps to take when a new game needs to be joined
-  function joinNewGameAfterPageLoad(correctTabId) {
-    let alive = true;
-    chrome.tabs.onUpdated.addListener(
-      function(tabId, changeInfo, tab) {
-        if (alive) {
-              chrome.storage.sync.get(
-                [
-                  "status"
-                ],
-                function(response) {
-              if (
-                response.status === "search"
-                && tabId === correctTabId
-                && tab.url.indexOf(SKRIBBLIO_URL) != -1
-                && changeInfo.status == 'complete'
-              )
-              {
-                console.log("Sending message to join new game");
-                alive = false;
-                chrome.tabs.sendMessage(
-                  tabId,
-                  {
-                    tabId: tabId
-                  },
-                  respondToContent
-                );
+  // Creates a new tab - not used currently
+  function createTab(windowId) {
+    return new Promise(
+      resolve => {
+        chrome.tabs.create(
+          {
+            windowId: id,
+            url: SKRIBBLIO_URL,
+            active: false
+          },
+          async tab => {
+            chrome.tabs.onUpdated.addListener(
+              function listener (tabId, info) {
+                if (info.status === 'complete' && tabId === tab.id) {
+                  chrome.tabs.onUpdated.removeListener(listener);
+                  resolve(tab);
+                }
               }
-            }
-          );
-        } else {
-          return;
-        }
-      }
-    );
-  }
-
-  // Processes the response from the content of a game
-  function respondToContent(response) {
-    updateStorage();
-
-    if (response === null) {
-      console.log("Response was null");
-    } else {
-      console.log("Searching players for friends");
-
-      let playersArray = response.players;
-      console.dir(`playersArray: ${playersArray.toString()}`);
-      let tabId = response.tabId;
-
-      if (playersArray.length > 1) {
-        updatePlayersFound(playersArray);
-
-        let friendsFound = [];
-        let friendsArray = getFriendsArray();
-
-        for (const friend of friendsArray) {
-          if (playersArray.includes(friend)) {
-            friendsFound.push(friend);
-          }
-        }
-
-        if (friendsFound.length === 0) {
-          console.log("No friends found");
-          refreshTab(tabId);
-        } else {
-          foundFriend(friendsFound, tabId);
-        }
-      } else {
-        console.log("Only 1 players was found");
-        refreshTab(tabId);
-      }
-    }
-  }
-
-  // Updates values in storage
-  function updateStorage() {
-    chrome.storage.sync.get(
-      [
-        "gamesJoined",
-        "startTime",
-        "runTime",
-        "totalGamesJoined"
-      ],
-      function(response) {
-        console.dir(response);
-        let newGamesJoined = response.gamesJoined + 1;
-        $("#games-joined").text(newGamesJoined);
-
-        let startTime = response.startTime;
-        let newRunTime = new Date().getTime() - startTime;
-        $("#run-time").text(msToTime(newRunTime));
-
-        let newTotalGamesJoined = 1;
-        if (typeof response.totalGamesJoined !== 'undefined') {
-          newTotalGamesJoined += response.totalGamesJoined;
-        }
-
-        chrome.storage.sync.set(
-          {
-            "gamesJoined": newGamesJoined,
-            "totalGamesJoined": newTotalGamesJoined,
-            "runTime": newRunTime
+            );
           }
         );
       }
     );
-  }
-
-  // Updates the values in storage related to players found or seen
-  function updatePlayersFound(playersArray) {
-    chrome.storage.sync.get(
-      [
-        "playersFound",
-        "totalPlayersSeen"
-      ],
-      function(response) {
-        console.dir(response);
-
-        let playersFound = response.playersFound;
-        let newPlayersFound = [];
-        playersArray.forEach(
-          (element) => {
-            console.log();
-            if (playersFound.indexOf(element) === -1) {
-              newPlayersFound.push(element);
-            }
-          }
-        );
-
-        let totalPlayersFound = newPlayersFound.concat(playersFound);
-
-        let newTotalPlayersSeen = playersArray.length;
-        if (typeof response.totalPlayersSeen !== 'undefined') {
-          newTotalPlayersSeen += response.totalPlayersSeen;
-        }
-
-        chrome.storage.sync.set(
-          {
-            "playersFound": totalPlayersFound,
-            "totalPlayersSeen": newTotalPlayersSeen
-          }
-        );
-
-        $("#players-found").text(totalPlayersFound.length);
-      }
-    );
-  }
-
-  // Retrieves the friends entered
-  function getFriendsArray() {
-    let friendsArray = []
-    Array.from(document.querySelector("#friends").children).forEach(
-      (item, index) => {
-        let friend = item.innerText.split(" ").slice(0, -1).join(" ");
-        friendsArray.push(friend);
-      }
-    )
-
-    return friendsArray;
-  }
-
-
-  // Refreshes a tab
-  function refreshTab(tabId) {
-    chrome.storage.sync.get(
-      [
-        "status"
-      ],
-      function(response) {
-        if (response.status !== "pause") {
-          console.log("Refreshing");
-          chrome.tabs.reload(
-            tabId,
-            function() {
-              console.log("Sending message to start new game");
-              joinNewGameAfterPageLoad(tabId);
-            }
-          );
-        }
-      }
-    );
-  }
-
-  // Steps to take when one or more friends are found
-  function foundFriend(friendsArray, tabId) {
-    stopSearch();
-    console.log(`Friend(s) found: ${friendsArray.to_s}`);
-
-    if (friendsArray.length > 1) {
-      $("#found-friend-title").text("Friends");
-    }
-    $("#found-friend-p").text(friendsArray.join(", "));
-    $("#found-friend").show();
-
-    chrome.storage.sync.get(
-      [
-        "startTime",
-        "runTime",
-        "totalFriendsFound",
-        "totalRunTime"
-      ],
-      function(response) {
-        let currentTime = new Date().getTime();
-        let finalRunTime = currentTime - response.startTime;
-
-        let newTotalFriendsFound = 1;
-        if (typeof response.totalFriendsFound !== 'undefined') {
-          newTotalFriendsFound += response.totalFriendsFound;
-        }
-
-        let newTotalRunTime = finalRunTime;
-        if (typeof response.totalRunTime !== 'undefined') {
-          newTotalRunTime += totalRunTime;
-        }
-
-        chrome.storage.sync.set(
-          {
-            "runTime": finalRunTime,
-            "endTime": currentTime,
-            "totalFriendsFound": newTotalFriendsFound,
-            "totalRunTime": newTotalRunTime
-          }
-        );
-        $("#run-time").text(msToTime(finalRunTime));
-      }
-    );
-
-    chrome.tabs.update(
-      tabId,
-      {
-        active: true
-      }
-    );
-  }
-
-  // Converts ms to a readable time format (MM:SS.M)
-  function msToTime(duration) {
-    let milliseconds = parseInt((duration % 1000) / 100);
-    let seconds = Math.floor((duration / 1000) % 60);
-    let minutes = Math.floor((duration / (1000 * 60)) % 60);
-
-    minutes = (minutes < 10) ? "0" + minutes : minutes;
-    seconds = (seconds < 10) ? "0" + seconds : seconds;
-
-    return minutes + ":" + seconds + "." + milliseconds;
   }
 
   function wait(ms) {
