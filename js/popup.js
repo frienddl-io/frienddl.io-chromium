@@ -1,58 +1,45 @@
-const SKRIBBLIO_URL = "https://skribbl.io/";
-
 let backgroundPort = chrome.runtime.connect(
   {
     name: "p2b"
   }
 );
 
-// chrome.runtime.onConnect.addListener(
-//   function(port) {
-//     if (port.name !== "b2p") {
-//       console.log("Port is not b2p: " + port.name);
-//     } else {
-//       console.log("Port is b2p");
-//       port.onMessage.addListener(
-//         function(message) {
-//           console.dir(message);
-
-//           if (message.task === "getFriendsArray") {
-//             return getFriendsArray();
-//           }
-//         }
-//       );
-//     }
-//   }
-// );
-
 chrome.storage.onChanged.addListener(
   function(changes, namespace) {
+    console.log("Listening");
     for (let key in changes) {
       let storageChange = changes[key];
-        console.log('Storage key "%s" in namespace "%s" changed. ' +
-                    'Old value was "%s", new value is "%s".',
-                    key,
-                    namespace,
-                    storageChange.oldValue,
-                    storageChange.newValue);
-      let updated = false;
+      console.log('Storage key "%s" in namespace "%s" changed. ' +
+                  'Old value was "%s", new value is "%s".',
+                  key,
+                  namespace,
+                  storageChange.oldValue,
+                  storageChange.newValue);
+      console.log("Analyzing");
+      // let updated = false;
       switch(key) {
+        case "foundFriends":
+          console.log("Updating found friends");
+          foundFriend(storageChange.newValue);
+          // updated = true;
+          break;
         case "gamesJoined":
           console.log("Updating games joined");
           $("#games-joined").text(storageChange.newValue);
-          updated = true;
+          // updated = true;
           break;
         case "runTime":
           console.log("Updating run time");
           $("#run-time").text(msToTime(storageChange.newValue));
-          updated = true;
+          // updated = true;
           break;
         case "playersFound":
           console.log("Updating players found");
           $("#players-found").text(storageChange.newValue.length);
-          updated = true;
+          // updated = true;
           break;
       }
+      console.log("Finished analyzing");
 
       // if (updated) {
       //   chrome.browserAction.setPopup(
@@ -432,38 +419,5 @@ document.addEventListener("DOMContentLoaded", function () {
         );
       }
     );
-  }
-  // Creates a new tab - not used currently
-  function createTab(windowId) {
-    return new Promise(
-      resolve => {
-        chrome.tabs.create(
-          {
-            windowId: id,
-            url: SKRIBBLIO_URL,
-            active: false
-          },
-          async tab => {
-            chrome.tabs.onUpdated.addListener(
-              function listener (tabId, info) {
-                if (info.status === 'complete' && tabId === tab.id) {
-                  chrome.tabs.onUpdated.removeListener(listener);
-                  resolve(tab);
-                }
-              }
-            );
-          }
-        );
-      }
-    );
-  }
-
-  function wait(ms) {
-    console.log("Waiting");
-    var start = new Date().getTime();
-    var end = start;
-    while(end < start + ms) {
-      end = new Date().getTime();
-    }
   }
 }, false);

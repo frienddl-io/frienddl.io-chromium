@@ -1,16 +1,5 @@
+console.log("Frienddl.io background script loaded");
 const SKRIBBLIO_URL = "https://skribbl.io/";
-
-// let contentPort = chrome.runtime.connect(
-//   {
-//     name: "b2c"
-//   }
-// );
-// let popupPort = chrome.runtime.connect(
-//   {
-//     name: "bdnadnlj"
-//   }
-// );
-
 console.log("Frienddl.io background script loaded");
 
 chrome.runtime.onConnect.addListener(
@@ -80,13 +69,6 @@ function joinNewGame(tabId) {
               },
               respondToContent
             );
-            // contentPort.postMessage(
-            //   {
-            //     tabId: tabId
-            //   },
-            //   respondToContent
-            // );
-            // return false;
           }
         }
       );
@@ -112,14 +94,6 @@ function respondToContent(response) {
 
     if (playersArray.length > 1) {
       updatePlayersFound(playersArray, tabId);
-
-      // let friendsArray = getFriendsArray();
-      // console.log("Sending message to get getFriendsArray");
-      // let friendsArray = popupPort.postMessage(
-      //   {
-      //     task: "getFriendsArray"
-      //   }
-      // );
 
       chrome.storage.sync.get(
         [
@@ -176,9 +150,6 @@ function updateStorage(tabId) {
           "gamesJoined": newGamesJoined,
           "totalGamesJoined": newTotalGamesJoined,
           "runTime": newRunTime
-        },
-        function() {
-          // updatePopupStats(tabId);
         }
       );
     }
@@ -217,9 +188,6 @@ function updatePlayersFound(playersArray, tabId) {
         {
           "playersFound": totalPlayersFound,
           "totalPlayersSeen": newTotalPlayersSeen
-        },
-        function() {
-          // updatePopupStats(tabId);
         }
       );
     }
@@ -268,20 +236,13 @@ function foundFriend(friendsArray, tabId) {
 
           chrome.storage.sync.set(
             {
+              "foundFriends": friendsArray,
               "runTime": finalRunTime,
               "endTime": currentTime,
               "totalFriendsFound": newTotalFriendsFound,
               "totalRunTime": newTotalRunTime
             },
             function() {
-              console.log("Sending message to join new game");
-              chrome.tabs.sendMessage(
-                tabId,
-                {
-                  task: "foundFriend",
-                  friendsArray: friendsArray
-                }
-              );
             }
           );
         }
@@ -297,11 +258,27 @@ function foundFriend(friendsArray, tabId) {
   );
 }
 
-
-// chrome.runtime.onMessage.addListener(receiveRequest);
-// console.log("Added listener");
-
-// function receiveRequest(request, sender, sendResponse) {
-//   console.log("Request received");
-//   console.dir(request);
-// }
+// Creates a new tab; not used currently but will come in handy for multi-threading
+function createTab(windowId) {
+  return new Promise(
+    resolve => {
+      chrome.tabs.create(
+        {
+          windowId: id,
+          url: SKRIBBLIO_URL,
+          active: false
+        },
+        async tab => {
+          chrome.tabs.onUpdated.addListener(
+            function listener (tabId, info) {
+              if (info.status === 'complete' && tabId === tab.id) {
+                chrome.tabs.onUpdated.removeListener(listener);
+                resolve(tab);
+              }
+            }
+          );
+        }
+      );
+    }
+  );
+}
