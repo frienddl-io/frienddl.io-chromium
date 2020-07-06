@@ -1,2 +1,2 @@
-/css/bootstrap.min.css
-/js/jquery-3.5.1.min.js
+# Ignore minified files
+*.min.*
