@@ -34,7 +34,7 @@ function goToScribblioHomePageAsync(tabId) {
         },
         async tab => {
           chrome.tabs.onUpdated.addListener(
-            function listener (tabId, info) {
+            function listener(tabId, info) {
               if (info.status === 'complete' && tabId === tab.id) {
                 chrome.tabs.onUpdated.removeListener(listener);
                 resolve(tab);
@@ -270,7 +270,7 @@ function createTab(windowId) {
         },
         async tab => {
           chrome.tabs.onUpdated.addListener(
-            function listener (tabId, info) {
+            function listener(tabId, info) {
               if (info.status === 'complete' && tabId === tab.id) {
                 chrome.tabs.onUpdated.removeListener(listener);
                 resolve(tab);
