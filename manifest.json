@@ -1,10 +1,10 @@
 {
-  "name": "frienddlio",
+  "name": "Frienddl.io",
   "version": "0.0.0",
   "manifest_version": 2,
   "browser_action": {
     "default_popup": "html/default.html",
-    "default_title": "Frienddlio"
+    "default_title": "Frienddl.io"
   },
   "content_scripts": [
     {
