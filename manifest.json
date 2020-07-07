@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "manifest_version": 2,
   "browser_action": {
-    "default_popup": "popup.html",
+    "default_popup": "html/default.html",
     "default_title": "Frienddlio"
   },
   "content_scripts": [

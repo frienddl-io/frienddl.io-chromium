@@ -114,3 +114,8 @@ td
 {
   font-size: 20px;
 }
+
+.spinner-border
+{
+  vertical-align: baseline;
+}

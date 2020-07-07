@@ -1,7 +1,8 @@
 console.log("Frienddl.io background script loaded");
-const SKRIBBLIO_URL = "https://skribbl.io/";
-console.log("Frienddl.io background script loaded");
 
+const SKRIBBLIO_URL = "https://skribbl.io/";
+
+// Listen for messages from popup
 chrome.runtime.onConnect.addListener(
   function(port) {
     if (port.name !== "p2b") {
@@ -21,7 +22,6 @@ chrome.runtime.onConnect.addListener(
   }
 );
 
-
 // Updates a tab to go to the Scribbl.io home page
 function goToScribblioHomePageAsync(tabId) {
   return new Promise(
@@ -38,6 +38,8 @@ function goToScribblioHomePageAsync(tabId) {
               if (info.status === 'complete' && tabId === tab.id) {
                 chrome.tabs.onUpdated.removeListener(listener);
                 resolve(tab);
+              } else {
+                console.log(`Not ready | info.status: ${info.status} , Target Tab: ${tabId} , Current Tab: ${tab.id}`);
               }
             }
           );
@@ -47,6 +49,7 @@ function goToScribblioHomePageAsync(tabId) {
   );
 }
 
+// Steps to take when a new game needs to be joined
 function joinNewGame(tabId) {
   console.log("Before async");
   (
@@ -56,10 +59,10 @@ function joinNewGame(tabId) {
 
       chrome.storage.sync.get(
         [
-          "status"
+          "state"
         ],
         function(response) {
-          if (response.status === "search") {
+          if (response.state === "search") {
             console.log("Sending message to join new game");
             chrome.tabs.sendMessage(
               tabId,
@@ -75,7 +78,6 @@ function joinNewGame(tabId) {
     }
   )();
 }
-
 
 // Processes the response from the content of a game
 function respondToContent(response) {
@@ -100,8 +102,6 @@ function respondToContent(response) {
           "friends"
         ],
         function(response) {
-          console.log("friendsArray: " + response.friends.toString());
-
           for (const friend of response.friends) {
             if (playersArray.includes(friend)) {
               friendsFound.push(friend);
@@ -194,21 +194,11 @@ function updatePlayersFound(playersArray, tabId) {
   );
 }
 
-// function updatePopupStats(tabId) {
-//   console.log("Sending message to update stats");
-//   chrome.tabs.sendMessage(
-//     tabId,
-//     {
-//       task: "updateStats"
-//     }
-//   );
-// }
-
 // Steps to take when one or more friends are found
 function foundFriend(friendsArray, tabId) {
   chrome.storage.sync.set(
     {
-      "status": "stop"
+      "state": "stop"
     },
     function() {
       console.log("Search marked as stopped");
@@ -222,7 +212,7 @@ function foundFriend(friendsArray, tabId) {
         ],
         function(response) {
           let currentTime = new Date().getTime();
-          let finalRunTime = currentTime - response.startTime;
+          let finalRunTime = getCurrentRunTime(response.startTime, currentTime);
 
           let newTotalFriendsFound = 1;
           if (typeof response.totalFriendsFound !== 'undefined') {
@@ -281,4 +271,12 @@ function createTab(windowId) {
       );
     }
   );
+}
+
+// Returns the current run time
+function getCurrentRunTime(startTime, currentTime = undefined) {
+  if (currentTime === undefined) {
+    currentTime = new Date().getTime();
+  }
+  return currentTime - startTime;
 }

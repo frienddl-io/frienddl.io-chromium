@@ -1,87 +1,38 @@
+console.log("Frienddl.io popup script loaded");
+
+// Create port to send messages to background
 let backgroundPort = chrome.runtime.connect(
   {
     name: "p2b"
   }
 );
 
+// Listen for changes to storage
 chrome.storage.onChanged.addListener(
   function(changes, namespace) {
-    console.log("Listening");
     for (let key in changes) {
       let storageChange = changes[key];
-      console.log('Storage key "%s" in namespace "%s" changed. ' +
-                  'Old value was "%s", new value is "%s".',
-                  key,
-                  namespace,
-                  storageChange.oldValue,
-                  storageChange.newValue);
-      console.log("Analyzing");
-      // let updated = false;
       switch(key) {
         case "foundFriends":
-          console.log("Updating found friends");
           foundFriend(storageChange.newValue);
-          // updated = true;
           break;
         case "gamesJoined":
-          console.log("Updating games joined");
           $("#games-joined").text(storageChange.newValue);
-          // updated = true;
           break;
         case "runTime":
-          console.log("Updating run time");
           $("#run-time").text(msToTime(storageChange.newValue));
-          // updated = true;
           break;
         case "playersFound":
-          console.log("Updating players found");
           $("#players-found").text(storageChange.newValue.length);
-          // updated = true;
           break;
       }
-      console.log("Finished analyzing");
-
-      // if (updated) {
-      //   chrome.browserAction.setPopup(
-      //     {
-      //       popup: "popup.html"
-      //     }
-      //   );
-      // }
     }
   }
 );
 
-// chrome.runtime.onMessage.addListener(receiveRequest);
-
-// function receiveRequest(request, sender, sendResponse) {
-//   console.log("Request received");
-//   console.dir(request);
-
-//   if (request.task === "foundFriend") {
-//     foundFriend(request.friendsArray);
-//   } else if (request.task === "updateStats") {
-//     updateStats();
-//   }
-// }
-
-// function updateStats() {
-//   chrome.storage.sync.get(
-//     [
-//       "gamesJoined",
-//       "runTime",
-//       "playersFound"
-//     ],
-//     function(response) {
-//       $("#games-joined").text(response.gamesJoined);
-//       $("#run-time").text(msToTime(response.runTime));
-//       $("#players-found").text(playersFound.length);
-//     }
-//   );
-// }
-
 // Steps to take when one or more friends are found
 function foundFriend(friendsArray) {
+  updatePopup("success");
   if (friendsArray.length > 1) {
     $("#found-friend-title").text("Friends");
   }
@@ -90,34 +41,10 @@ function foundFriend(friendsArray) {
 
   chrome.storage.sync.get(
     [
-      "startTime",
-      "runTime",
-      "totalFriendsFound",
-      "totalRunTime"
+      "runTime"
     ],
     function(response) {
-      let currentTime = new Date().getTime();
-      let finalRunTime = currentTime - response.startTime;
-
-      let newTotalFriendsFound = 1;
-      if (typeof response.totalFriendsFound !== 'undefined') {
-        newTotalFriendsFound += response.totalFriendsFound;
-      }
-
-      let newTotalRunTime = finalRunTime;
-      if (typeof response.totalRunTime !== 'undefined') {
-        newTotalRunTime += totalRunTime;
-      }
-
-      chrome.storage.sync.set(
-        {
-          "runTime": finalRunTime,
-          "endTime": currentTime,
-          "totalFriendsFound": newTotalFriendsFound,
-          "totalRunTime": newTotalRunTime
-        }
-      );
-      $("#run-time").text(msToTime(finalRunTime));
+      $("#run-time").text(msToTime(response.runTime));
     }
   );
 }
@@ -135,7 +62,42 @@ function msToTime(duration) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Check for enter press on input
+  // Set values of friends and stats from storage on popup startup
+  chrome.storage.sync.get(
+    [
+      "friends",
+      "gamesJoined",
+      "playersFound",
+      "state",
+      "startTime",
+      "runTime"
+    ],
+    function(response) {
+      let friendsArray = response.friends;
+      friendsArray.forEach(
+        function(friendName) {
+          console.log(friendName);
+          let id = `${friendName}-entered`;
+          addFriendButton(id, friendName);
+        }
+      );
+
+      $("#games-joined").text(response.gamesJoined);
+      $("#players-found").text(response.playersFound.length);
+      let runtime = "";
+      if (response.state === "search") {
+        runtime = getCurrentRunTime(response.startTime);
+      } else if (response.state === "pause") {
+        runtime = response.runTime;
+      }
+
+      if (runtime !== "") {
+        $("#run-time").text(msToTime(runtime));
+      }
+    }
+  );
+
+  // Check for enter press on friend input
   $("#friend-name").keypress(
     function(event) {
       let keycode = (event.keyCode ? event.keyCode : event.which);
@@ -146,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   );
 
-  // Listen for Add button click
+  // Listen for button that adds a friend
   $("#add").bind("click", addFriend);
 
   // Steps to take when a friend is to be added
@@ -161,27 +123,30 @@ document.addEventListener("DOMContentLoaded", function () {
       $("#character-error").hide();
       $("#friend-name").val('');
       let id = `${friendName}-entered`;
-      console.log($(id));
+      console.log("Checking exists");
       let exists = $(`#${id}`).length !== 0;
 
       if (!exists) {
         $("#duplicate-error").hide();
-        let btn = document.createElement("BUTTON");
-
-        btn.id = id;
-        btn.type = "button";
-        btn.classList.add("btn");
-        btn.classList.add("rounded");
-        btn.classList.add("btn-outline-danger");
-
-        btn.innerHTML = friendName + " <span aria-hidden='true'>&times;</span>";
-        btn.onclick = function () {
-          console.log(`Removing friend: ${friendName}`);
-          this.parentElement.removeChild(this);
-        };
-
-        console.log(`Adding friend: ${friendName}`);
-        document.querySelector('#friends').append(btn);
+        chrome.storage.sync.get(
+          [
+            "friends"
+          ],
+          function(response) {
+            let friendsArray = response.friends;
+            console.log(friendsArray.toString());
+            friendsArray.push(friendName);
+            chrome.storage.sync.set(
+              {
+                "friends": friendsArray
+              },
+              function() {
+                console.log("Adding friend");
+                addFriendButton(id, friendName);
+              }
+            );
+          }
+        );
       } else {
         console.log(`Friend has already been added: ${friendName}`);
         $("#duplicate-error").show();
@@ -189,10 +154,56 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Listen for buttons that start search
+  // Creates a button for a friend
+  function addFriendButton(id, friendName) {
+    let btn = document.createElement("BUTTON");
+
+    btn.id = id;
+    btn.type = "button";
+    btn.classList.add("btn");
+    btn.classList.add("rounded");
+    btn.classList.add("btn-outline-danger");
+
+    btn.innerHTML = friendName + " <span aria-hidden='true'>&times;</span>";
+    btn.onclick = removeFriend;
+
+    console.log(`Adding friend button: ${friendName}`);
+    document.querySelector('#friends').append(btn);
+  }
+
+  // Removes a button for a friend and updates storage
+  function removeFriend() {
+    let friendName = getFriendNameFromButton(this);
+    console.log(`Removing friend: ${friendName}`);
+    this.parentElement.removeChild(this);
+
+    chrome.storage.sync.get(
+      [
+        "friends"
+      ],
+      function(response) {
+        let friendsArray = response.friends;
+        let newFriendsArray = [];
+
+        for(let i = 0; i < friendsArray.length; i++) {
+          if (friendsArray[i] !== friendName) {
+            newFriendsArray.push(friendsArray[i])
+          }
+        }
+
+        chrome.storage.sync.set(
+          {
+            "friends": newFriendsArray
+          }
+        )
+      }
+    );
+  }
+
+  // Listen for button that starts search
   $("#start-button").bind("click", startSearch);
 
-  // Steps to take for searching needs to be started
+  // Steps to take when searching needs to be started
   function startSearch() {
     this.blur();
     $("#character-error").hide();
@@ -200,13 +211,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let friendsArray = getFriendsEntered();
 
-    if (friendsArray === 0) {
+    if (friendsArray.length === 0) {
       $("#friend-error").show();
     } else {
+      updatePopup("search");
       chrome.storage.sync.set(
         {
           "friends": friendsArray,
-          "status": "search",
+          "state": "search",
           "gamesJoined": 0,
           "endTime": -1,
           "runTime": -1,
@@ -228,7 +240,6 @@ document.addEventListener("DOMContentLoaded", function () {
           $("#run-time").text("00:00.0");
           $("#stats").show();
 
-
           chrome.storage.sync.get(
             [
               "totalTimesSearched"
@@ -248,9 +259,7 @@ document.addEventListener("DOMContentLoaded", function () {
           );
 
           chrome.windows.create(
-            {
-              // state: "minimized"
-            },
+            {},
             function(window) {
               let currentTime = new Date().getTime();
               chrome.storage.sync.set(
@@ -275,9 +284,10 @@ document.addEventListener("DOMContentLoaded", function () {
   // Steps to take when searching needs to be paused
   function pauseSearch() {
     this.blur();
+    updatePopup("pause");
     chrome.storage.sync.set(
       {
-        "status": "pause"
+        "state": "pause"
       },
       function() {
         console.log("Pausing search");
@@ -291,10 +301,9 @@ document.addEventListener("DOMContentLoaded", function () {
               "startTime"
             ],
             function(response) {
-            let currentTime = new Date().getTime();
             chrome.storage.sync.set(
               {
-                "runTime": currentTime - response.startTime
+                "runTime": getCurrentRunTime(response.startTime)
               }
             );
           }
@@ -309,9 +318,10 @@ document.addEventListener("DOMContentLoaded", function () {
   // Steps to take when searching needs to be resumed
   function resumeSearch() {
     this.blur();
+    updatePopup("search");
     chrome.storage.sync.set(
       {
-        "status": "search"
+        "state": "search"
       },
       function() {
         console.log("Resuming search");
@@ -360,12 +370,17 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
+  // Extracts the name of a friend from a button
+  function getFriendNameFromButton(element) {
+    return element.innerText.split(" ").slice(0, -1).join(" ");
+  }
+
   // Retrieves the friends entered
   function getFriendsEntered() {
     let friendsArray = []
     Array.from(document.querySelector("#friends").children).forEach(
-      (item, index) => {
-        let friend = item.innerText.split(" ").slice(0, -1).join(" ");
+      (element, index) => {
+        let friend = getFriendNameFromButton(element);
         friendsArray.push(friend);
       }
     )
@@ -390,9 +405,10 @@ document.addEventListener("DOMContentLoaded", function () {
   // Steps to take when searching needs to be stopped
   function stopSearch() {
     this.blur();
+    updatePopup("stop");
     chrome.storage.sync.set(
       {
-        "status": "stop"
+        "state": "stop"
       },
       function() {
         console.log("Stopping search");
@@ -411,7 +427,7 @@ document.addEventListener("DOMContentLoaded", function () {
             chrome.storage.sync.set(
               {
                 "endTime": currentTime,
-                "runTime": currentTime - response.startTime
+                "runTime": getCurrentRunTime(response.startTime, currentTime)
               }
             );
             chrome.windows.remove(response.windowId);
@@ -419,5 +435,42 @@ document.addEventListener("DOMContentLoaded", function () {
         );
       }
     );
+  }
+
+  // Updates the popup to a predefined HTML file
+  function updatePopup(state) {
+    let popupFile = "";
+
+    switch(state) {
+      case "search":
+        popupFile = "html/search.html";
+        break;
+      case "pause":
+        popupFile = "html/pause.html";
+        break;
+      case "stop":
+        popupFile = "html/default.html";
+        break;
+      case "success":
+        popupFile = "html/success.html";
+        break;
+    }
+    if (popupFile !== "") {
+      chrome.browserAction.setPopup(
+        {
+          popup: popupFile
+        }
+      );
+    } else {
+      console.log(`State invalid: ${state}`);
+    }
+  }
+
+  // Returns the current run time
+  function getCurrentRunTime(startTime, currentTime = undefined) {
+    if (currentTime === undefined) {
+      currentTime = new Date().getTime();
+    }
+    return currentTime - startTime;
   }
 }, false);
