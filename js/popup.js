@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ],
     function(response) {
       let friendsArray = response.friends;
-      if (friendsArray.length !== 0) {
+      if (friendsArray !== undefined) {
         friendsArray.forEach(
           function(friendName) {
             console.log(friendName);
@@ -100,8 +100,14 @@ document.addEventListener("DOMContentLoaded", function () {
         );
       }
 
-      $("#games-joined").text(response.gamesJoined);
-      $("#players-found").text(response.playersFound.length);
+      if (response.gamesJoined !== undefined) {
+        $("#games-joined").text(response.gamesJoined);
+      }
+
+      if (response.gamesJoined !== undefined) {
+        $("#players-found").text(response.playersFound.length);
+      }
+      
       let runtime = "";
       if (response.state === "search") {
         runtime = getCurrentRunTime(response.startTime);
