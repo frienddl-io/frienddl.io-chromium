@@ -7,6 +7,20 @@ let backgroundPort = chrome.runtime.connect(
   }
 );
 
+// Colors for badge
+const SEARCH_BADGE_COLOR = {
+  color: "#28a745"
+};
+const PAUSE_BADGE_COLOR = {
+  color: "#ffc107"
+};
+const STOP_BADGE_COLOR = {
+  color: "#dc3545"
+};
+const SUCCESS_BADGE_COLOR = {
+  color: "#007bff"
+};
+
 // Listen for changes to storage
 chrome.storage.onChanged.addListener(
   function(changes, namespace) {
@@ -33,6 +47,8 @@ chrome.storage.onChanged.addListener(
 // Steps to take when one or more friends are found
 function foundFriend(friendsArray) {
   updatePopup("success");
+  chrome.browserAction.setBadgeBackgroundColor(SUCCESS_BADGE_COLOR);
+
   if (friendsArray.length > 1) {
     $("#found-friend-title").text("Friends");
   }
@@ -268,6 +284,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   "startTime": currentTime
                 },
                 function() {
+                  chrome.browserAction.setBadgeBackgroundColor(SEARCH_BADGE_COLOR);
                   joinNewGame(window.tabs[0].id);
                 }
               );
@@ -285,6 +302,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function pauseSearch() {
     this.blur();
     updatePopup("pause");
+    chrome.browserAction.setBadgeBackgroundColor(PAUSE_BADGE_COLOR);
     chrome.storage.sync.set(
       {
         "state": "pause"
@@ -319,6 +337,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function resumeSearch() {
     this.blur();
     updatePopup("search");
+    chrome.browserAction.setBadgeBackgroundColor(SEARCH_BADGE_COLOR);
     chrome.storage.sync.set(
       {
         "state": "search"
@@ -406,6 +425,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function stopSearch() {
     this.blur();
     updatePopup("stop");
+    chrome.browserAction.setBadgeBackgroundColor(STOP_BADGE_COLOR);
     chrome.storage.sync.set(
       {
         "state": "stop"

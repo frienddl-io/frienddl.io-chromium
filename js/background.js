@@ -1,6 +1,9 @@
 console.log("Frienddl.io background script loaded");
 
 const SKRIBBLIO_URL = "https://skribbl.io/";
+const SUCCESS_BADGE_TEXT = {
+  text: "!"
+};
 
 // Listen for messages from popup
 chrome.runtime.onConnect.addListener(
@@ -99,7 +102,8 @@ function respondToContent(response) {
 
       chrome.storage.sync.get(
         [
-          "friends"
+          "friends",
+          "state"
         ],
         function(response) {
           for (const friend of response.friends) {
@@ -111,7 +115,9 @@ function respondToContent(response) {
           let friendsFound = [];
           if (friendsFound.length === 0) {
             console.log("No friends found");
-            joinNewGame(tabId);
+            if (response.state === "search") {
+              joinNewGame(tabId);
+            }
           } else {
             foundFriend(friendsFound, tabId);
           }
@@ -136,6 +142,11 @@ function updateStorage(tabId) {
     function(response) {
       console.dir(response);
       let newGamesJoined = response.gamesJoined + 1;
+      chrome.browserAction.setBadgeText(
+        {
+          text: newGamesJoined.toString()
+        }
+      );
 
       let startTime = response.startTime;
       let newRunTime = new Date().getTime() - startTime;
@@ -201,7 +212,7 @@ function foundFriend(friendsArray, tabId) {
       "state": "stop"
     },
     function() {
-      console.log("Search marked as stopped");
+      chrome.browserAction.setBadgeText(SUCCESS_BADGE_TEXT);
 
       chrome.storage.sync.get(
         [
