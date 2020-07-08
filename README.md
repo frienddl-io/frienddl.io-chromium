@@ -13,14 +13,10 @@
     ```
 
 2. Navigate to the directory: `cd frienddlio`
-3. Download compressed, production jQuery `3.5.1` from the [official website](https://jquery.com/download) saving it in the `js` directory
-4. Download Bootstrap `v.4.3.1` from the [official website](https://getbootstrap.com/docs/4.3/getting-started/download/)
-5. Extract and move the `bootstrap.min.css` file to the `css` directory
-6. Open the Extensions page in Chrome: `chrome://extensions/`
-7. Turn on developer mode in the top right corner
-8. Click "Load unpacked" at the top left
-9. Select the `frienddlio` directory
-10. If it loads successfully the extension will show
+3. Open the Extensions page in Chrome: `chrome://extensions/`
+4. Turn on developer mode in the top right corner
+5. Click "Load unpacked" at the top left
+6. Select the `frienddlio` directory
 
 ## Contributions
 

@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (response.gamesJoined !== undefined) {
         $("#players-found").text(response.playersFound.length);
       }
-      
+
       let runtime = "";
       if (response.state === "search") {
         runtime = getCurrentRunTime(response.startTime);
@@ -157,8 +157,11 @@ document.addEventListener("DOMContentLoaded", function () {
             "friends"
           ],
           function(response) {
-            let friendsArray = response.friends;
-            console.log(friendsArray.toString());
+            let friendsArray = [];
+            if (friendsArray !== undefined) {
+              friendsArray.concat(response.friends);
+            }
+
             friendsArray.push(friendName);
             chrome.storage.sync.set(
               {
