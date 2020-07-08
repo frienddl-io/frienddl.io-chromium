@@ -90,13 +90,15 @@ document.addEventListener("DOMContentLoaded", function () {
     ],
     function(response) {
       let friendsArray = response.friends;
-      friendsArray.forEach(
-        function(friendName) {
-          console.log(friendName);
-          let id = `${friendName}-entered`;
-          addFriendButton(id, friendName);
-        }
-      );
+      if (friendsArray.length !== 0) {
+        friendsArray.forEach(
+          function(friendName) {
+            console.log(friendName);
+            let id = `${friendName}-entered`;
+            addFriendButton(id, friendName);
+          }
+        );
+      }
 
       $("#games-joined").text(response.gamesJoined);
       $("#players-found").text(response.playersFound.length);
