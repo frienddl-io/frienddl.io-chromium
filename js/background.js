@@ -106,13 +106,13 @@ function respondToContent(response) {
           "state"
         ],
         function(response) {
+          let friendsFound = [];
           for (const friend of response.friends) {
             if (playersArray.includes(friend)) {
               friendsFound.push(friend);
             }
           }
 
-          let friendsFound = [];
           if (friendsFound.length === 0) {
             console.log("No friends found");
             if (response.state === "search") {
