@@ -98,6 +98,10 @@ document.addEventListener("DOMContentLoaded", function () {
             addFriendButton(id, friendName);
           }
         );
+
+        if (response.state === "search") {
+          updateDisabledPropOfForm(true);
+        }
       }
 
       if (response.gamesJoined !== undefined) {
@@ -190,6 +194,8 @@ document.addEventListener("DOMContentLoaded", function () {
     btn.classList.add("btn");
     btn.classList.add("rounded");
     btn.classList.add("btn-outline-danger");
+    btn.classList.add("friend-button");
+    btn.classList.add("enabled-friend-button");
 
     btn.innerHTML = friendName + " <span aria-hidden='true'>&times;</span>";
     btn.onclick = removeFriend;
@@ -232,6 +238,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Steps to take when searching needs to be started
   function startSearch() {
+    console.log("Starting search");
+
     this.blur();
     $("#character-error").hide();
     $("#duplicate-error").hide();
@@ -253,6 +261,7 @@ document.addEventListener("DOMContentLoaded", function () {
         },
         function() {
           $("#friend-error").hide();
+          updateDisabledPropOfForm(true);
 
           $("#resume-col").hide();
           $("#pause-col").show();
@@ -311,6 +320,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Steps to take when searching needs to be paused
   function pauseSearch() {
+    console.log("Pausing search");
+
     this.blur();
     updatePopup("pause");
     chrome.browserAction.setBadgeBackgroundColor(PAUSE_BADGE_COLOR);
@@ -319,7 +330,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "state": "pause"
       },
       function() {
-        console.log("Pausing search");
+        updateDisabledPropOfForm(false);
 
         $("#spinner").hide();
         $("#pause-col").hide();
@@ -346,6 +357,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Steps to take when searching needs to be resumed
   function resumeSearch() {
+    console.log("Resuming search");
+
     this.blur();
     updatePopup("search");
     chrome.browserAction.setBadgeBackgroundColor(SEARCH_BADGE_COLOR);
@@ -354,7 +367,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "state": "search"
       },
       function() {
-        console.log("Resuming search");
+        updateDisabledPropOfForm(true)
 
         $("#character-error").hide();
         $("#duplicate-error").hide();
@@ -434,6 +447,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Steps to take when searching needs to be stopped
   function stopSearch() {
+    console.log("Stopping search");
+
     this.blur();
     updatePopup("stop");
     chrome.browserAction.setBadgeBackgroundColor(STOP_BADGE_COLOR);
@@ -446,6 +461,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         $("#spinner").hide();
         $("#search-buttons").hide();
+        updateDisabledPropOfForm(false);
         $("#start-button").show();
 
         chrome.storage.sync.get(
@@ -466,6 +482,19 @@ document.addEventListener("DOMContentLoaded", function () {
         );
       }
     );
+  }
+
+  // Updates all form elements to be either enabled or disabled
+  function updateDisabledPropOfForm(state) {
+    $("#friend-name").prop("disabled", state);
+    $("#add").prop("disabled", state);
+    $("#friends button").prop("disabled", state);
+
+    if (state) {
+      $("#friends button").removeClass("enabled-friend-button");
+    } else {
+      $("#friends button").addClass("enabled-friend-button");
+    }
   }
 
   // Updates the popup to a predefined HTML file

@@ -69,13 +69,13 @@ td
   margin: 0 10px 10px 0;
 }
 
-.btn-outline-danger
+.friend-button
 {
   color: #fff !important;
   border-color: #fff !important;
 }
 
-.btn-outline-danger:hover
+.enabled-friend-button:hover
 {
   color: #fff !important;
   background-color: #a35048 !important;
