@@ -94,7 +94,6 @@ function respondToContent(response) {
     console.log("Searching players for friends");
 
     let playersArray = response.players;
-    console.dir(`playersArray: ${playersArray.toString()}`);
     let tabId = response.tabId;
 
     if (playersArray.length > 1) {
@@ -152,7 +151,7 @@ function updateStorage(tabId) {
       let newRunTime = new Date().getTime() - startTime;
 
       let newTotalGamesJoined = 1;
-      if (typeof response.totalGamesJoined !== 'undefined') {
+      if (response.totalGamesJoined !== undefined) {
         newTotalGamesJoined += response.totalGamesJoined;
       }
 
@@ -207,11 +206,13 @@ function updatePlayersFound(playersArray, tabId) {
 
 // Steps to take when one or more friends are found
 function foundFriend(friendsArray, tabId) {
+  console.log("Found friend");
   chrome.storage.sync.set(
     {
       "state": "stop"
     },
     function() {
+      updatePopupToSuccess();
       chrome.browserAction.setBadgeText(SUCCESS_BADGE_TEXT);
 
       chrome.storage.sync.get(
@@ -219,75 +220,88 @@ function foundFriend(friendsArray, tabId) {
           "startTime",
           "runTime",
           "totalFriendsFound",
-          "totalRunTime"
+          "totalRunTime",
+          "windowId"
         ],
         function(response) {
           let currentTime = new Date().getTime();
           let finalRunTime = getCurrentRunTime(response.startTime, currentTime);
 
           let newTotalFriendsFound = 1;
-          if (typeof response.totalFriendsFound !== 'undefined') {
+          if (response.totalFriendsFound !== undefined) {
             newTotalFriendsFound += response.totalFriendsFound;
           }
 
           let newTotalRunTime = finalRunTime;
-          if (typeof response.totalRunTime !== 'undefined') {
-            newTotalRunTime += totalRunTime;
+          if (response.totalRunTime !== undefined) {
+            newTotalRunTime += response.totalRunTime;
           }
 
           chrome.storage.sync.set(
             {
-              "foundFriends": friendsArray,
+              "friendsFound": friendsArray,
               "runTime": finalRunTime,
               "endTime": currentTime,
               "totalFriendsFound": newTotalFriendsFound,
               "totalRunTime": newTotalRunTime
-            },
-            function() {
+            }
+          );
+
+          chrome.windows.update(
+            response.windowId,
+            {
+              drawAttention: true
             }
           );
         }
       );
+    }
+  );
+}
 
-      chrome.tabs.update(
-        tabId,
-        {
-          active: true
-        }
-      );
+// Updates the popup to a predefined success HTML file
+function updatePopupToSuccess() {
+  let popupFile = "html/success.html";
+
+  chrome.browserAction.setPopup(
+    {
+      popup: popupFile
     }
   );
 }
 
 // Creates a new tab; not used currently but will come in handy for multi-threading
-function createTab(windowId) {
+function createTab() {
   return new Promise(
     resolve => {
-      chrome.tabs.create(
-        {
-          windowId: id,
-          url: SKRIBBLIO_URL,
-          active: false
-        },
-        async tab => {
-          chrome.tabs.onUpdated.addListener(
-            function listener(tabId, info) {
-              if (info.status === 'complete' && tabId === tab.id) {
-                chrome.tabs.onUpdated.removeListener(listener);
-                resolve(tab);
+      chrome.storage.sync.get(
+        [
+          "windowId"
+        ],
+        function(response) {
+          if (response.windowId !== undefined) {
+            chrome.tabs.create(
+              {
+                windowId: response.windowId,
+                url: SKRIBBLIO_URL,
+                active: false
+              },
+              async tab => {
+                chrome.tabs.onUpdated.addListener(
+                  function listener(tabId, info) {
+                    if (info.status === 'complete' && tabId === tab.id) {
+                      chrome.tabs.onUpdated.removeListener(listener);
+                      resolve(tab);
+                    }
+                  }
+                );
               }
-            }
-          );
+            );
+          } else {
+            console.error("Window ID not in storage");
+          }
         }
       );
     }
   );
-}
-
-// Returns the current run time
-function getCurrentRunTime(startTime, currentTime = undefined) {
-  if (currentTime === undefined) {
-    currentTime = new Date().getTime();
-  }
-  return currentTime - startTime;
 }

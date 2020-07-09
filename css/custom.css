@@ -11,13 +11,10 @@ body
   padding: 10px;
 }
 
-h1,
-h2,
-h3,
-p,
+#title,
+#instructions,
 th,
 td,
-span,
 #spinner
 {
   color: #fff;
@@ -92,16 +89,10 @@ td
   margin-bottom: 5px;
 }
 
-#errors div
+#errors div,
+#found-friend
 {
   margin-bottom: 10px;
-}
-
-#found-friend h3,
-#found-friend span
-{
-  margin-bottom: 10px;
-  color: rgb(193, 255, 198);
 }
 
 .table td,

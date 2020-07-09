@@ -1,5 +1,9 @@
 console.log("Frienddl.io popup script loaded");
 
+const SUCCESS_BADGE_TEXT = {
+  text: "!"
+};
+
 // Create port to send messages to background
 let backgroundPort = chrome.runtime.connect(
   {
@@ -18,7 +22,7 @@ const STOP_BADGE_COLOR = {
   color: "#dc3545"
 };
 const SUCCESS_BADGE_COLOR = {
-  color: "#007bff"
+  color: "#17A2B8"
 };
 
 // Listen for changes to storage
@@ -27,7 +31,8 @@ chrome.storage.onChanged.addListener(
     for (let key in changes) {
       let storageChange = changes[key];
       switch(key) {
-        case "foundFriends":
+        case "friendsFound":
+          console.log("Friend found");
           foundFriend(storageChange.newValue);
           break;
         case "gamesJoined":
@@ -47,7 +52,13 @@ chrome.storage.onChanged.addListener(
 // Steps to take when one or more friends are found
 function foundFriend(friendsArray) {
   updatePopup("success");
+  chrome.browserAction.setBadgeText(SUCCESS_BADGE_TEXT);
   chrome.browserAction.setBadgeBackgroundColor(SUCCESS_BADGE_COLOR);
+
+  updateDisabledPropOfForm(false);
+  $("#spinner").hide();
+  $("#search-buttons").hide();
+  $("#start-button").show();
 
   if (friendsArray.length > 1) {
     $("#found-friend-title").text("Friends");
@@ -63,6 +74,48 @@ function foundFriend(friendsArray) {
       $("#run-time").text(msToTime(response.runTime));
     }
   );
+}
+
+// Updates the popup to a predefined HTML file
+function updatePopup(state) {
+  let popupFile = "";
+
+  switch(state) {
+    case "search":
+      popupFile = "html/search.html";
+      break;
+    case "pause":
+      popupFile = "html/pause.html";
+      break;
+    case "stop":
+      popupFile = "html/default.html";
+      break;
+    case "success":
+      popupFile = "html/success.html";
+      break;
+  }
+  if (popupFile !== "") {
+    chrome.browserAction.setPopup(
+      {
+        popup: popupFile
+      }
+    );
+  } else {
+    console.error(`State to update popup invalid: ${state}`);
+  }
+}
+
+// Updates all form elements to be either enabled or disabled
+function updateDisabledPropOfForm(state) {
+  $("#friend-name").prop("disabled", state);
+  $("#add").prop("disabled", state);
+  $("#friends button").prop("disabled", state);
+
+  if (state) {
+    $("#friends button").removeClass("enabled-friend-button");
+  } else {
+    $("#friends button").addClass("enabled-friend-button");
+  }
 }
 
 // Converts ms to a readable time format (MM:SS.M)
@@ -81,6 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Set values of friends and stats from storage on popup startup
   chrome.storage.sync.get(
     [
+      "friendsFound",
       "friends",
       "gamesJoined",
       "playersFound",
@@ -122,6 +176,10 @@ document.addEventListener("DOMContentLoaded", function () {
       if (runtime !== "") {
         $("#run-time").text(msToTime(runtime));
       }
+
+      if (response.friendsFound !== undefined && response.friendsFound.length > 0) {
+        foundFriend(response.friendsFound)
+      }
     }
   );
 
@@ -150,20 +208,22 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
       $("#character-error").hide();
       $("#friend-name").val('');
+
       let id = `${friendName}-entered`;
-      console.log("Checking exists");
       let exists = $(`#${id}`).length !== 0;
 
       if (!exists) {
         $("#duplicate-error").hide();
+        console.log(`Adding friend: ${friendName}`);
+
         chrome.storage.sync.get(
           [
             "friends"
           ],
           function(response) {
             let friendsArray = [];
-            if (friendsArray !== undefined) {
-              friendsArray.concat(response.friends);
+            if (response.friends !== undefined) {
+              friendsArray = friendsArray.concat(response.friends);
             }
 
             friendsArray.push(friendName);
@@ -172,7 +232,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 "friends": friendsArray
               },
               function() {
-                console.log("Adding friend");
                 addFriendButton(id, friendName);
               }
             );
@@ -257,7 +316,8 @@ document.addEventListener("DOMContentLoaded", function () {
           "gamesJoined": 0,
           "endTime": -1,
           "runTime": -1,
-          "playersFound": []
+          "playersFound": [],
+          "friendsFound": []
         },
         function() {
           $("#friend-error").hide();
@@ -268,6 +328,7 @@ document.addEventListener("DOMContentLoaded", function () {
           $("#stop-col").show();
           $("#search-buttons").show();
           $("#start-button").hide();
+          $("#found-friend").hide();
 
           $("#spinner").show();
 
@@ -282,7 +343,8 @@ document.addEventListener("DOMContentLoaded", function () {
             ],
             function(response) {
               let newTotalTimesSearched = 1;
-              if (typeof response.totalTimesSearched !== 'undefined') {
+
+              if (response.totalTimesSearched !== undefined) {
                 newTotalTimesSearched += response.totalTimesSearched;
               }
 
@@ -305,7 +367,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 function() {
                   chrome.browserAction.setBadgeBackgroundColor(SEARCH_BADGE_COLOR);
-                  joinNewGame(window.tabs[0].id);
+                  joinNewGame(window.id, window.tabs[0].id);
                 }
               );
             }
@@ -401,7 +463,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     function(window) {
                       let tabId = window.tabs[0].id;
                       console.log("tabId: " + tabId);
-                      joinNewGame(tabId);
+                      joinNewGame(window.id, tabId);
                     }
                   );
                 }
@@ -432,10 +494,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Steps to take when a new game needs to be joined
-  function joinNewGame(tabId) {
+  function joinNewGame(windowId, tabId) {
     console.log("Sending join new game message");
     backgroundPort.postMessage(
       {
+        windowId: tabId,
         tabId: tabId,
         task: "joinNewGame"
       }
@@ -457,8 +520,6 @@ document.addEventListener("DOMContentLoaded", function () {
         "state": "stop"
       },
       function() {
-        console.log("Stopping search");
-
         $("#spinner").hide();
         $("#search-buttons").hide();
         updateDisabledPropOfForm(false);
@@ -482,48 +543,6 @@ document.addEventListener("DOMContentLoaded", function () {
         );
       }
     );
-  }
-
-  // Updates all form elements to be either enabled or disabled
-  function updateDisabledPropOfForm(state) {
-    $("#friend-name").prop("disabled", state);
-    $("#add").prop("disabled", state);
-    $("#friends button").prop("disabled", state);
-
-    if (state) {
-      $("#friends button").removeClass("enabled-friend-button");
-    } else {
-      $("#friends button").addClass("enabled-friend-button");
-    }
-  }
-
-  // Updates the popup to a predefined HTML file
-  function updatePopup(state) {
-    let popupFile = "";
-
-    switch(state) {
-      case "search":
-        popupFile = "html/search.html";
-        break;
-      case "pause":
-        popupFile = "html/pause.html";
-        break;
-      case "stop":
-        popupFile = "html/default.html";
-        break;
-      case "success":
-        popupFile = "html/success.html";
-        break;
-    }
-    if (popupFile !== "") {
-      chrome.browserAction.setPopup(
-        {
-          popup: popupFile
-        }
-      );
-    } else {
-      console.log(`State invalid: ${state}`);
-    }
   }
 
   // Returns the current run time

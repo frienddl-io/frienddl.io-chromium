@@ -11,7 +11,7 @@
   </head>
   <body>
     <div class="container-fluid">
-      <h1 class="h1 center">
+      <h1 id="title" class="h1 center">
         Frienddl.io
       </h1>
       <p id="instructions">
@@ -64,11 +64,12 @@
         &nbsp;Searching...
       </div>
 
-      <div id="found-friend" class="center" style="display: none;">
+      <div id="found-friend" class="center alert alert-success" role="alert" style="display: none;">
         <h3 class="h3 center"><span id="found-friend-title">
           Friend</span> Found!
         </h3>
-        <p id="found-friend-p"></p>
+        <hr>
+        <p id="found-friend-p" class="mb-0"></p>
       </div>
 
       <div id="stats">
