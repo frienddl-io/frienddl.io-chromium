@@ -1,6 +1,10 @@
-# <span>Frienddl.io</span>
+<p align="center">
+<img src="img/logo.png" alt="Traefik" title="Traefik" />
+</p>
 
-[Chrome extension](https://developer.chrome.com/extensions) allowing users to find friends on [Scribbl.io](https://skribbl.io/), an online drawing & guessing game.
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/containous/traefik/blob/master/LICENSE.md)
+
+frienddl.io is a [Chrome extension](https://developer.chrome.com/extensions) allowing users to find friends on [skribbl.io](https://skribbl.io/), a free online multiplayer drawing & guessing game.
 
 **Status:** Unpublished, still in beta
 
@@ -29,7 +33,3 @@ Follow these steps to contribute:
 3. Make changes
 4. Test changes by running the application locally
 5. When satisfied with changes, open a pull request with screenshots of your testing evidence
-
-## License
-
-[MIT](/LICENSE)

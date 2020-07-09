@@ -1,4 +1,4 @@
-console.log("Frienddl.io content script loaded");
+console.log("frienddl.io content script loaded");
 
 // Listen for messages from background
 chrome.runtime.onMessage.addListener(receiveRequest);
@@ -7,51 +7,60 @@ function receiveRequest(request, sender, sendResponse) {
   console.log("Request received");
   console.dir(request);
 
-  console.log("Waiting for play button");
-  var checkIfPlayButtonExists = setInterval(
-    function() {
-      console.log("Checking if play button exists");
-      console.log($("button[type='submit']"));
-      if ($("button[type='submit']").length >= 2) {
-        console.log("Play button exists, clicking now");
-
-        let playButton = $("button[type='submit']")[0];
-        console.log("Clicking play button");
-        playButton.click();
-        clearInterval(checkIfPlayButtonExists);
-      }
-    },
-    100
-  );
-
-  console.log("Waiting for players");
-  var checkIfPlayersExist = setInterval(
-    function() {
-      if ($('.player').length >= 2) {
-        console.log("Players exist");
-
-        let playersArray = [];
-        $('.player').each(
+  chrome.storage.sync.get(
+    [
+      "state"
+    ],
+    function(response) {
+      if (response.state === "search") {
+        console.log("Waiting for play button");
+        var checkIfPlayButtonExists = setInterval(
           function() {
-            let playerName = $(this).find(".name").html();
-            if (playerName !== null && playerName !== "" && !(playersArray.includes(playerName))) {
-              playersArray.push(playerName);
+            console.log("Checking if play button exists");
+            console.log($("button[type='submit']"));
+            if ($("button[type='submit']").length >= 2) {
+              console.log("Play button exists, clicking now");
+
+              let playButton = $("button[type='submit']")[0];
+              console.log("Clicking play button");
+              playButton.click();
+              clearInterval(checkIfPlayButtonExists);
             }
-          }
+          },
+          100
         );
 
-        clearInterval(checkIfPlayersExist);
-        console.log("playersArray: " + playersArray.toString());
-        console.log("Sending response");
-        sendResponse(
-          {
-            players: playersArray,
-            tabId: request.tabId
-          }
+        console.log("Waiting for players");
+        var checkIfPlayersExist = setInterval(
+          function() {
+            if ($('.player').length >= 2) {
+              console.log("Players exist");
+
+              let playersArray = [];
+              $('.player').each(
+                function() {
+                  let playerName = $(this).find(".name").html();
+                  if (playerName !== null && playerName !== "" && !(playersArray.includes(playerName))) {
+                    playersArray.push(playerName);
+                  }
+                }
+              );
+
+              clearInterval(checkIfPlayersExist);
+              console.log("playersArray: " + playersArray.toString());
+              console.log("Sending response");
+              sendResponse(
+                {
+                  players: playersArray,
+                  tabId: request.tabId
+                }
+              );
+            }
+          },
+          100
         );
       }
-    },
-    100
+    }
   );
 
   return true;

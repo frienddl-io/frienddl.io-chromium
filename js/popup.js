@@ -1,8 +1,4 @@
-console.log("Frienddl.io popup script loaded");
-
-const SUCCESS_BADGE_TEXT = {
-  text: "!"
-};
+console.log("frienddl.io popup script loaded");
 
 // Create port to send messages to background
 let backgroundPort = chrome.runtime.connect(
@@ -11,19 +7,14 @@ let backgroundPort = chrome.runtime.connect(
   }
 );
 
+// Text for badge
+const SUCCESS_BADGE_TEXT = "!";
+
 // Colors for badge
-const SEARCH_BADGE_COLOR = {
-  color: "#28a745"
-};
-const PAUSE_BADGE_COLOR = {
-  color: "#ffc107"
-};
-const STOP_BADGE_COLOR = {
-  color: "#dc3545"
-};
-const SUCCESS_BADGE_COLOR = {
-  color: "#17A2B8"
-};
+const SEARCH_BADGE_COLOR = "#28a745";
+const PAUSE_BADGE_COLOR = "#ffc107";
+const STOP_BADGE_COLOR = "#dc3545";
+const SUCCESS_BADGE_COLOR = "#17A2B8";
 
 // Listen for changes to storage
 chrome.storage.onChanged.addListener(
@@ -31,8 +22,12 @@ chrome.storage.onChanged.addListener(
     for (let key in changes) {
       let storageChange = changes[key];
       switch(key) {
+        case "state":
+          if (storageChange.newValue === "stop") {
+            searchIsStopped();
+          }
+          break;
         case "friendsFound":
-          console.log("Friend found");
           foundFriend(storageChange.newValue);
           break;
         case "gamesJoined":
@@ -51,9 +46,7 @@ chrome.storage.onChanged.addListener(
 
 // Steps to take when one or more friends are found
 function foundFriend(friendsArray) {
-  updatePopup("success");
-  chrome.browserAction.setBadgeText(SUCCESS_BADGE_TEXT);
-  chrome.browserAction.setBadgeBackgroundColor(SUCCESS_BADGE_COLOR);
+  updatePopupAndBadge("success");
 
   updateDisabledPropOfForm(false);
   $("#spinner").hide();
@@ -76,21 +69,59 @@ function foundFriend(friendsArray) {
   );
 }
 
+// Steps to take when searching has been stopped
+function searchIsStopped() {
+  $("#spinner").hide();
+  $("#search-buttons").hide();
+  updateDisabledPropOfForm(false);
+  $("#start-button").show()
+}
+
 // Updates the popup to a predefined HTML file
-function updatePopup(state) {
+function updatePopupAndBadge(state) {
   let popupFile = "";
 
+  console.log(`Making popup & bade updates for: ${state}`)
   switch(state) {
     case "search":
+      console.log("Search!");
+      chrome.browserAction.setBadgeBackgroundColor(
+        {
+          color: SEARCH_BADGE_COLOR
+        }
+      );
       popupFile = "html/search.html";
       break;
     case "pause":
+      console.log("'Pause'!");
+      chrome.browserAction.setBadgeBackgroundColor(
+        {
+          color: PAUSE_BADGE_COLOR
+        }
+      );
       popupFile = "html/pause.html";
       break;
     case "stop":
+      console.log("Stop!");
+      chrome.browserAction.setBadgeBackgroundColor(
+        {
+          color: STOP_BADGE_COLOR
+        }
+      );
       popupFile = "html/default.html";
       break;
     case "success":
+      console.log("Success!");
+      chrome.browserAction.setBadgeText(
+        {
+          text: SUCCESS_BADGE_TEXT
+        }
+      );
+      chrome.browserAction.setBadgeBackgroundColor(
+        {
+          color: SUCCESS_BADGE_COLOR
+        }
+      );
       popupFile = "html/success.html";
       break;
   }
@@ -107,8 +138,8 @@ function updatePopup(state) {
 
 // Updates all form elements to be either enabled or disabled
 function updateDisabledPropOfForm(state) {
-  $("#friend-name").prop("disabled", state);
-  $("#add").prop("disabled", state);
+  $("#friend-input").prop("disabled", state);
+  $("#add-friend").prop("disabled", state);
   $("#friends button").prop("disabled", state);
 
   if (state) {
@@ -143,6 +174,7 @@ document.addEventListener("DOMContentLoaded", function () {
       "runTime"
     ],
     function(response) {
+      let currentlySearching = response.state === "search";
       let friendsArray = response.friends;
       if (friendsArray !== undefined) {
         friendsArray.forEach(
@@ -153,7 +185,7 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         );
 
-        if (response.state === "search") {
+        if (currentlySearching) {
           updateDisabledPropOfForm(true);
         }
       }
@@ -167,7 +199,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       let runtime = "";
-      if (response.state === "search") {
+      if (currentlySearching) {
         runtime = getCurrentRunTime(response.startTime);
       } else if (response.state === "pause") {
         runtime = response.runTime;
@@ -184,7 +216,7 @@ document.addEventListener("DOMContentLoaded", function () {
   );
 
   // Check for enter press on friend input
-  $("#friend-name").keypress(
+  $("#friend-input").keypress(
     function(event) {
       let keycode = (event.keyCode ? event.keyCode : event.which);
       if (keycode == '13') {
@@ -195,19 +227,19 @@ document.addEventListener("DOMContentLoaded", function () {
   );
 
   // Listen for button that adds a friend
-  $("#add").bind("click", addFriend);
+  $("#add-friend").bind("click", addFriend);
 
   // Steps to take when a friend is to be added
   function addFriend() {
     this.blur();
     $("#friend-error").hide();
 
-    let friendName = $("#friend-name").val();
+    let friendName = $("#friend-input").val();
     if (friendName === "") {
       $("#character-error").show();
     } else {
       $("#character-error").hide();
-      $("#friend-name").val('');
+      $("#friend-input").val('');
 
       let id = `${friendName}-entered`;
       let exists = $(`#${id}`).length !== 0;
@@ -308,7 +340,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (friendsArray.length === 0) {
       $("#friend-error").show();
     } else {
-      updatePopup("search");
+      console.log("Before startSearch()");
+      updatePopupAndBadge("search");
       chrome.storage.sync.set(
         {
           "friends": friendsArray,
@@ -366,7 +399,6 @@ document.addEventListener("DOMContentLoaded", function () {
                   "startTime": currentTime
                 },
                 function() {
-                  chrome.browserAction.setBadgeBackgroundColor(SEARCH_BADGE_COLOR);
                   joinNewGame(window.id, window.tabs[0].id);
                 }
               );
@@ -385,8 +417,7 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Pausing search");
 
     this.blur();
-    updatePopup("pause");
-    chrome.browserAction.setBadgeBackgroundColor(PAUSE_BADGE_COLOR);
+    updatePopupAndBadge("pause");
     chrome.storage.sync.set(
       {
         "state": "pause"
@@ -422,8 +453,8 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Resuming search");
 
     this.blur();
-    updatePopup("search");
-    chrome.browserAction.setBadgeBackgroundColor(SEARCH_BADGE_COLOR);
+    console.log("Before resumeSearch()");
+    updatePopupAndBadge("search");
     chrome.storage.sync.set(
       {
         "state": "search"
@@ -513,17 +544,13 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Stopping search");
 
     this.blur();
-    updatePopup("stop");
-    chrome.browserAction.setBadgeBackgroundColor(STOP_BADGE_COLOR);
+    updatePopupAndBadge("stop");
     chrome.storage.sync.set(
       {
         "state": "stop"
       },
       function() {
-        $("#spinner").hide();
-        $("#search-buttons").hide();
-        updateDisabledPropOfForm(false);
-        $("#start-button").show();
+        searchIsStopped();
 
         chrome.storage.sync.get(
           [

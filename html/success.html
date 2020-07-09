@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <title>
-      Frienddl.io
+      frienddl.io
     </title>
     <!-- Bootstrap -->
     <link href="../css/bootstrap.min.css" rel="stylesheet">
@@ -11,15 +11,16 @@
   </head>
   <body>
     <div class="container-fluid">
-      <h1 id="title" class="h1 center">
-        Frienddl.io
-      </h1>
+      <div  id="title" class="center">
+        <img src="../img/title.png" alt="frienddl.io">
+      </div>
       <p id="instructions">
-        Enter your friends then search to find them on Scribbl.io
+        Enter your friends then search to find them on Skribbl.io
       </p>
 
       <div class="input-group mb-3">
-        <input id="friend-name" type="text" class="form-control" placeholder="Friend" aria-label="Friend" aria-describedby="basic-addon2">
+        <img id="pencil" src="../img/pencil.gif" alt="pencil icon">
+        <input id="friend-input" type="text" class="form-control" placeholder="Friend" aria-label="Friend" aria-describedby="basic-addon2">
         <div class="input-group-append">
           <button id="add" class="btn btn-secondary" type="button">Add</button>
         </div>
@@ -35,12 +36,12 @@
             Resume
           </button>
         </div>
-        <div id="pause-col" class="col">
+        <div id="pause-col" class="col" style="display: none;">
           <button id="pause-button" class="btn btn-warning btn-lg btn-block" type="submit">
             Pause
           </button>
         </div>
-        <div id="stop-col" class="col">
+        <div id="stop-col" class="col" style="display: none;">
           <button id="stop-button" class="btn btn-danger btn-lg btn-block" type="submit">
             Stop
           </button>
@@ -60,11 +61,11 @@
       </div>
 
       <div id="spinner" class="btn btn-block" style="display: none;">
-        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        <img src="../img/spinner.gif" height="35px">
         &nbsp;Searching...
       </div>
 
-      <div id="found-friend" class="center alert alert-success" role="alert" style="display: none;">
+      <div id="found-friend" class="center alert alert-success" role="alert">
         <h3 class="h3 center"><span id="found-friend-title">
           Friend</span> Found!
         </h3>

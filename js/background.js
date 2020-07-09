@@ -1,9 +1,13 @@
-console.log("Frienddl.io background script loaded");
+console.log("frienddl.io background script loaded");
 
 const SKRIBBLIO_URL = "https://skribbl.io/";
-const SUCCESS_BADGE_TEXT = {
-  text: "!"
-};
+
+// Text for badge
+const SUCCESS_BADGE_TEXT = "!";
+
+// Colors for badge
+const STOP_BADGE_COLOR = "#dc3545";
+const SUCCESS_BADGE_COLOR = "#17A2B8";
 
 // Listen for messages from popup
 chrome.runtime.onConnect.addListener(
@@ -25,8 +29,24 @@ chrome.runtime.onConnect.addListener(
   }
 );
 
-// Updates a tab to go to the Scribbl.io home page
-function goToScribblioHomePageAsync(tabId) {
+// Listen for window to close
+chrome.windows.onRemoved.addListener(
+  function (windowId) {
+    chrome.storage.sync.get(
+      [
+        "windowId"
+      ],
+      function(response) {
+        if(windowId === response.windowId) {
+          stopSearch();
+        }
+      }
+    );
+  }
+);
+
+// Updates a tab to go to the skribbl.io home page
+function goToSkribblioHomePageAsync(tabId) {
   return new Promise(
     resolve => {
       chrome.tabs.update(
@@ -57,7 +77,7 @@ function joinNewGame(tabId) {
   console.log("Before async");
   (
     async() => {
-      let tab = await goToScribblioHomePageAsync(tabId);
+      let tab = await goToSkribblioHomePageAsync(tabId);
       console.dir(tab);
 
       chrome.storage.sync.get(
@@ -86,10 +106,12 @@ function joinNewGame(tabId) {
 function respondToContent(response) {
   console.log("Received response from content");
   console.dir(response);
-  updateStorage(response.tabId);
+  updateStorage();
 
-  if (response === null) {
-    console.log("Response was null");
+  if (response === undefined) {
+    let lastError = chrome.runtime.lastError.message;
+    console.log(`Response was undefined, last error: ${lastError}`);
+    // stopSearch();
   } else {
     console.log("Searching players for friends");
 
@@ -129,8 +151,34 @@ function respondToContent(response) {
   }
 }
 
+function stopSearch() {
+  chrome.storage.sync.set(
+    {
+      "state": "stop"
+    },
+    function() {
+      updatePopupAndBadge("stop");
+
+      chrome.storage.sync.get(
+        [
+          "startTime"
+        ],
+        function(response) {
+          let currentTime = new Date().getTime();
+          chrome.storage.sync.set(
+            {
+              "endTime": currentTime,
+              "runTime": getCurrentRunTime(response.startTime, currentTime)
+            }
+          );
+        }
+      );
+    }
+  );
+}
+
 // Updates values in storage
-function updateStorage(tabId) {
+function updateStorage() {
   chrome.storage.sync.get(
     [
       "gamesJoined",
@@ -212,8 +260,7 @@ function foundFriend(friendsArray, tabId) {
       "state": "stop"
     },
     function() {
-      updatePopupToSuccess();
-      chrome.browserAction.setBadgeText(SUCCESS_BADGE_TEXT);
+      updatePopupAndBadge("success");
 
       chrome.storage.sync.get(
         [
@@ -259,15 +306,46 @@ function foundFriend(friendsArray, tabId) {
   );
 }
 
-// Updates the popup to a predefined success HTML file
-function updatePopupToSuccess() {
-  let popupFile = "html/success.html";
+// Updates the popup to a predefined HTML file
+function updatePopupAndBadge(state) {
+  let popupFile = "";
 
-  chrome.browserAction.setPopup(
-    {
-      popup: popupFile
-    }
-  );
+  console.log(`Making popup & bade updates for: ${state}`)
+  switch(state) {
+    case "stop":
+      console.log("Stop!");
+      chrome.browserAction.setBadgeBackgroundColor(
+        {
+          color: STOP_BADGE_COLOR
+        }
+      );
+      popupFile = "html/default.html";
+      break;
+    case "success":
+      console.log("Success!");
+      chrome.browserAction.setBadgeText(
+        {
+          text: SUCCESS_BADGE_TEXT
+        }
+      );
+      chrome.browserAction.setBadgeBackgroundColor(
+        {
+          color: SUCCESS_BADGE_COLOR
+        }
+      );
+      popupFile = "html/success.html";
+      break;
+  }
+  if (popupFile !== "") {
+    chrome.browserAction.setPopup(
+      {
+        popup: popupFile
+      }
+    );
+    console.log("Popup file set to " + popupFile);
+  } else {
+    console.error(`State to update popup invalid: ${state}`);
+  }
 }
 
 // Creates a new tab; not used currently but will come in handy for multi-threading
@@ -304,4 +382,12 @@ function createTab() {
       );
     }
   );
+}
+
+// Returns the current run time
+function getCurrentRunTime(startTime, currentTime = undefined) {
+  if (currentTime === undefined) {
+    currentTime = new Date().getTime();
+  }
+  return currentTime - startTime;
 }

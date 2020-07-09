@@ -1,3 +1,4 @@
+/* Shared */
 html,
 body
 {
@@ -11,7 +12,12 @@ body
   padding: 10px;
 }
 
-#title,
+.center
+{
+  margin: auto;
+  text-align: center;
+}
+
 #instructions,
 th,
 td,
@@ -20,27 +26,38 @@ td,
   color: #fff;
 }
 
-.center
+#title,
+#friend-error
 {
-  margin: auto;
-  text-align: center;
+  margin-bottom: 5px;
 }
 
+#errors div,
+#found-friend
+{
+  margin-bottom: 10px;
+}
+
+/* Header */
 #instructions
 {
   text-align: center;
   margin-bottom: 10px;
 }
 
-#stats th
+/* Form */
+
+#pencil
 {
-  font-weight: bold;
-  text-align: right;
+  height: 38px;
+  margin-right: 10px;
 }
 
-#stats td
+#friend-input
 {
-  font-weight: normal;
+  border-radius: .25rem;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 #start-button,
@@ -49,16 +66,6 @@ td,
 #stop-button
 {
   margin-bottom: 15px;
-}
-
-th
-{
-  width: 60%;
-}
-
-td
-{
-  width: 40%;
 }
 
 #friends button
@@ -84,29 +91,34 @@ td
   color: rgb(255, 154, 154);
 }
 
-#friend-error
-{
-  margin-bottom: 5px;
-}
-
-#errors div,
-#found-friend
-{
-  margin-bottom: 10px;
-}
-
-.table td,
-.table th
-{
-  padding: .4rem;
-}
+/* Search */
 
 #spinner
 {
   font-size: 20px;
 }
 
-.spinner-border
+#spinner img
 {
-  vertical-align: baseline;
+  height: 35px;
+  vertical-align: top;
+}
+
+#stats th
+{
+  font-weight: bold;
+  text-align: right;
+  width: 60%;
+}
+
+#stats td
+{
+  font-weight: normal;
+  width: 40%;
+}
+
+.table td,
+.table th
+{
+  padding: .4rem;
 }
