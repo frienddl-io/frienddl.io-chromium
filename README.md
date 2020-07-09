@@ -33,3 +33,10 @@ Follow these steps to contribute:
 3. Make changes
 4. Test changes by running the application locally
 5. When satisfied with changes, open a pull request with screenshots of your testing evidence
+
+## Credit
+
+* Font in logo: [Kimberly Geswein](http://www.kimberlygeswein.com/)
+* GIFs and background image: [skribbl.io](https://skribbl.io/)
+* JS library: [jQuery](https://jquery.com/)
+* CSS framework: [Bootstrap](https://getbootstrap.com/)
