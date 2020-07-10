@@ -3,7 +3,7 @@
 </p>
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/blakegearin/frienddlio/blob/main/LICENSE.md)
-[![](https://img.shields.io/npm/v/@backstage/core?label=Version)](https://github.com/blakegearin/frienddlio/releases)
+[![](https://img.shields.io/badge/version-1.0.1-brightgreen)](https://github.com/blakegearin/frienddlio/releases)
 
 frienddl.io is a [Chrome extension](https://developer.chrome.com/extensions) to find friends on [skribbl.io](https://skribbl.io/), a free online multiplayer drawing & guessing game.
 
