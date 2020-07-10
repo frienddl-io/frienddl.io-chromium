@@ -313,6 +313,11 @@ function updatePopupAndBadge(state) {
           color: STOP_BADGE_COLOR
         }
       );
+      chrome.browserAction.setBadgeText(
+        {
+          text: ""
+        }
+      );
       popupFile = "html/default.html";
       break;
     case "success":

@@ -100,6 +100,11 @@ function updatePopupAndBadge(state) {
       popupFile = "html/pause.html";
       break;
     case "stop":
+      chrome.browserAction.setBadgeText(
+        {
+          text: ""
+        }
+      );
       chrome.browserAction.setBadgeBackgroundColor(
         {
           color: STOP_BADGE_COLOR
