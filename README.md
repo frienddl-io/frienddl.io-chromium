@@ -1,10 +1,11 @@
 <p align="center">
-<img src="img/logo.png" alt="Traefik" title="Traefik" />
+  <img id="logo" src="img/logo.png" class="center" alt="frienddl.io" title="frienddl.io" />
 </p>
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/containous/traefik/blob/master/LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/blakegearin/frienddlio/blob/main/LICENSE.md)
+[![](https://img.shields.io/npm/v/@backstage/core?label=Version)](https://github.com/blakegearin/frienddlio/releases)
 
-frienddl.io is a [Chrome extension](https://developer.chrome.com/extensions) allowing users to find friends on [skribbl.io](https://skribbl.io/), a free online multiplayer drawing & guessing game.
+frienddl.io is a [Chrome extension](https://developer.chrome.com/extensions) to find friends on [skribbl.io](https://skribbl.io/), a free online multiplayer drawing & guessing game.
 
 **Status:** Unpublished, still in beta
 
