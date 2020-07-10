@@ -1,6 +1,6 @@
 {
   "name": "frienddl.io",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "manifest_version": 2,
   "browser_action": {
     "default_popup": "html/default.html",
