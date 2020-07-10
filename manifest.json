@@ -1,5 +1,6 @@
 {
   "name": "frienddl.io",
+  "short_name": "frienddl.io",
   "version": "1.0.0",
   "manifest_version": 2,
   "browser_action": {

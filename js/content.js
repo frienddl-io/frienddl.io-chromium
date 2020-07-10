@@ -3,6 +3,18 @@ console.log("frienddl.io content script loaded");
 // Listen for messages from background
 chrome.runtime.onMessage.addListener(receiveRequest);
 
+function checkDisconnected() {
+  let disconnectButton = $("#modalDisconnect button:contains('Ok')");
+  let disconnectVisible = disconnectButton.is(":visible");
+  if (disconnectVisible) {
+    console.log("Disconnected");
+    disconnectButton.click();
+    return true;
+  } else {
+    return false;
+  }
+}
+
 function receiveRequest(request, sender, sendResponse) {
   console.log("Request received");
   console.dir(request);
@@ -33,6 +45,16 @@ function receiveRequest(request, sender, sendResponse) {
         console.log("Waiting for players");
         var checkIfPlayersExist = setInterval(
           function() {
+            let disconnected = checkDisconnected();
+            if (disconnected) {
+              sendResponse(
+                {
+                  players: [],
+                  tabId: request.tabId
+                }
+              );
+            }
+
             if ($('.player').length >= 2) {
               console.log("Players exist");
 
