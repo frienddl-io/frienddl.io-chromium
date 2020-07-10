@@ -84,7 +84,6 @@ function updatePopupAndBadge(state) {
   console.log(`Making popup & bade updates for: ${state}`)
   switch(state) {
     case "search":
-      console.log("Search!");
       chrome.browserAction.setBadgeBackgroundColor(
         {
           color: SEARCH_BADGE_COLOR
@@ -93,7 +92,6 @@ function updatePopupAndBadge(state) {
       popupFile = "html/search.html";
       break;
     case "pause":
-      console.log("'Pause'!");
       chrome.browserAction.setBadgeBackgroundColor(
         {
           color: PAUSE_BADGE_COLOR
@@ -102,7 +100,6 @@ function updatePopupAndBadge(state) {
       popupFile = "html/pause.html";
       break;
     case "stop":
-      console.log("Stop!");
       chrome.browserAction.setBadgeBackgroundColor(
         {
           color: STOP_BADGE_COLOR
@@ -111,7 +108,6 @@ function updatePopupAndBadge(state) {
       popupFile = "html/default.html";
       break;
     case "success":
-      console.log("Success!");
       chrome.browserAction.setBadgeText(
         {
           text: SUCCESS_BADGE_TEXT
@@ -179,7 +175,6 @@ document.addEventListener("DOMContentLoaded", function () {
       if (friendsArray !== undefined) {
         friendsArray.forEach(
           function(friendName) {
-            console.log(friendName);
             let id = `${friendName}-entered`;
             addFriendButton(id, friendName);
           }
@@ -340,7 +335,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (friendsArray.length === 0) {
       $("#friend-error").show();
     } else {
-      console.log("Before startSearch()");
       updatePopupAndBadge("search");
       chrome.storage.sync.set(
         {
@@ -453,7 +447,6 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Resuming search");
 
     this.blur();
-    console.log("Before resumeSearch()");
     updatePopupAndBadge("search");
     chrome.storage.sync.set(
       {
@@ -493,7 +486,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     function(window) {
                       let tabId = window.tabs[0].id;
-                      console.log("tabId: " + tabId);
                       joinNewGame(window.id, tabId);
                     }
                   );

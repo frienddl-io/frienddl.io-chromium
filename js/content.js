@@ -16,8 +16,6 @@ function receiveRequest(request, sender, sendResponse) {
         console.log("Waiting for play button");
         var checkIfPlayButtonExists = setInterval(
           function() {
-            console.log("Checking if play button exists");
-            console.log($("button[type='submit']"));
             if ($("button[type='submit']").length >= 2) {
               console.log("Play button exists, clicking now");
 
@@ -25,6 +23,8 @@ function receiveRequest(request, sender, sendResponse) {
               console.log("Clicking play button");
               playButton.click();
               clearInterval(checkIfPlayButtonExists);
+            } else {
+              console.log("Play button doesn't exist");
             }
           },
           100
@@ -47,14 +47,15 @@ function receiveRequest(request, sender, sendResponse) {
               );
 
               clearInterval(checkIfPlayersExist);
-              console.log("playersArray: " + playersArray.toString());
-              console.log("Sending response");
+              console.log(`Sending response with playersArray: ${playersArray.toString()}`);
               sendResponse(
                 {
                   players: playersArray,
                   tabId: request.tabId
                 }
               );
+            } else {
+              console.log("Players don't exist");
             }
           },
           100

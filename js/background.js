@@ -15,7 +15,7 @@ chrome.runtime.onConnect.addListener(
     if (port.name !== "p2b") {
       console.log("Port is not p2b: " + port.name);
     } else {
-      console.log("Port is p2b");
+      console.log("Connected to p2b");
       port.onMessage.addListener(
         function(message) {
           console.dir(message);
@@ -74,11 +74,10 @@ function goToSkribblioHomePageAsync(tabId) {
 
 // Steps to take when a new game needs to be joined
 function joinNewGame(tabId) {
-  console.log("Before async");
   (
     async() => {
+      console.log("Awaiting skribbl.io home page load");
       let tab = await goToSkribblioHomePageAsync(tabId);
-      console.dir(tab);
 
       chrome.storage.sync.get(
         [
@@ -111,7 +110,6 @@ function respondToContent(response) {
   if (response === undefined) {
     let lastError = chrome.runtime.lastError.message;
     console.log(`Response was undefined, last error: ${lastError}`);
-    // stopSearch();
   } else {
     console.log("Searching players for friends");
 
@@ -222,13 +220,10 @@ function updatePlayersFound(playersArray, tabId) {
       "totalPlayersSeen"
     ],
     function(response) {
-      console.dir(response);
-
       let playersFound = response.playersFound;
       let newPlayersFound = [];
       playersArray.forEach(
         (element) => {
-          console.log();
           if (playersFound.indexOf(element) === -1) {
             newPlayersFound.push(element);
           }
@@ -313,7 +308,6 @@ function updatePopupAndBadge(state) {
   console.log(`Making popup & bade updates for: ${state}`)
   switch(state) {
     case "stop":
-      console.log("Stop!");
       chrome.browserAction.setBadgeBackgroundColor(
         {
           color: STOP_BADGE_COLOR
@@ -322,7 +316,6 @@ function updatePopupAndBadge(state) {
       popupFile = "html/default.html";
       break;
     case "success":
-      console.log("Success!");
       chrome.browserAction.setBadgeText(
         {
           text: SUCCESS_BADGE_TEXT
@@ -342,7 +335,6 @@ function updatePopupAndBadge(state) {
         popup: popupFile
       }
     );
-    console.log("Popup file set to " + popupFile);
   } else {
     console.error(`State to update popup invalid: ${state}`);
   }
