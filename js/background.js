@@ -221,6 +221,9 @@ function updatePlayersFound(playersArray, tabId) {
     ],
     function(response) {
       let playersFound = response.playersFound;
+      if (playersFound !== undefined) {
+        console.dir(playersFound);
+      }
       let newPlayersFound = [];
       playersArray.forEach(
         (element) => {
