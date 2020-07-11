@@ -2,12 +2,23 @@
   <img id="logo" src="img/logo.png" class="center" alt="frienddl.io" title="frienddl.io" />
 </p>
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/blakegearin/frienddlio/blob/main/LICENSE.md)
 [![](https://img.shields.io/badge/version-1.0.1-brightgreen)](https://github.com/blakegearin/frienddlio/releases)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/blakegearin/frienddlio/blob/main/LICENSE.md)
 
 frienddl.io is a [Chrome extension](https://developer.chrome.com/extensions) to find friends on [skribbl.io](https://skribbl.io/), a free online multiplayer drawing & guessing game.
 
 **Status:** Unpublished, still in beta
+
+## Features
+
+- Works in the background so you can focus on other things while waiting
+- Saves your friends so you don't have to type them in repeatedly
+- Pause to add more friends and continue searching
+- Stop to close out the search window
+- Keeps track of search stats
+- Updates badge to show games joined along with color indicators
+- Alerts you when a friend has been found
+- Handles disconnect errors cleanly to keep the search going
 
 ## Getting Started
 
