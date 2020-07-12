@@ -3,6 +3,7 @@
   "short_name": "frienddl.io",
   "version": "1.0.1",
   "manifest_version": 2,
+  "description": "frienddl.io allows you to find friends on skribbl.io, a free online multiplayer drawing & guessing game.",
   "browser_action": {
     "default_popup": "html/default.html",
     "default_title": "frienddl.io"
