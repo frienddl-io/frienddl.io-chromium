@@ -34,6 +34,9 @@ chrome.storage.onChanged.addListener(
           $("#games-joined").text(storageChange.newValue);
           break;
         case "runTime":
+          console.log("37");
+          console.log("old value: " + storageChange.oldValue);
+          console.log("new value: " + storageChange.newValue);
           $("#run-time").text(msToTime(storageChange.newValue));
           break;
         case "playersFound":
@@ -64,6 +67,7 @@ function foundFriend(friendsArray) {
       "runTime"
     ],
     function(response) {
+      console.log("68");
       $("#run-time").text(msToTime(response.runTime));
     }
   );
@@ -208,6 +212,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       if (runtime !== "") {
+        console.log("211");
         $("#run-time").text(msToTime(runtime));
       }
 
@@ -419,6 +424,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     this.blur();
     updatePopupAndBadge("pause");
+
     chrome.storage.sync.set(
       {
         "state": "pause"
@@ -430,14 +436,16 @@ document.addEventListener("DOMContentLoaded", function () {
         $("#pause-col").hide();
         $("#resume-col").show();
 
-          chrome.storage.sync.get(
-            [
-              "startTime"
-            ],
-            function(response) {
+        chrome.storage.sync.get(
+          [
+            "startTime"
+          ],
+          function(response) {
+            let currentTime = new Date().getTime();
             chrome.storage.sync.set(
               {
-                "runTime": getCurrentRunTime(response.startTime)
+                "endTime": currentTime,
+                "runTime": getCurrentRunTime(response.startTime, currentTime)
               }
             );
           }
@@ -548,7 +556,7 @@ document.addEventListener("DOMContentLoaded", function () {
       [
         "state",
         "startTime",
-        "windowId",
+        "windowId"
       ],
       function(response) {
         let state = response.state;
@@ -563,8 +571,13 @@ document.addEventListener("DOMContentLoaded", function () {
             let storageUpdate = {
               "endTime": currentTime
             };
-            if (state != pause) {
+            console.log("572")
+            console.log(state);
+            if (state !== "pause") {
+              console.log("Updating runTime");
               storageUpdate["runTime"] = getCurrentRunTime(response.startTime, currentTime)
+            } else {
+              console.log("Not updating runTime due to previous pause state");
             }
             chrome.storage.sync.set(storageUpdate);
 

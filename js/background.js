@@ -150,27 +150,30 @@ function respondToContent(response) {
 }
 
 function stopSearch() {
-  chrome.storage.sync.set(
-    {
-      "state": "stop"
-    },
-    function() {
-      updatePopupAndBadge("stop");
+  updatePopupAndBadge("stop");
+  chrome.storage.sync.get(
+    [
+      "startTime",
+      "state"
+    ],
+    function(response) {
+      let state = response.state;
+      if (state !== "stop") {
+        let storageUpdate = {
+          "state": "stop"
+        };
 
-      chrome.storage.sync.get(
-        [
-          "startTime"
-        ],
-        function(response) {
+        if (state !== "pause") {
+          console.log("Updating endTime and runTime");
+
           let currentTime = new Date().getTime();
-          chrome.storage.sync.set(
-            {
-              "endTime": currentTime,
-              "runTime": getCurrentRunTime(response.startTime, currentTime)
-            }
-          );
+          storageUpdate["endTime"] = currentTime;
+          storageUpdate["runTime"] = getCurrentRunTime(response.startTime, currentTime);
+        } else {
+          console.log("Not updating endTime and runTime due to previous pause state");
         }
-      );
+        chrome.storage.sync.set(storageUpdate);
+      }
     }
   );
 }
@@ -201,6 +204,7 @@ function updateStorage() {
         newTotalGamesJoined += response.totalGamesJoined;
       }
 
+      console.log("205");
       chrome.storage.sync.set(
         {
           "gamesJoined": newGamesJoined,
@@ -282,6 +286,7 @@ function foundFriend(friendsArray, tabId) {
             newTotalRunTime += response.totalRunTime;
           }
 
+          console.log("286");
           chrome.storage.sync.set(
             {
               "friendsFound": friendsArray,
