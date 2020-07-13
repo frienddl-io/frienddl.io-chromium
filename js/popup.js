@@ -34,9 +34,6 @@ chrome.storage.onChanged.addListener(
           $("#games-joined").text(storageChange.newValue);
           break;
         case "runTime":
-          console.log("37");
-          console.log("old value: " + storageChange.oldValue);
-          console.log("new value: " + storageChange.newValue);
           $("#run-time").text(msToTime(storageChange.newValue));
           break;
         case "playersFound":
@@ -55,6 +52,7 @@ function foundFriend(friendsArray) {
   $("#spinner").hide();
   $("#search-buttons").hide();
   $("#start-button").show();
+  $("#minimized-toggle").prop("disabled", false);
 
   if (friendsArray.length > 1) {
     $("#found-friend-title").text("Friends");
@@ -67,7 +65,6 @@ function foundFriend(friendsArray) {
       "runTime"
     ],
     function(response) {
-      console.log("68");
       $("#run-time").text(msToTime(response.runTime));
     }
   );
@@ -79,6 +76,7 @@ function searchIsStopped() {
   $("#search-buttons").hide();
   updateDisabledPropOfForm(false);
   $("#start-button").show()
+  $("#minimized-toggle").prop("disabled", false);
 }
 
 // Updates the popup to a predefined HTML file
@@ -150,6 +148,7 @@ function updateDisabledPropOfForm(state) {
   if (state) {
     $("#friends button").removeClass("enabled-friend-button");
     $("#input-while-searching").show();
+    $("#minimized-toggle").prop("disabled", state);
   } else {
     $("#friends button").addClass("enabled-friend-button");
     $("#input-while-searching").hide();
@@ -178,7 +177,8 @@ document.addEventListener("DOMContentLoaded", function () {
       "playersFound",
       "state",
       "startTime",
-      "runTime"
+      "runTime",
+      "windowMinimized"
     ],
     function(response) {
       let currentlySearching = response.state === "search";
@@ -194,6 +194,13 @@ document.addEventListener("DOMContentLoaded", function () {
         if (currentlySearching) {
           updateDisabledPropOfForm(true);
         }
+      }
+
+      if (response.windowMinimized !== undefined && response.windowMinimized === false) {
+        console.log("Changing minimized toggle to unchecked");
+        $("#minimized-toggle").prop('checked', false);
+      } else {
+        console.log("Keeping minimized toggle checked");
       }
 
       if (response.gamesJoined !== undefined) {
@@ -212,7 +219,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       if (runtime !== "") {
-        console.log("211");
         $("#run-time").text(msToTime(runtime));
       }
 
@@ -331,6 +337,19 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
+  // Listen for minimized toggle
+  $("#minimized-toggle").bind("click", minimizeToggled);
+
+  function minimizeToggled() {
+    let checked = $(this).is(':checked');
+    console.log(`Setting windowMinimized to ${checked}`);
+    chrome.storage.sync.set(
+      {
+        "windowMinimized": checked
+      }
+    );
+  }
+
   // Listen for button that starts search
   $("#start-button").bind("click", startSearch);
 
@@ -395,8 +414,15 @@ document.addEventListener("DOMContentLoaded", function () {
             }
           );
 
+          let windowSettings = {};
+          let minimizeChecked = $("#minimized-toggle").is(':checked');
+          if (minimizeChecked) {
+            console.log("Setting window to minimized");
+            windowSettings["state"] = "minimized";
+          }
+
           chrome.windows.create(
-            {},
+            windowSettings,
             function(window) {
               let currentTime = new Date().getTime();
               chrome.storage.sync.set(
@@ -571,8 +597,6 @@ document.addEventListener("DOMContentLoaded", function () {
             let storageUpdate = {
               "endTime": currentTime
             };
-            console.log("572")
-            console.log(state);
             if (state !== "pause") {
               console.log("Updating runTime");
               storageUpdate["runTime"] = getCurrentRunTime(response.startTime, currentTime)

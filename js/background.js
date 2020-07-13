@@ -204,7 +204,6 @@ function updateStorage() {
         newTotalGamesJoined += response.totalGamesJoined;
       }
 
-      console.log("205");
       chrome.storage.sync.set(
         {
           "gamesJoined": newGamesJoined,
@@ -286,7 +285,6 @@ function foundFriend(friendsArray, tabId) {
             newTotalRunTime += response.totalRunTime;
           }
 
-          console.log("286");
           chrome.storage.sync.set(
             {
               "friendsFound": friendsArray,

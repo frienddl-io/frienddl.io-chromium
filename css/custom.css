@@ -21,7 +21,8 @@ body
 #instructions,
 th,
 td,
-#spinner
+#spinner,
+label
 {
   color: #fff;
 }
@@ -86,6 +87,30 @@ td,
   border-color: #a35048 !important;
 }
 
+#minimized-option
+{
+  margin-bottom: 5px;
+}
+
+label
+{
+  font-size: 14px;
+}
+
+/* Enabled */
+.custom-control-input:checked~.custom-control-label::before
+{
+  border-color: #28A745 !important;
+  background-color: #28A745 !important;
+}
+
+/* Disabled */
+.custom-control-input:checked:disabled~.custom-control-label::before
+{
+  border-color: #28a745 !important;
+  background-color: #74C687 !important;
+}
+
 .invalid-feedback
 {
   color: rgb(255, 154, 154);
@@ -101,6 +126,7 @@ td,
 #spinner
 {
   font-size: 20px;
+  cursor: default;
 }
 
 #spinner img
