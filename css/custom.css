@@ -91,6 +91,11 @@ td,
   color: rgb(255, 154, 154);
 }
 
+.warning
+{
+  color: rgb(255, 212, 0);
+}
+
 /* Search */
 
 #spinner

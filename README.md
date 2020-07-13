@@ -48,7 +48,8 @@ Follow these steps to contribute:
 
 ## Credit
 
-* Font in logo: [Kimberly Geswein](http://www.kimberlygeswein.com/)
-* GIFs and background image: [skribbl.io](https://skribbl.io/)
-* JS library: [jQuery](https://jquery.com/)
-* CSS framework: [Bootstrap](https://getbootstrap.com/)
+- GIFs and background image: [skribbl.io](https://skribbl.io/)
+- Font in logo: [Kimberly Geswein](http://www.kimberlygeswein.com/)
+- Favicon generation: [Favic-o-Matic](https://favicomatic.com/)
+- JS library: [jQuery](https://jquery.com/)
+- CSS framework: [Bootstrap](https://getbootstrap.com/)

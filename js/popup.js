@@ -145,8 +145,10 @@ function updateDisabledPropOfForm(state) {
 
   if (state) {
     $("#friends button").removeClass("enabled-friend-button");
+    $("#input-while-searching").show();
   } else {
     $("#friends button").addClass("enabled-friend-button");
+    $("#input-while-searching").hide();
   }
 }
 
@@ -542,26 +544,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
     this.blur();
     updatePopupAndBadge("stop");
-    chrome.storage.sync.set(
-      {
-        "state": "stop"
-      },
-      function() {
-        searchIsStopped();
+    chrome.storage.sync.get(
+      [
+        "state",
+        "startTime",
+        "windowId",
+      ],
+      function(response) {
+        let state = response.state;
+        chrome.storage.sync.set(
+          {
+            "state": "stop"
+          },
+          function() {
+            searchIsStopped();
 
-        chrome.storage.sync.get(
-          [
-            "startTime",
-            "windowId"
-          ],
-          function(response) {
             let currentTime = new Date().getTime();
-            chrome.storage.sync.set(
-              {
-                "endTime": currentTime,
-                "runTime": getCurrentRunTime(response.startTime, currentTime)
-              }
-            );
+            let storageUpdate = {
+              "endTime": currentTime
+            };
+            if (state != pause) {
+              storageUpdate["runTime"] = getCurrentRunTime(response.startTime, currentTime)
+            }
+            chrome.storage.sync.set(storageUpdate);
+
             chrome.windows.remove(response.windowId);
           }
         );
