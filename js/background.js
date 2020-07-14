@@ -351,42 +351,6 @@ function updatePopupAndBadge(state) {
   }
 }
 
-// Creates a new tab; not used currently but will come in handy for multi-threading
-function createTab() {
-  return new Promise(
-    resolve => {
-      chrome.storage.sync.get(
-        [
-          "windowId"
-        ],
-        function(response) {
-          if (response.windowId !== undefined) {
-            chrome.tabs.create(
-              {
-                windowId: response.windowId,
-                url: SKRIBBLIO_URL,
-                active: false
-              },
-              async tab => {
-                chrome.tabs.onUpdated.addListener(
-                  function listener(tabId, info) {
-                    if (info.status === 'complete' && tabId === tab.id) {
-                      chrome.tabs.onUpdated.removeListener(listener);
-                      resolve(tab);
-                    }
-                  }
-                );
-              }
-            );
-          } else {
-            console.error("Window ID not in storage");
-          }
-        }
-      );
-    }
-  );
-}
-
 // Returns the current run time
 function getCurrentRunTime(startTime, currentTime = undefined) {
   if (currentTime === undefined) {
