@@ -2,12 +2,12 @@
   <img id="logo" src="img/logo.png" class="center" alt="frienddl.io" title="frienddl.io" />
 </p>
 
-[![](https://img.shields.io/chrome-web-store/v/ofklomdiokkbgnogbdoplfoiihgpbhcl?color=6778C6)](https://github.com/blakegearin/frienddlio/releases)
+[![](https://img.shields.io/chrome-web-store/v/bmadghlcpopfbnfcpmicdoafognfbhmm?color=6778C6)](https://github.com/blakegearin/frienddlio/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/blakegearin/frienddlio/blob/main/LICENSE.md)
 
 frienddl.io is a [Chrome extension](https://developer.chrome.com/extensions) to find friends on [skribbl.io](https://skribbl.io/), a free online multiplayer drawing & guessing game.
 
-Download it now [here](https://chrome.google.com/webstore/detail/frienddlio/ofklomdiokkbgnogbdoplfoiihgpbhcl)!
+Download it now [here](https://chrome.google.com/webstore/detail/frienddlio/bmadghlcpopfbnfcpmicdoafognfbhmm)!
 
 ## Features
 
