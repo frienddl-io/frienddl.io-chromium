@@ -1,9 +1,9 @@
 {
-  "name": "frienddl.io",
+  "name": "frienddl.io - skribbl.io friend finder",
   "short_name": "frienddl.io",
   "version": "1.1.2",
   "manifest_version": 2,
-  "description": "frienddl.io allows you to find friends on skribbl.io, a free online multiplayer drawing & guessing game.",
+  "description": "Find friends in public rooms on skribbl.io",
   "browser_action": {
     "default_popup": "html/default.html",
     "default_title": "frienddl.io"
