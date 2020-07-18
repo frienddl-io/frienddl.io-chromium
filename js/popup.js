@@ -28,7 +28,9 @@ chrome.storage.onChanged.addListener(
           }
           break;
         case "friendsFound":
-          foundFriend(storageChange.newValue);
+          if (storageChange.newValue.length > 0) {
+            foundFriend(storageChange.newValue);
+          }
           break;
         case "gamesJoined":
           $("#games-joined").text(storageChange.newValue);
@@ -83,7 +85,7 @@ function searchIsStopped() {
 function updatePopupAndBadge(state) {
   let popupFile = "";
 
-  console.log(`Making popup & bade updates for: ${state}`)
+  console.log(`Making popup & badge updates for: ${state}`)
   switch(state) {
     case "search":
       chrome.browserAction.setBadgeBackgroundColor(

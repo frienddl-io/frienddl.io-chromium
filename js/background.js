@@ -311,7 +311,7 @@ function foundFriend(friendsArray, tabId) {
 function updatePopupAndBadge(state) {
   let popupFile = "";
 
-  console.log(`Making popup & bade updates for: ${state}`)
+  console.log(`Making popup & badge updates for: ${state}`)
   switch(state) {
     case "stop":
       chrome.browserAction.setBadgeBackgroundColor(
