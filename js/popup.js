@@ -62,7 +62,7 @@ function foundFriend(friendsArray) {
   $("#found-friend-p").text(friendsArray.join(", "));
   $("#found-friend").show();
 
-  chrome.storage.sync.get(
+  chrome.storage.local.get(
     [
       "runTime"
     ],
@@ -171,7 +171,7 @@ function msToTime(duration) {
 
 document.addEventListener("DOMContentLoaded", function () {
   // Set values of friends and stats from storage on popup startup
-  chrome.storage.sync.get(
+  chrome.storage.local.get(
     [
       "friendsFound",
       "friends",
@@ -263,7 +263,7 @@ document.addEventListener("DOMContentLoaded", function () {
         $("#duplicate-error").hide();
         console.log(`Adding friend: ${friendName}`);
 
-        chrome.storage.sync.get(
+        chrome.storage.local.get(
           [
             "friends"
           ],
@@ -274,7 +274,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             friendsArray.push(friendName);
-            chrome.storage.sync.set(
+            chrome.storage.local.set(
               {
                 "friends": friendsArray
               },
@@ -316,7 +316,7 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log(`Removing friend: ${friendName}`);
     this.parentElement.removeChild(this);
 
-    chrome.storage.sync.get(
+    chrome.storage.local.get(
       [
         "friends"
       ],
@@ -330,7 +330,7 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         }
 
-        chrome.storage.sync.set(
+        chrome.storage.local.set(
           {
             "friends": newFriendsArray
           }
@@ -345,7 +345,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function minimizeToggled() {
     let checked = $(this).is(':checked');
     console.log(`Setting windowMinimized to ${checked}`);
-    chrome.storage.sync.set(
+    chrome.storage.local.set(
       {
         "windowMinimized": checked
       }
@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
       $("#friend-error").show();
     } else {
       updatePopupAndBadge("search");
-      chrome.storage.sync.set(
+      chrome.storage.local.set(
         {
           "friends": friendsArray,
           "state": "search",
@@ -397,7 +397,7 @@ document.addEventListener("DOMContentLoaded", function () {
           $("#run-time").text("00:00.0");
           $("#stats").show();
 
-          chrome.storage.sync.get(
+          chrome.storage.local.get(
             [
               "totalTimesSearched"
             ],
@@ -408,7 +408,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 newTotalTimesSearched += response.totalTimesSearched;
               }
 
-              chrome.storage.sync.set(
+              chrome.storage.local.set(
                 {
                   "totalTimesSearched": newTotalTimesSearched
                 }
@@ -427,7 +427,7 @@ document.addEventListener("DOMContentLoaded", function () {
             windowSettings,
             function(window) {
               let currentTime = new Date().getTime();
-              chrome.storage.sync.set(
+              chrome.storage.local.set(
                 {
                   "windowId": window.id,
                   "startTime": currentTime
@@ -453,7 +453,7 @@ document.addEventListener("DOMContentLoaded", function () {
     this.blur();
     updatePopupAndBadge("pause");
 
-    chrome.storage.sync.set(
+    chrome.storage.local.set(
       {
         "state": "pause"
       },
@@ -464,13 +464,13 @@ document.addEventListener("DOMContentLoaded", function () {
         $("#pause-col").hide();
         $("#resume-col").show();
 
-        chrome.storage.sync.get(
+        chrome.storage.local.get(
           [
             "startTime"
           ],
           function(response) {
             let currentTime = new Date().getTime();
-            chrome.storage.sync.set(
+            chrome.storage.local.set(
               {
                 "endTime": currentTime,
                 "runTime": getCurrentRunTime(response.startTime, currentTime)
@@ -491,7 +491,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     this.blur();
     updatePopupAndBadge("search");
-    chrome.storage.sync.set(
+    chrome.storage.local.set(
       {
         "state": "search"
       },
@@ -506,7 +506,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (friendsArray === 0) {
           $("#friend-error").show();
         } else {
-          chrome.storage.sync.set(
+          chrome.storage.local.set(
             {
               "friends": friendsArray
             },
@@ -517,7 +517,7 @@ document.addEventListener("DOMContentLoaded", function () {
               $("#pause-col").show();
               $("#spinner").show();
 
-              chrome.storage.sync.get(
+              chrome.storage.local.get(
                 [
                   "windowId"
                 ],
@@ -580,7 +580,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     this.blur();
     updatePopupAndBadge("stop");
-    chrome.storage.sync.get(
+    chrome.storage.local.get(
       [
         "state",
         "startTime",
@@ -588,7 +588,7 @@ document.addEventListener("DOMContentLoaded", function () {
       ],
       function(response) {
         let state = response.state;
-        chrome.storage.sync.set(
+        chrome.storage.local.set(
           {
             "state": "stop"
           },
@@ -605,7 +605,7 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
               console.log("Not updating runTime due to previous pause state");
             }
-            chrome.storage.sync.set(storageUpdate);
+            chrome.storage.local.set(storageUpdate);
 
             chrome.windows.remove(response.windowId);
           }

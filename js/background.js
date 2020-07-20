@@ -9,12 +9,12 @@ const SUCCESS_BADGE_TEXT = "!";
 const STOP_BADGE_COLOR = "#dc3545";
 const SUCCESS_BADGE_COLOR = "#17A2B8";
 
+let CONTENT_PORTS = [];
+
 // Listen for messages from popup
 chrome.runtime.onConnect.addListener(
   function(port) {
-    if (port.name !== "p2b") {
-      console.log("Port is not p2b: " + port.name);
-    } else {
+    if (port.name === "p2b") {
       console.log("Connected to p2b");
       port.onMessage.addListener(
         function(message) {
@@ -25,6 +25,11 @@ chrome.runtime.onConnect.addListener(
           }
         }
       );
+    } if (port.name === "c2b") {
+      let tabId = port.sender.tab.id;
+      CONTENT_PORTS.push(tabId);
+    } else {
+      console.log("Port is not recognized: " + port.name);
     }
   }
 );
@@ -32,7 +37,7 @@ chrome.runtime.onConnect.addListener(
 // Listen for window to close
 chrome.windows.onRemoved.addListener(
   function (windowId) {
-    chrome.storage.sync.get(
+    chrome.storage.local.get(
       [
         "windowId"
       ],
@@ -79,23 +84,40 @@ function joinNewGame(tabId) {
       console.log("Awaiting skribbl.io home page load");
       let tab = await goToSkribblioHomePageAsync(tabId);
 
-      chrome.storage.sync.get(
-        [
-          "state"
-        ],
-        function(response) {
-          if (response.state === "search") {
-            console.log("Sending message to join new game");
-            chrome.tabs.sendMessage(
-              tabId,
-              {
-                tabId: tabId,
-                task: "retrieveContent"
-              },
-              respondToContent
+      console.log("Waiting for content script to load");
+      var checkIfContentScriptIsLoaded = setInterval(
+        function() {
+          if (CONTENT_PORTS.includes(tabId)) {
+            console.log("Loaded");
+
+            chrome.storage.local.get(
+              [
+                "state"
+              ],
+              function(response) {
+                if (response.state === "search") {
+                  console.log("Sending message to join new game");
+                  chrome.tabs.sendMessage(
+                    tabId,
+                    {
+                      tabId: tabId,
+                      task: "retrieveContent"
+                    },
+                    respondToContent
+                  );
+                } else {
+                  console.log(`State is not search: ${response.state}`);
+                }
+              }
             );
+            clearInterval(checkIfContentScriptIsLoaded);
+          } else {
+            console.log("Content script isn't loaded");
+            console.dir(CONTENT_PORTS);
+            console.log(CONTENT_PORTS.includes(tabId));
           }
-        }
+        },
+        100
       );
     }
   )();
@@ -119,7 +141,7 @@ function respondToContent(response) {
     if (playersArray.length > 1) {
       updatePlayersFound(playersArray, tabId);
 
-      chrome.storage.sync.get(
+      chrome.storage.local.get(
         [
           "friends",
           "state"
@@ -151,7 +173,7 @@ function respondToContent(response) {
 
 function stopSearch() {
   updatePopupAndBadge("stop");
-  chrome.storage.sync.get(
+  chrome.storage.local.get(
     [
       "startTime",
       "state"
@@ -172,7 +194,7 @@ function stopSearch() {
         } else {
           console.log("Not updating endTime and runTime due to previous pause state");
         }
-        chrome.storage.sync.set(storageUpdate);
+        chrome.storage.local.set(storageUpdate);
       }
     }
   );
@@ -180,7 +202,7 @@ function stopSearch() {
 
 // Updates values in storage
 function updateStorage() {
-  chrome.storage.sync.get(
+  chrome.storage.local.get(
     [
       "gamesJoined",
       "startTime",
@@ -204,7 +226,7 @@ function updateStorage() {
         newTotalGamesJoined += response.totalGamesJoined;
       }
 
-      chrome.storage.sync.set(
+      chrome.storage.local.set(
         {
           "gamesJoined": newGamesJoined,
           "totalGamesJoined": newTotalGamesJoined,
@@ -217,7 +239,7 @@ function updateStorage() {
 
 // Updates the values in storage related to players found or seen
 function updatePlayersFound(playersArray, tabId) {
-  chrome.storage.sync.get(
+  chrome.storage.local.get(
     [
       "playersFound",
       "totalPlayersSeen"
@@ -243,7 +265,7 @@ function updatePlayersFound(playersArray, tabId) {
         newTotalPlayersSeen += response.totalPlayersSeen;
       }
 
-      chrome.storage.sync.set(
+      chrome.storage.local.set(
         {
           "playersFound": totalPlayersFound,
           "totalPlayersSeen": newTotalPlayersSeen
@@ -256,14 +278,14 @@ function updatePlayersFound(playersArray, tabId) {
 // Steps to take when one or more friends are found
 function foundFriend(friendsArray, tabId) {
   console.log("Found friend");
-  chrome.storage.sync.set(
+  chrome.storage.local.set(
     {
       "state": "stop"
     },
     function() {
       updatePopupAndBadge("success");
 
-      chrome.storage.sync.get(
+      chrome.storage.local.get(
         [
           "startTime",
           "runTime",
@@ -285,7 +307,7 @@ function foundFriend(friendsArray, tabId) {
             newTotalRunTime += response.totalRunTime;
           }
 
-          chrome.storage.sync.set(
+          chrome.storage.local.set(
             {
               "friendsFound": friendsArray,
               "runTime": finalRunTime,
