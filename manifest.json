@@ -3,7 +3,7 @@
   "short_name": "frienddl.io",
   "version": "1.1.4",
   "manifest_version": 2,
-  "description": "Find friends in public rooms on skribbl.io",
+  "description": "Tool to find friends in public rooms on skribbl.io",
   "browser_action": {
     "default_popup": "html/default.html",
     "default_title": "frienddl.io"

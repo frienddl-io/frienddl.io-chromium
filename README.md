@@ -7,7 +7,7 @@
 
 frienddl.io is a browser extension to find friends on [skribbl.io](https://skribbl.io/), a free online multiplayer drawing & guessing game.
 
-Download it now on [Chrome](https://chrome.google.com/webstore/detail/frienddlio/bmadghlcpopfbnfcpmicdoafognfbhmm) or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/frienddlio/)
+Download it now on [Chrome](https://chrome.google.com/webstore/detail/frienddlio/bmadghlcpopfbnfcpmicdoafognfbhmm) or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/frienddlio/)!
 
 This is the codebase for the Google Chrome version, but the goal is for all versions to have nearly identical code and feature parity.
 
