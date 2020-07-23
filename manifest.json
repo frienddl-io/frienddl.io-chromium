@@ -1,11 +1,12 @@
 {
-  "name": "frienddl.io - skribbl.io friend finder",
+  "name": "__MSG_extensionName__",
   "short_name": "frienddl.io",
   "version": "1.1.4",
   "manifest_version": 2,
-  "description": "Tool to find friends in public rooms on skribbl.io",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "en",
   "browser_action": {
-    "default_popup": "html/default.html",
+    "default_popup": "html/popup.html",
     "default_title": "frienddl.io"
   },
   "content_scripts": [

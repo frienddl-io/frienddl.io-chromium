@@ -12,6 +12,11 @@ body
   padding: 10px;
 }
 
+.hidden
+{
+  display: none;
+}
+
 .center
 {
   margin: auto;
@@ -33,7 +38,7 @@ label
   margin-bottom: 5px;
 }
 
-#errors div,
+#form-input-feedback div,
 #found-friend
 {
   margin-bottom: 10px;
@@ -119,6 +124,7 @@ label
 .warning
 {
   color: rgb(255, 212, 0);
+  font-size: 80%;
 }
 
 /* Search */

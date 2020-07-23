@@ -63,7 +63,7 @@ function goToSkribblioHomePageAsync(tabId) {
         async tab => {
           chrome.tabs.onUpdated.addListener(
             function listener(tabId, info) {
-              if (info.status === 'complete' && tabId === tab.id) {
+              if (info.status === "complete" && tabId === tab.id) {
                 chrome.tabs.onUpdated.removeListener(listener);
                 resolve(tab);
               } else {
@@ -172,7 +172,7 @@ function respondToContent(response) {
 }
 
 function stopSearch() {
-  updatePopupAndBadge("stop");
+  updateBadge("stop");
   chrome.storage.local.get(
     [
       "startTime",
@@ -283,7 +283,7 @@ function foundFriend(friendsArray, tabId) {
       "state": "stop"
     },
     function() {
-      updatePopupAndBadge("success");
+      updateBadge("success");
 
       chrome.storage.local.get(
         [
@@ -329,11 +329,9 @@ function foundFriend(friendsArray, tabId) {
   );
 }
 
-// Updates the popup to a predefined HTML file
-function updatePopupAndBadge(state) {
-  let popupFile = "";
-
-  console.log(`Making popup & badge updates for: ${state}`)
+// Updates badge to reflect the state
+function updateBadge(state) {
+  console.log(`Making badge updates for: ${state}`)
   switch(state) {
     case "stop":
       chrome.browserAction.setBadgeBackgroundColor(
@@ -341,12 +339,6 @@ function updatePopupAndBadge(state) {
           color: STOP_BADGE_COLOR
         }
       );
-      chrome.browserAction.setBadgeText(
-        {
-          text: ""
-        }
-      );
-      popupFile = "html/default.html";
       break;
     case "success":
       chrome.browserAction.setBadgeText(
@@ -359,17 +351,9 @@ function updatePopupAndBadge(state) {
           color: SUCCESS_BADGE_COLOR
         }
       );
-      popupFile = "html/success.html";
       break;
-  }
-  if (popupFile !== "") {
-    chrome.browserAction.setPopup(
-      {
-        popup: popupFile
-      }
-    );
-  } else {
-    console.error(`State to update popup invalid: ${state}`);
+    default:
+      console.error(`State to update invalid: ${state}`);
   }
 }
 
