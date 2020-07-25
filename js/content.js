@@ -1,4 +1,4 @@
-console.log("frienddl.io content script loaded");
+console.log("frienddl.io content.js loaded");
 
 console.log("Setting up port");
 let backgroundPort = chrome.runtime.connect(
