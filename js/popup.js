@@ -681,3 +681,7 @@ document.addEventListener("DOMContentLoaded", function () {
     return currentTime - startTime;
   }
 }, false);
+
+module.export = {
+
+}

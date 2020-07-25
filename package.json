@@ -1,0 +1,15 @@
+{
+  "jest": {
+    "setupFiles": [
+      "jest-webextension-mock",
+      "./test/setup-jest.js"
+    ]
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^26.1.0",
+    "jest-webextension-mock": "^3.6.1"
+  }
+}
