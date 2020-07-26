@@ -36,7 +36,8 @@ This project is open for anyone to contribute. Follow these steps:
 3. Make changes
 4. Reload the extension
 5. Test changes by running the application locally
-6. When satisfied with changes, open a pull request with screenshots of your testing evidence
+6. Add unit tests and ensure all are passing: `npm test`
+7. When satisfied with changes, open a pull request with screenshots of your testing evidence
 
 ## Getting Started
 

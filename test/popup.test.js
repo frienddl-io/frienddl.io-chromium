@@ -1,7 +1,12 @@
 const { chrome } = require('jest-chrome');
-require('../js/popup');
 
-describe('on startup', () => {
+import { Popup } from '../js/popup_class.js';
+
+describe('constructor', () => {
+  beforeAll(() => {
+    let popup = new Popup();
+  });
+
   it('should call chrome.storage.local.get once', () => {
     expect(chrome.storage.local.get).toHaveBeenCalledTimes(1);
   });
@@ -11,6 +16,6 @@ describe('on startup', () => {
   });
 
   it('should have listener on chrome.storage.onChanged', () => {
-    expect(chrome.storage.onChanged.hasListeners()).toBe(true)
+    expect(chrome.storage.onChanged.hasListeners()).toBe(true);
   });
 });

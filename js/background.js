@@ -1,4 +1,4 @@
-console.log("frienddl.io background script loaded");
+console.log("frienddl.io background.js loaded");
 
 const SKRIBBLIO_URL = "https://skribbl.io/";
 
