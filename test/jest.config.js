@@ -3,7 +3,5 @@ module.exports = {
   setupFilesAfterEnv: ['./jest.setup.js'],
   transform: {
     "^.+\\.jsx?$": "babel-jest"
-  }//,
-  // collectCoverageFrom: ['src/**/*.{ts,tsx,js,jsx}', '!src/**/*.d.ts'],
-  // preset: 'ts-jest'
+  }
 };

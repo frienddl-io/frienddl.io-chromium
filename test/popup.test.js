@@ -15,7 +15,7 @@ describe('constructor', () => {
     expect(chrome.i18n.getMessage).toHaveBeenCalledTimes(19);
   });
 
-  it('should have listener on chrome.storage.onChanged', () => {
+  it('should add listener on chrome.storage.onChanged', () => {
     expect(chrome.storage.onChanged.hasListeners()).toBe(true);
   });
 });

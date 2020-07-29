@@ -19,9 +19,7 @@
     }
   ],
   "background": {
-    "scripts": [
-      "js/background.js"
-    ]
+    "page": "html/background.html"
   },
   "icons": {
     "16": "img/favicon/favicon-16x16.png",
