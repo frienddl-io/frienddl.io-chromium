@@ -323,6 +323,9 @@ function foundFriend(friendsArray, tabId) {
               drawAttention: true
             }
           );
+
+          let audio = new Audio('../mp3/friend_found.mp3');
+          audio.play();
         }
       );
     }
