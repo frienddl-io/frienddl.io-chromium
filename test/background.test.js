@@ -37,14 +37,42 @@ describe('checkWindowRemoved', () => {
     expect(chrome.storage.local.get).toHaveBeenCalledTimes(1);
   });
 
+  it('should call chrome.storage.local.get once', () => {
+    Background.checkWindowRemoved('');
+    expect(chrome.storage.local.get).toHaveBeenCalledTimes(1);
+
+    let message = [
+      "windowId"
+    ];
+
+    chrome.storage.local.get.mockImplementation(
+      (message, callback) => {
+        callback(response)
+      },
+    )
+
+    expect(chrome.runtime.sendMessage).toBeCalledWith(
+      message,
+      callbackSpy,
+    )
+    expect(callbackSpy).toBeCalledWith(response)
+  });
+
   describe('when the windowId matches response.windowId', () => {
     beforeAll(() => {
-      Background.mockClear();
-      mockStopSearch.mockClear();
+      // Background.mockClear();
+      // mockStopSearch.mockClear();
     });
 
     it('calls stopSearch once', () => {
       Background.checkWindowRemoved(windowId);
+      const greetImplementation = name => `Hey, ${name}!`;
+      const mockFn = jest.fn(greetImplementation);
+      const value = greetWorld(mockFn);
+      expect(mockFn).toHaveBeenCalled();
+      expect(mockFn).toHaveBeenCalledWith('world');
+      expect(value).toBe('Hey, world!');
+
       expect(mockStopSearch).toHaveBeenCalledTimes(1);
     });
   });

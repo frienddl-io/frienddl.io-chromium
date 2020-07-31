@@ -18,19 +18,21 @@ export class Background {
     chrome.windows.onRemoved.addListener(Background.checkWindowRemoved);
   }
 
+  static compareWindowRemovedToSearchWindow(response, windowId) {
+    if(windowId === response.windowId) {
+      Background.stopSearch();
+    } else {
+      console.log(`Window with ID removed but isn't search window: ${response.windowId}`)
+    }
+  }
+
   // Checks to see if a removed window is the search window
   static checkWindowRemoved(windowId) {
     chrome.storage.local.get(
       [
         "windowId"
       ],
-      function(response) {
-        if(windowId === response.windowId) {
-          Background.stopSearch();
-        } else {
-          console.log(`Window with ID removed but isn't search window: ${response.windowId}`)
-        }
-      }
+      compareWindowRemovedToSearchWindow(response, windowId)
     );
   }
 
