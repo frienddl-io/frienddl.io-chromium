@@ -44,6 +44,11 @@ label
   margin-bottom: 10px;
 }
 
+svg
+{
+  vertical-align: text-bottom;
+}
+
 /* Header */
 #instructions
 {
@@ -152,6 +157,7 @@ label
 {
   font-weight: normal;
   width: 40%;
+  vertical-align: middle;
 }
 
 .table td,

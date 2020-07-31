@@ -31,11 +31,6 @@ $("#duplicate-error").text(chrome.i18n.getMessage("duplicateError"));
 $("#friend-error").text(chrome.i18n.getMessage("friendError"));
 $("#pause-instruction").text(chrome.i18n.getMessage("pauseInstruction"));
 
-$("#start-button").text(chrome.i18n.getMessage("startButton"));
-$("#resume-button").text(chrome.i18n.getMessage("resumeButton"));
-$("#pause-button").text(chrome.i18n.getMessage("pauseButton"));
-$("#stop-button").text(chrome.i18n.getMessage("stopButton"));
-
 $("#spinner-icon").attr("alt", chrome.i18n.getMessage("altSpinner"));
 $("#spinner-text").text(chrome.i18n.getMessage("searchText"));
 $("#games-joined th").text(chrome.i18n.getMessage("gamesJoined"));

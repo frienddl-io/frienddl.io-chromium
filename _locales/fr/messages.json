@@ -1,0 +1,56 @@
+{
+  "extensionName": {
+    "message": "frienddl.io - skribbl.io friend finder"
+  },
+  "extensionDescription": {
+    "message": "Outil pour chercher vos amis aux salons publics de skribbl.io"
+  },
+  "instructions": {
+    "message": "Inscrivez les noms de vos amis, puis chercher pour les trouver en skribbl.io"
+  },
+  "altPencil": {
+    "message": "icône de crayon"
+  },
+  "addFriendPlaceholder": {
+    "message": "Ami"
+  },
+  "addFriendButton": {
+    "message": "Ajouter"
+  },
+  "windowMinimized": {
+    "message": "Une fenêtre chercheuse est ouverte et réduit"
+  },
+  "characterError": {
+    "message": "S'il vous plaît, inscrivez au moins un caractère. "
+  },
+  "duplicateError": {
+    "message": "Cet ami deja ajouté."
+  },
+  "friendError": {
+    "message": "S'il vous plaît, ajouter au moins un ami."
+  },
+  "pauseInstruction": {
+    "message": "Mettez en pause pour ajouter ou enlever un nom d’ami. "
+  },
+  "altSpinner": {
+    "message": "girouette"
+  },
+  "searchText": {
+    "message": "Cherchant..."
+  },
+  "gamesJoined": {
+    "message": "Jeux Entré"
+  },
+  "playersFound": {
+    "message": "Joueurs Trouvés"
+  },
+  "runTime": {
+    "message": "Durée d'exécution"
+  },
+  "foundFriendSingular": {
+    "message": "Un ami Trouvé!"
+  },
+  "foundFriendPlural": {
+    "message": "Des amis trouvés!"
+  }
+}

@@ -20,18 +20,6 @@
   "windowMinimized": {
     "message": "Open search window minimized"
   },
-  "startButton": {
-    "message": "Search"
-  },
-  "resumeButton": {
-    "message": "Resume"
-  },
-  "pauseButton": {
-    "message": "Pause"
-  },
-  "stopButton": {
-    "message": "Stop"
-  },
   "characterError": {
     "message": "Please enter at least one character."
   },
@@ -51,13 +39,13 @@
     "message": "Searching..."
   },
   "gamesJoined": {
-    "message": "Games Joined:"
+    "message": "Games Joined"
   },
   "playersFound": {
-    "message": "Players Found:"
+    "message": "Players Found"
   },
   "runTime": {
-    "message": "Run Time:"
+    "message": "Run Time"
   },
   "foundFriendSingular": {
     "message": "Found Friend!"

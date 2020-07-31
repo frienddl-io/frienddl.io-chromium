@@ -324,7 +324,9 @@ function foundFriend(friendsArray, tabId) {
             }
           );
 
-          let audio = new Audio('../mp3/friend_found.mp3');
+          let language = chrome.i18n.getUILanguage().split('-')[0];
+          console.log(`Using language: ${language}`);
+          let audio = new Audio(`../_locales/${language}/success.mp3`);
           audio.play();
         }
       );
