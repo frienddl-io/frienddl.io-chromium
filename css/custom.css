@@ -71,6 +71,24 @@ svg
   border-bottom-right-radius: 0;
 }
 
+.btn-success {
+  color: #fff;
+  background-color: #1DBF38;
+  border-color: #1DBF38;
+}
+
+.btn-warning
+{
+  background-color: #F3FF17;
+  border-color: #F3FF17;
+}
+
+.btn-danger
+{
+  background-color: #E80920;
+  border-color: #E80920;
+}
+
 #start-button,
 #resume-button,
 #pause-button,
@@ -93,8 +111,8 @@ svg
 .enabled-friend-button:hover
 {
   color: #fff !important;
-  background-color: #a35048 !important;
-  border-color: #a35048 !important;
+  background-color: #c82333 !important;
+  border-color: #bd2130 !important;
 }
 
 #minimized-option
@@ -164,4 +182,11 @@ label
 .table th
 {
   padding: .4rem;
+}
+
+.alert-success
+{
+  color: #FFFFFF;
+  background-color: transparent;
+  border-color: #c3e6cb;
 }
