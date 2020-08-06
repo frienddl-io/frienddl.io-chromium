@@ -36,7 +36,11 @@ This project is open for anyone to contribute. Follow these steps:
 3. Make changes
 4. Reload the extension
 5. Test changes by running the application locally
-6. Add unit tests and ensure all are passing: `npm test`
+6. Unit tests
+   1. Install `npm` if you haven't already: https://www.npmjs.com/get-npm
+   2. If adding new code, add new unit tests
+   3. If changing existing code, ensure unit tests remain passing or update as necessary
+   4. Run unit tests: `npm test`
 7. When satisfied with changes, open a pull request with screenshots of your testing evidence
 
 ## Getting Started
