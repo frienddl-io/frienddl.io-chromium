@@ -1,264 +1,65 @@
-console.log("frienddl.io background script loaded");
+console.log('frienddl.io background script loaded');
 
-const SKRIBBLIO_URL = "https://skribbl.io/";
+const SKRIBBLIO_URL = 'https://skribbl.io/';
 
 // Text for badge
-const SUCCESS_BADGE_TEXT = "!";
+const SUCCESS_BADGE_TEXT = '!';
 
 // Colors for badge
-const STOP_BADGE_COLOR = "#dc3545";
-const SUCCESS_BADGE_COLOR = "#17A2B8";
+const STOP_BADGE_COLOR = '#dc3545';
+const SUCCESS_BADGE_COLOR = '#17A2B8';
 
-let CONTENT_PORTS = [];
-
-// Listen for messages from popup
-chrome.runtime.onConnect.addListener(
-  function(port) {
-    if (port.name === "p2b") {
-      console.log("Connected to p2b");
-      port.onMessage.addListener(
-        function(message) {
-          console.dir(message);
-
-          if (message.task === "joinNewGame") {
-            joinNewGame(message.tabId);
-          }
-        }
-      );
-    } if (port.name === "c2b") {
-      let tabId = port.sender.tab.id;
-      CONTENT_PORTS.push(tabId);
-    } else {
-      console.log("Port is not recognized: " + port.name);
-    }
-  }
-);
-
-// Listen for window to close
-chrome.windows.onRemoved.addListener(
-  function (windowId) {
-    chrome.storage.local.get(
-      [
-        "windowId"
-      ],
-      function(response) {
-        if(windowId === response.windowId) {
-          stopSearch();
-        }
-      }
-    );
-  }
-);
+const CONTENT_PORTS = [];
 
 // Updates a tab to go to the skribbl.io home page
 function goToSkribblioHomePageAsync(tabId) {
   return new Promise(
-    resolve => {
+    (resolve) => {
       chrome.tabs.update(
         tabId,
         {
           url: SKRIBBLIO_URL,
-          active: false
+          active: false,
         },
-        async tab => {
+        async (tab) => {
           chrome.tabs.onUpdated.addListener(
-            function listener(tabId, info) {
-              if (info.status === "complete" && tabId === tab.id) {
+            function listener(listenerTabId, info) {
+              if (info.status === 'complete' && listenerTabId === tab.id) {
                 chrome.tabs.onUpdated.removeListener(listener);
                 resolve(tab);
               } else {
-                console.log(`Not ready | info.status: ${info.status} , Target Tab: ${tabId} , Current Tab: ${tab.id}`);
+                console.log(`Not ready | info.status: ${info.status} , Target Tab: ${listenerTabId} , Current Tab: ${tab.id}`);
               }
-            }
+            },
           );
-        }
-      );
-    }
-  );
-}
-
-// Steps to take when a new game needs to be joined
-function joinNewGame(tabId) {
-  (
-    async() => {
-      console.log("Awaiting skribbl.io home page load");
-      let tab = await goToSkribblioHomePageAsync(tabId);
-
-      console.log("Waiting for content script to load");
-      var checkIfContentScriptIsLoaded = setInterval(
-        function() {
-          if (CONTENT_PORTS.includes(tabId)) {
-            console.log("Loaded");
-
-            chrome.storage.local.get(
-              [
-                "state"
-              ],
-              function(response) {
-                if (response.state === "search") {
-                  console.log("Sending message to join new game");
-                  chrome.tabs.sendMessage(
-                    tabId,
-                    {
-                      tabId: tabId,
-                      task: "retrieveContent"
-                    },
-                    respondToContent
-                  );
-                } else {
-                  console.log(`State is not search: ${response.state}`);
-                }
-              }
-            );
-            clearInterval(checkIfContentScriptIsLoaded);
-          } else {
-            console.log("Content script isn't loaded");
-            console.dir(CONTENT_PORTS);
-            console.log(CONTENT_PORTS.includes(tabId));
-          }
         },
-        100
       );
-    }
-  )();
-}
-
-// Processes the response from the content of a game
-function respondToContent(response) {
-  console.log("Received response from content");
-  console.dir(response);
-  updateStorage();
-
-  if (response === undefined) {
-    let lastError = chrome.runtime.lastError.message;
-    console.log(`Response was undefined, last error: ${lastError}`);
-  } else {
-    console.log("Searching players for friends");
-
-    let playersArray = response.players;
-    let tabId = response.tabId;
-
-    if (playersArray.length > 1) {
-      updatePlayersFound(playersArray, tabId);
-
-      chrome.storage.local.get(
-        [
-          "friends",
-          "state"
-        ],
-        function(response) {
-          let friendsFound = [];
-          for (const friend of response.friends) {
-            if (playersArray.includes(friend)) {
-              friendsFound.push(friend);
-            }
-          }
-
-          if (friendsFound.length === 0) {
-            console.log("No friends found");
-            if (response.state === "search") {
-              joinNewGame(tabId);
-            }
-          } else {
-            foundFriend(friendsFound, tabId);
-          }
-        }
-      );
-    } else {
-      console.log("Only 1 players was found");
-      joinNewGame(tabId);
-    }
-  }
-}
-
-function stopSearch() {
-  updateBadge("stop");
-  chrome.storage.local.get(
-    [
-      "startTime",
-      "state"
-    ],
-    function(response) {
-      let state = response.state;
-      if (state !== "stop") {
-        let storageUpdate = {
-          "state": "stop"
-        };
-
-        if (state !== "pause") {
-          console.log("Updating endTime and runTime");
-
-          let currentTime = new Date().getTime();
-          storageUpdate["endTime"] = currentTime;
-          storageUpdate["runTime"] = getCurrentRunTime(response.startTime, currentTime);
-        } else {
-          console.log("Not updating endTime and runTime due to previous pause state");
-        }
-        chrome.storage.local.set(storageUpdate);
-      }
-    }
-  );
-}
-
-// Updates values in storage
-function updateStorage() {
-  chrome.storage.local.get(
-    [
-      "gamesJoined",
-      "startTime",
-      "runTime",
-      "totalGamesJoined"
-    ],
-    function(response) {
-      console.dir(response);
-      let newGamesJoined = response.gamesJoined + 1;
-      chrome.browserAction.setBadgeText(
-        {
-          text: newGamesJoined.toString()
-        }
-      );
-
-      let startTime = response.startTime;
-      let newRunTime = new Date().getTime() - startTime;
-
-      let newTotalGamesJoined = 1;
-      if (response.totalGamesJoined !== undefined) {
-        newTotalGamesJoined += response.totalGamesJoined;
-      }
-
-      chrome.storage.local.set(
-        {
-          "gamesJoined": newGamesJoined,
-          "totalGamesJoined": newTotalGamesJoined,
-          "runTime": newRunTime
-        }
-      );
-    }
+    },
   );
 }
 
 // Updates the values in storage related to players found or seen
-function updatePlayersFound(playersArray, tabId) {
+function updatePlayersFound(playersArray) {
   chrome.storage.local.get(
     [
-      "playersFound",
-      "totalPlayersSeen"
+      'playersFound',
+      'totalPlayersSeen',
     ],
-    function(response) {
-      let playersFound = response.playersFound;
+    (response) => {
+      const playersFound = [response.playersFound];
       if (playersFound !== undefined) {
         console.dir(playersFound);
       }
-      let newPlayersFound = [];
+      const newPlayersFound = [];
       playersArray.forEach(
         (element) => {
           if (playersFound.indexOf(element) === -1) {
             newPlayersFound.push(element);
           }
-        }
+        },
       );
 
-      let totalPlayersFound = newPlayersFound.concat(playersFound);
+      const totalPlayersFound = newPlayersFound.concat(playersFound);
 
       let newTotalPlayersSeen = playersArray.length;
       if (typeof response.totalPlayersSeen !== 'undefined') {
@@ -267,35 +68,108 @@ function updatePlayersFound(playersArray, tabId) {
 
       chrome.storage.local.set(
         {
-          "playersFound": totalPlayersFound,
-          "totalPlayersSeen": newTotalPlayersSeen
-        }
+          playersFound: totalPlayersFound,
+          totalPlayersSeen: newTotalPlayersSeen,
+        },
       );
-    }
+    },
   );
 }
 
+// Updates values in storage
+function updateStorage() {
+  chrome.storage.local.get(
+    [
+      'gamesJoined',
+      'startTime',
+      'runTime',
+      'totalGamesJoined',
+    ],
+    (response) => {
+      console.dir(response);
+      const newGamesJoined = response.gamesJoined + 1;
+      chrome.browserAction.setBadgeText(
+        {
+          text: newGamesJoined.toString(),
+        },
+      );
+
+      const startTime = [response.startTime];
+      const newRunTime = new Date().getTime() - startTime;
+
+      let newTotalGamesJoined = 1;
+      if (response.totalGamesJoined !== undefined) {
+        newTotalGamesJoined += response.totalGamesJoined;
+      }
+
+      chrome.storage.local.set(
+        {
+          gamesJoined: newGamesJoined,
+          totalGamesJoined: newTotalGamesJoined,
+          runTime: newRunTime,
+        },
+      );
+    },
+  );
+}
+
+// Returns the current run time
+function getCurrentRunTime(startTime, currentTime = undefined) {
+  if (currentTime === undefined) {
+    return new Date().getTime() - startTime;
+  }
+  return currentTime - startTime;
+}
+
+// Updates badge to reflect the state
+function updateBadge(state) {
+  console.log(`Making badge updates for: ${state}`);
+  switch (state) {
+    case 'stop':
+      chrome.browserAction.setBadgeBackgroundColor(
+        {
+          color: STOP_BADGE_COLOR,
+        },
+      );
+      break;
+    case 'success':
+      chrome.browserAction.setBadgeText(
+        {
+          text: SUCCESS_BADGE_TEXT,
+        },
+      );
+      chrome.browserAction.setBadgeBackgroundColor(
+        {
+          color: SUCCESS_BADGE_COLOR,
+        },
+      );
+      break;
+    default:
+      console.error(`State to update invalid: ${state}`);
+  }
+}
+
 // Steps to take when one or more friends are found
-function foundFriend(friendsArray, tabId) {
-  console.log("Found friend");
+function foundFriend(friendsArray) {
+  console.log('Found friend');
   chrome.storage.local.set(
     {
-      "state": "stop"
+      state: 'stop',
     },
-    function() {
-      updateBadge("success");
+    () => {
+      updateBadge('success');
 
       chrome.storage.local.get(
         [
-          "startTime",
-          "runTime",
-          "totalFriendsFound",
-          "totalRunTime",
-          "windowId"
+          'startTime',
+          'runTime',
+          'totalFriendsFound',
+          'totalRunTime',
+          'windowId',
         ],
-        function(response) {
-          let currentTime = new Date().getTime();
-          let finalRunTime = getCurrentRunTime(response.startTime, currentTime);
+        (response) => {
+          const currentTime = new Date().getTime();
+          const finalRunTime = getCurrentRunTime(response.startTime, currentTime);
 
           let newTotalFriendsFound = 1;
           if (response.totalFriendsFound !== undefined) {
@@ -309,63 +183,190 @@ function foundFriend(friendsArray, tabId) {
 
           chrome.storage.local.set(
             {
-              "friendsFound": friendsArray,
-              "runTime": finalRunTime,
-              "endTime": currentTime,
-              "totalFriendsFound": newTotalFriendsFound,
-              "totalRunTime": newTotalRunTime
-            }
+              friendsFound: friendsArray,
+              runTime: finalRunTime,
+              endTime: currentTime,
+              totalFriendsFound: newTotalFriendsFound,
+              totalRunTime: newTotalRunTime,
+            },
           );
 
           chrome.windows.update(
             response.windowId,
             {
-              drawAttention: true
-            }
+              drawAttention: true,
+            },
           );
 
-          let language = chrome.i18n.getUILanguage().split('-')[0];
+          const language = chrome.i18n.getUILanguage().split('-')[0];
           console.log(`Using language: ${language}`);
-          let audio = new Audio(`../_locales/${language}/success.mp3`);
+          const audio = new Audio(`../_locales/${language}/success.mp3`);
           audio.play();
-        }
+        },
       );
-    }
+    },
   );
 }
 
-// Updates badge to reflect the state
-function updateBadge(state) {
-  console.log(`Making badge updates for: ${state}`)
-  switch(state) {
-    case "stop":
-      chrome.browserAction.setBadgeBackgroundColor(
-        {
-          color: STOP_BADGE_COLOR
-        }
+// Steps to take when a new game needs to be joined
+function joinNewGame(newGameTabId) {
+  (
+    async () => {
+      console.log('Awaiting skribbl.io home page load');
+      await goToSkribblioHomePageAsync(newGameTabId);
+
+      console.log('Waiting for content script to load');
+      const checkIfContentScriptIsLoaded = setInterval(
+        () => {
+          if (CONTENT_PORTS.includes(newGameTabId)) {
+            console.log('Loaded');
+
+            chrome.storage.local.get(
+              [
+                'state',
+              ],
+              (response) => {
+                if (response.state === 'search') {
+                  console.log('Sending message to join new game');
+                  chrome.tabs.sendMessage(
+                    newGameTabId,
+                    {
+                      tabId: newGameTabId,
+                      task: 'retrieveContent',
+                    },
+                    // eslint-disable-next-line no-use-before-define
+                    respondToContent,
+                  );
+                } else {
+                  console.log(`State is not search: ${response.state}`);
+                }
+              },
+            );
+            clearInterval(checkIfContentScriptIsLoaded);
+          } else {
+            console.log('Content script isn\'t loaded');
+            console.dir(CONTENT_PORTS);
+            console.log(CONTENT_PORTS.includes(newGameTabId));
+          }
+        },
+        100,
       );
-      break;
-    case "success":
-      chrome.browserAction.setBadgeText(
-        {
-          text: SUCCESS_BADGE_TEXT
-        }
+    }
+  )();
+}
+
+// Processes the response from the content of a game
+function respondToContent(response) {
+  console.log('Received response from content');
+  console.dir(response);
+  updateStorage();
+
+  if (response === undefined) {
+    const lastError = chrome.runtime.lastError.message;
+    console.log(`Response was undefined, last error: ${lastError}`);
+  } else {
+    console.log('Searching players for friends');
+
+    const playersArray = [response.players];
+
+    if (playersArray.length > 1) {
+      updatePlayersFound(playersArray, response.tabId);
+
+      chrome.storage.local.get(
+        [
+          'friends',
+          'state',
+        ],
+        (getResponse) => {
+          const friendsFound = [];
+          getResponse.friends.forEach(
+            (friend) => {
+              if (playersArray.includes(friend)) {
+                friendsFound.push(friend);
+              }
+            },
+          );
+
+          if (friendsFound.length === 0) {
+            console.log('No friends found');
+            if (getResponse.state === 'search') {
+              joinNewGame(response.tabId);
+            }
+          } else {
+            foundFriend(friendsFound, response.tabId);
+          }
+        },
       );
-      chrome.browserAction.setBadgeBackgroundColor(
-        {
-          color: SUCCESS_BADGE_COLOR
-        }
-      );
-      break;
-    default:
-      console.error(`State to update invalid: ${state}`);
+    } else {
+      console.log('Only 1 players was found');
+      joinNewGame(response.tabId);
+    }
   }
 }
 
-// Returns the current run time
-function getCurrentRunTime(startTime, currentTime = undefined) {
-  if (currentTime === undefined) {
-    currentTime = new Date().getTime();
-  }
-  return currentTime - startTime;
+// Listen for messages from popup
+chrome.runtime.onConnect.addListener(
+  (port) => {
+    if (port.name === 'p2b') {
+      console.log('Connected to p2b');
+      port.onMessage.addListener(
+        (message) => {
+          console.dir(message);
+
+          if (message.task === 'joinNewGame') {
+            joinNewGame(message.tabId);
+          }
+        },
+      );
+    } if (port.name === 'c2b') {
+      const tabId = port.sender.tab.id;
+      CONTENT_PORTS.push(tabId);
+    } else {
+      console.log(`Port is not recognized: ${port.name}`);
+    }
+  },
+);
+
+function stopSearch() {
+  updateBadge('stop');
+  chrome.storage.local.get(
+    [
+      'startTime',
+      'state',
+    ],
+    (response) => {
+      if (response.state !== 'stop') {
+        const storageUpdate = {
+          state: 'stop',
+        };
+
+        if (response.state !== 'pause') {
+          console.log('Updating endTime and runTime');
+
+          const currentTime = new Date().getTime();
+          storageUpdate.endTime = currentTime;
+          storageUpdate.runTime = getCurrentRunTime(response.startTime, currentTime);
+        } else {
+          console.log('Not updating endTime and runTime due to previous pause state');
+        }
+        chrome.storage.local.set(storageUpdate);
+      }
+    },
+  );
 }
+
+// Listen for window to close
+chrome.windows.onRemoved.addListener(
+  (windowId) => {
+    chrome.storage.local.get(
+      [
+        'windowId',
+      ],
+      (response) => {
+        if (windowId === response.windowId) {
+          stopSearch();
+        }
+      },
+    );
+  },
+);

@@ -1,0 +1,24 @@
+{
+  "name": "frienddl.io-chrome",
+  "version": "1.1.4",
+  "description": "",
+  "main": "",
+  "dependencies": {
+    "jest": "^26.4.2"
+  },
+  "devDependencies": {
+    "eslint": "^7.7.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frienddl-io/frienddl.io-chrome.git"
+  },
+  "author": "Blake Gearin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/frienddl-io/frienddl.io-support/issues"
+  },
+  "homepage": "https://github.com/frienddl-io/frienddl.io-chrome#readme"
+}

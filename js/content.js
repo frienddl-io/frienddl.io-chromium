@@ -1,75 +1,75 @@
-console.log("frienddl.io content script loaded");
+console.log('frienddl.io content script loaded');
 
-console.log("Setting up port");
-let backgroundPort = chrome.runtime.connect(
+console.log('Setting up port');
+chrome.runtime.connect(
   {
-    name: "c2b"
-  }
+    name: 'c2b',
+  },
 );
 
 function checkDisconnected() {
-  let disconnectButton = $("#modalDisconnect button:contains('Ok')");
-  let disconnectVisible = disconnectButton.is(":visible");
+  const disconnectButton = $('#modalDisconnect button:contains("Ok")');
+  const disconnectVisible = disconnectButton.is(':visible');
   if (disconnectVisible) {
-    console.log("Disconnected");
+    console.log('Disconnected');
     disconnectButton.click();
     return true;
-  } else {
-    return false;
   }
+
+  return false;
 }
 
 function receiveRequest(request, sender, sendResponse) {
-  console.log("Request received");
+  console.log('Request received');
   console.dir(request);
 
   chrome.storage.local.get(
     [
-      "state"
+      'state',
     ],
-    function(response) {
-      if (response.state === "search") {
-        console.log("Waiting for play button");
-        var checkIfPlayButtonExists = setInterval(
-          function() {
-            if ($("button[type='submit']").length >= 2) {
-              console.log("Play button exists, clicking now");
+    (response) => {
+      if (response.state === 'search') {
+        console.log('Waiting for play button');
+        const checkIfPlayButtonExists = setInterval(
+          () => {
+            if ($('button[type="submit"]').length >= 2) {
+              console.log('Play button exists, clicking now');
 
-              let playButton = $("button[type='submit']")[0];
-              console.log("Clicking play button");
+              const playButton = $('button[type="submit"]')[0];
+              console.log('Clicking play button');
               playButton.click();
               clearInterval(checkIfPlayButtonExists);
             } else {
-              console.log("Play button doesn't exist");
+              console.log('Play button doesn\'t exist');
             }
           },
-          100
+          100,
         );
 
-        console.log("Waiting for players");
-        var checkIfPlayersExist = setInterval(
-          function() {
-            let disconnected = checkDisconnected();
+        console.log('Waiting for players');
+        const checkIfPlayersExist = setInterval(
+          () => {
+            const disconnected = checkDisconnected();
             if (disconnected) {
               sendResponse(
                 {
                   players: [],
-                  tabId: request.tabId
-                }
+                  tabId: request.tabId,
+                },
               );
             }
 
             if ($('.player').length >= 2) {
-              console.log("Players exist");
+              console.log('Players exist');
 
-              let playersArray = [];
+              const playersArray = [];
               $('.player').each(
-                function() {
-                  let playerName = $(this).find(".name").html();
-                  if (playerName !== null && playerName !== "" && !(playersArray.includes(playerName))) {
+                () => {
+                  const playerName = $(this).find('.name').html();
+                  if (playerName !== null && playerName !== '' && !(playersArray.includes(playerName))) {
                     playersArray.push(playerName);
                   }
-                }
+                },
               );
 
               clearInterval(checkIfPlayersExist);
@@ -77,17 +77,17 @@ function receiveRequest(request, sender, sendResponse) {
               sendResponse(
                 {
                   players: playersArray,
-                  tabId: request.tabId
-                }
+                  tabId: request.tabId,
+                },
               );
             } else {
-              console.log("Players don't exist");
+              console.log('Players don\'t exist');
             }
           },
-          100
+          100,
         );
       }
-    }
+    },
   );
 
   return true;

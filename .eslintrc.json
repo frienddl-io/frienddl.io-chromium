@@ -1,0 +1,18 @@
+{
+    "env": {
+        "browser": true,
+        "commonjs": true,
+        "es2020": true,
+        "webextensions": true,
+        "jquery": true
+    },
+    "extends": [
+        "airbnb-base"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 11
+    },
+    "rules": {
+        "no-console": ["error", { "allow": ["log", "warn", "error", "dir"] }]
+    }
+}

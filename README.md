@@ -36,7 +36,11 @@ This project is open for anyone to contribute. Follow these steps:
 3. Make changes
 4. Reload the extension
 5. Test changes by running the application locally
-6. When satisfied with changes, open a pull request with screenshots of your testing evidence
+6. Linter
+   1. Install npm if you haven't already: https://www.npmjs.com/get-npm
+   2. Run `npm install`
+   3. Run the linter: `eslint js\`
+7. When satisfied with changes and lint is clean, open a pull request with screenshots of your testing evidence
 
 ## Getting Started
 
