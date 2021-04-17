@@ -77,16 +77,6 @@ chrome.storage.onChanged.addListener(
   }
 );
 
-// For debugging
-// function wait(ms) {
-//   console.log("Waiting");
-//   var start = new Date().getTime();
-//   var end = start;
-//   while(end < start + ms) {
-//     end = new Date().getTime();
-//   }
-// }
-
 // Steps to take when one or more friends are found
 function foundFriend(friendsArray) {
   updatePopupAndBadge("success");

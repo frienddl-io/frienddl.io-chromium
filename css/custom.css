@@ -12,6 +12,11 @@ body
   padding: 10px;
 }
 
+.container-fluid
+{
+  padding-bottom: 5px;
+}
+
 .hidden
 {
   display: none;
