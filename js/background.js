@@ -48,31 +48,35 @@ chrome.alarms.onAlarm.addListener(
 
 // Creates alarm to monitor current player's score
 function createAlarm(tabId) {
-  chrome.storage.sync.get(
-    [
-      "highScoreOptOut"
-    ],
-    function(response) {
-      let highScoreOptOut = response.highScoreOptOut || false;
+  if (tabId === null) {
+    console.log("tabId is null; not creating alarm");
+  } else {
+    chrome.storage.sync.get(
+      [
+        "highScoreOptOut"
+      ],
+      function(response) {
+        let highScoreOptOut = response.highScoreOptOut || false;
 
-      console.dir(tabId);
-      let alarmName = tabId.toString();
-      console.log(`alarmName: ${alarmName}`)
+        console.dir(tabId);
+        let alarmName = tabId.toString();
+        console.log(`alarmName: ${alarmName}`)
 
-      if (!highScoreOptOut) {
-        console.log(`Creating alarm: ${alarmName}`);
-        chrome.alarms.create(
-          alarmName,
-          {
-            delayInMinutes: 1
-          }
-        );
-        console.log(`Alarm created: ${alarmName}`);
-      } else {
-        console.log("Opted out of high scores; not creating alarm");
+        if (!highScoreOptOut) {
+          console.log(`Creating alarm: ${alarmName}`);
+          chrome.alarms.create(
+            alarmName,
+            {
+              delayInMinutes: 1
+            }
+          );
+          console.log(`Alarm created: ${alarmName}`);
+        } else {
+          console.log("Opted out of high scores; not creating alarm");
+        }
       }
-    }
-  );
+    );
+  }
 }
 
 // Listen for messages from popup
@@ -102,14 +106,14 @@ chrome.runtime.onConnect.addListener(
 
       createAlarm(tabId);
     } else {
-      console.log("Port is not recognized: " + port.name);
+      console.log(`Port is not recognized: ${port.name}`);
     }
   }
 );
 
 function scoreOutdated(currentScoreDate, today, days) {
   let daysAgo = new Date(today - (days * 24 * 60 * 60 * 1000)).getTime();
-  console.log(`daysAgo: ${daysAgo}`);
+  console.debug(`daysAgo: ${daysAgo}`);
 
   if (currentScoreDate < daysAgo) {
     console.log(`currentScoreDate is older than ${days} days: ${currentScoreDate} < ${daysAgo}`);
@@ -128,7 +132,8 @@ function respondToScoreSearchContent(response) {
     let lastError = chrome.runtime.lastError.message;
     console.log(`Response was undefined, last error: ${lastError}`);
   } else {
-    console.log("Checking for new high score");
+    let tabId = response.tabId;
+    console.log(`Checking for new high score in tab with id: ${tabId}`);
 
     let score = response.score;
     console.debug("score: " + score)
@@ -242,9 +247,9 @@ function respondToScoreSearchContent(response) {
     } else {
       console.log("Score not found or 0; skipping over");
     }
-  }
 
-  createAlarm(response.tabId);
+    createAlarm(tabId);
+  }
 }
 
 // Listen for window to close
@@ -369,6 +374,7 @@ function respondToFriendSearchContent(response) {
 
           if (friendsFound.length === 0) {
             console.log("No friends found");
+            foundFriend(friendsFound, tabId);
             if (response.state === "search") {
               joinNewGame(tabId);
             }
@@ -504,7 +510,8 @@ function foundFriend(friendsArray, tabId) {
           "runTime",
           "totalFriendsFound",
           "totalRunTime",
-          "windowId"
+          "windowId",
+          "audioAlert"
         ],
         function(response) {
           let currentTime = new Date().getTime();
@@ -537,10 +544,15 @@ function foundFriend(friendsArray, tabId) {
             }
           );
 
-          let language = chrome.i18n.getUILanguage().split('-')[0];
-          console.log(`Using language: ${language}`);
-          let audio = new Audio(`../_locales/${language}/success.mp3`);
-          audio.play();
+          let audioAlert = response.audioAlert;
+          console.log(`audioAlert: ${audioAlert}`);
+
+          if (audioAlert === null || audioAlert) {
+            let language = chrome.i18n.getUILanguage().split('-')[0];
+            console.log(`Using language: ${language}`);
+            let audio = new Audio(`../_locales/${language}/success.mp3`);
+            audio.play();
+          }
         }
       );
     }

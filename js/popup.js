@@ -25,6 +25,7 @@ $("#friend-input").attr("placeholder", chrome.i18n.getMessage("addFriendPlacehol
 $("#pencil").attr("alt", chrome.i18n.getMessage("altPencil"));
 $("#add-friend-button").text(chrome.i18n.getMessage("addFriendButton"));
 $("#minimized-text").text(chrome.i18n.getMessage("windowMinimized"));
+$("#audio-alert-text").text(chrome.i18n.getMessage("audioAlert"));
 
 $("#character-error").text(chrome.i18n.getMessage("characterError"));
 $("#duplicate-error").text(chrome.i18n.getMessage("duplicateError"));
@@ -207,6 +208,7 @@ function updateDisabledPropOfForm(state, pause = false) {
 
   if (!pause) {
     $("#minimized-toggle").prop("disabled", state);
+    $("#audio-alert-toggle").prop("disabled", state);
   }
 
   if (state) {
@@ -244,6 +246,7 @@ document.addEventListener("DOMContentLoaded", function () {
       "startTime",
       "runTime",
       "windowMinimized",
+      "audioAlert",
       "currentTab"
     ],
     function(response) {
@@ -270,9 +273,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (response.windowMinimized !== undefined && response.windowMinimized === false) {
         console.log("Changing minimized toggle to unchecked");
-        $("#minimized-toggle").prop('checked', false);
+        $("#minimized-toggle").prop("checked", false);
       } else {
         console.log("Keeping minimized toggle checked");
+      }
+
+      if (response.audioAlert !== undefined && response.audioAlert === false) {
+        console.log("Changing audio alert toggle to unchecked");
+        $("#audio-alert-toggle").prop("checked", false);
+      } else {
+        console.log("Keeping audio alert toggle checked");
       }
 
       if (response.gamesJoined !== undefined) {
@@ -501,11 +511,24 @@ document.addEventListener("DOMContentLoaded", function () {
   $("#minimized-toggle").bind("click", minimizeToggled);
 
   function minimizeToggled() {
-    let checked = $(this).is(':checked');
+    let checked = $(this).is(":checked");
     console.log(`Setting windowMinimized to ${checked}`);
     chrome.storage.local.set(
       {
         "windowMinimized": checked
+      }
+    );
+  }
+
+  // Listen for audio alert toggle
+  $("#audio-alert-toggle").bind("click", audioAlertToggled);
+
+  function audioAlertToggled() {
+    let checked = $(this).is(":checked");
+    console.log(`Setting audioAlert to ${checked}`);
+    chrome.storage.local.set(
+      {
+        "audioAlert": checked
       }
     );
   }

@@ -1,12 +1,12 @@
 const prefix = "frienddl.io | ";
 console.log(prefix + "Content script loaded");
 
-console.log("Setting up c2b port");
 let backgroundPort = chrome.runtime.connect(
   {
     name: "c2b"
   }
 );
+console.log(prefix + "c2b port set up");
 
 function checkDisconnected() {
   let disconnectButton = $("#modalDisconnect button:contains('Ok')");

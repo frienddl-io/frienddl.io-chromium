@@ -20,6 +20,9 @@
   "windowMinimized": {
     "message": "Une fenêtre chercheuse est ouverte et réduit"
   },
+  "audioAlert": {
+    "message": "Play audio message when found"
+  },
   "characterError": {
     "message": "S'il vous plaît, inscrivez au moins un caractère. "
   },

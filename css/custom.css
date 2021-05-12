@@ -147,7 +147,7 @@ svg
   border-color: #bd2130 !important;
 }
 
-#minimized-option
+#friend-finder .custom-control.custom-switch
 {
   margin-bottom: 5px;
 }
@@ -160,8 +160,8 @@ label
 /* Enabled */
 #friend-finder .custom-control-input:checked~.custom-control-label::before
 {
-  border-color: #28A745 !important;
-  background-color: #28A745 !important;
+  border-color: #28A745;
+  background-color: #28A745;
 }
 
 .invalid-feedback
@@ -220,12 +220,12 @@ label
 /* Enabled */
 #opt-out-option .custom-control-input:checked~.custom-control-label::before
 {
-  border-color: #7a2931 !important;
-  background-color: #AD3233  !important;
+  border-color: #7a2931;
+  background-color: #AD3233;
 }
 
 table.disabled th,
 table.disabled td
 {
-  color: rgba(247, 248, 247, 0.418);
+  color: rgba(247, 248, 247, 0.42);
 }

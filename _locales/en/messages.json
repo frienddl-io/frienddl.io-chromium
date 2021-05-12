@@ -20,6 +20,9 @@
   "windowMinimized": {
     "message": "Open search window minimized"
   },
+  "audioAlert": {
+    "message": "Play audio message when found"
+  },
   "characterError": {
     "message": "Please enter at least one character."
   },
