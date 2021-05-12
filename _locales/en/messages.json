@@ -1,11 +1,14 @@
 {
   "extensionName": {
-    "message": "frienddl.io - skribbl.io friend finder"
+    "message": "frienddl.io - skribbl.io friend finder & score keeper"
   },
   "extensionDescription": {
-    "message": "Tool to find friends in public rooms on skribbl.io"
+    "message": "Tool to find friends in public rooms on skribbl.io and keep track of high scores"
   },
-  "instructions": {
+  "friendFinderTabName": {
+    "message": "Friend Finder"
+  },
+  "friendFinderDescription": {
     "message": "Enter your friends then search to find them on skribbl.io"
   },
   "altPencil": {
@@ -19,6 +22,9 @@
   },
   "windowMinimized": {
     "message": "Open search window minimized"
+  },
+  "audioAlert": {
+    "message": "Play audio message when found"
   },
   "characterError": {
     "message": "Please enter at least one character."
@@ -52,5 +58,56 @@
   },
   "foundFriendPlural": {
     "message": "Found Friends!"
+  },
+  "scoreKeeperTabName": {
+    "message": "Score Keeper"
+  },
+  "scoreKeeperAutomaticDescription": {
+    "message": "Updates as you earn points"
+  },
+  "scoreKeeperManualDescription": {
+    "message": "Click button to update"
+  },
+  "highScores": {
+    "message": "High Scores"
+  },
+  "altCrown": {
+    "message": "crown icon"
+  },
+  "totalPoints": {
+    "message": "Total Points"
+  },
+  "altRollingDie": {
+    "message": "rolling die icon"
+  },
+  "scoreKeeperAutomatic": {
+    "message": "Auto"
+  },
+  "scoreKeeperManual": {
+    "message": "Manual"
+  },
+  "scoreKeeperUpdateButton": {
+    "message": "Sync"
+  },
+  "updateText": {
+    "message": "Updating..."
+  },
+  "lastDay": {
+    "message": "Last Day"
+  },
+  "lastSevenDays": {
+    "message": "Last 7 Days"
+  },
+  "lastThirtyDays": {
+    "message": "Last 30 Days"
+  },
+  "allTime": {
+    "message": "All-Time"
+  },
+  "resetButton": {
+    "message": "Reset"
+  },
+  "resetWarning": {
+    "message": "Click again to permanently delete data."
   }
 }

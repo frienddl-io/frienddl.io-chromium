@@ -1,15 +1,18 @@
 {
   "extensionName": {
-    "message": "frienddl.io - skribbl.io friend finder"
+    "message": "frienddl.io - skribbl.io marqueur et chercheur des amis"
   },
   "extensionDescription": {
-    "message": "Outil pour chercher vos amis aux salons publics de skribbl.io"
+    "message": "Un outil pour trouver vos amis dans les salons publics et suivre les meilleures scores."
   },
-  "instructions": {
+  "friendFinderTabName": {
+    "message": "Trouveur des amis"
+  },
+  "friendFinderDescription": {
     "message": "Inscrivez les noms de vos amis, puis chercher pour les trouver en skribbl.io"
   },
   "altPencil": {
-    "message": "icône de crayon"
+    "message": "Icône de crayon"
   },
   "addFriendPlaceholder": {
     "message": "Ami"
@@ -19,6 +22,9 @@
   },
   "windowMinimized": {
     "message": "Une fenêtre chercheuse est ouverte et réduit"
+  },
+  "audioAlert": {
+    "message": "Jouer un message audio lorsqu'un ami est trouvé"
   },
   "characterError": {
     "message": "S'il vous plaît, inscrivez au moins un caractère. "
@@ -52,5 +58,56 @@
   },
   "foundFriendPlural": {
     "message": "Des amis trouvés!"
+  },
+  "scoreKeeperTabName": {
+    "message": "Marqueur"
+  },
+  "scoreKeeperAutomaticDescription": {
+    "message": "Mise à jour pendant vous jouez"
+  },
+  "scoreKeeperManualDescription": {
+    "message": "Cliquer pour mise à jour"
+  },
+  "highScores": {
+    "message": "Meilleurs scores"
+  },
+  "altCrown": {
+    "message": "Icône de couronne"
+  },
+  "totalPoints": {
+    "message": "Points totals"
+  },
+  "altRollingDie": {
+    "message": "Icône de dé roulant"
+  },
+  "scoreKeeperAutomatic": {
+    "message": "Auto"
+  },
+  "scoreKeeperManual": {
+    "message": "Manuel"
+  },
+  "scoreKeeperUpdateButton": {
+    "message": "Synchroniser"
+  },
+  "updateText": {
+    "message": "Mise à jour..."
+  },
+  "lastDay": {
+    "message": "Dernier 24h"
+  },
+  "lastSevenDays": {
+    "message": "Dernier 7 jours"
+  },
+  "lastThirtyDays": {
+    "message": "Dernier 30 jours"
+  },
+  "allTime": {
+    "message": "De tous les temps"
+  },
+  "resetButton": {
+    "message": "Remettre"
+  },
+  "resetWarning": {
+    "message": "Cliquer encore pour supprimer des données définitivement."
   }
 }

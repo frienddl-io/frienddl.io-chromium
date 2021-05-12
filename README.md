@@ -5,31 +5,55 @@
 [![](https://img.shields.io/chrome-web-store/v/bmadghlcpopfbnfcpmicdoafognfbhmm?color=6778C6)](https://github.com/frienddl-io/frienddl.io-chrome/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/frienddl-io/frienddl.io-chrome/blob/main/LICENSE.md)
 
-frienddl.io is a browser extension to find friends on [skribbl.io](https://skribbl.io/), a free online multiplayer drawing & guessing game.
+frienddl.io is a browser extension for [skribbl.io](https://skribbl.io/), a free online multiplayer drawing & guessing game. It aims to make playing more enjoyable by helping friends find each other in public lobbies and to keep track of scores.
 
-Download it now on [Chrome](https://chrome.google.com/webstore/detail/frienddlio/bmadghlcpopfbnfcpmicdoafognfbhmm) or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/frienddlio/)!
+Download it now for [Chromium browsers](https://chrome.google.com/webstore/detail/frienddlio/bmadghlcpopfbnfcpmicdoafognfbhmm) or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/frienddlio/)!
 
-This is the codebase for the Google Chrome version, but the goal is for all versions to have nearly identical code and feature parity.
+This is the codebase for the Chromium version, but the goal is for all versions to have nearly identical code and feature parity.
+
+Chromium browsers include:
+
+- Google Chrome
+- Microsoft Edge (newer versions)
+- Brave
+- Opera
 
 ## Features
 
+- Clean and easy to understand user interface
+- All data is stored on your machine and isn't collected
+
+### Friend Finder
+
 - Works in the background so you can focus on other things while waiting
-- Alerts you when a friend has been found
 - Saves your friends so you don't have to type them in repeatedly
 - Pause to add more friends and continue searching
 - Stop to close out the search window
+- Option to play audio when a friend has been found
 - Option to open the search window minimized
 - Keeps track of search stats
 - Updates badge to show how many games have been joined
 - Handles disconnect errors cleanly to keep the search running
+- Use with an ad blocker for best results; I recommend [Privacy Badger](https://privacybadger.org/)
+
+### Score Keeper
+
+- Monitors your score as you earn points in games
+- Switch to manual mode to update it yourself
+- Shows your all-time high score as well as 1, 7, and 30 day high scores
+- Shows the total amount of points you've earned as well as 1, 7, and 30 day totals
+- Shows your current name and avatar
+- Option to reset your data to give yourself a clean slate
 
 ## Support
 
-More information [here](https://github.com/frienddl-io/frienddl.io-support)
+More information is on the [support repository](https://github.com/frienddl-io/frienddl.io-support).
 
 ## Contributions
 
-This project is open for anyone to contribute. Follow these steps:
+This project's code is open for anyone to contribute. It's formatted for easy reading, with the hope that JavaScript novices are able to understand the core logic.
+
+Follow these steps to contribute:
 
 1. Fork this repository
 2. Follow the [Getting Started](#getting-started) steps
@@ -49,7 +73,7 @@ This project is open for anyone to contribute. Follow these steps:
 2. Open the Extensions page in Chrome: `chrome://extensions/`
 3. Turn on developer mode in the top right corner
 4. Click "Load unpacked" at the top left
-5. Select the `frienddl.io-chrome` directory
+5. Select the `frienddl.io-chromium` directory
 
 ## Credits
 

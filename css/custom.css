@@ -5,11 +5,23 @@ body
   width: 300px;
   height: 150px;
   background-image: url("../img/background.png");
+  background-color: #255294;
 }
 
 body
 {
   padding: 10px;
+}
+
+h2,
+.h2
+{
+  font-size: 1.7rem;
+}
+
+hr
+{
+  border-top-color: #FFFFFF;
 }
 
 .container-fluid
@@ -28,13 +40,64 @@ body
   text-align: center;
 }
 
-#instructions,
-th,
-td,
-#spinner,
-label
+.row {
+  margin-right: 0px;
+  margin-left: 0px;
+}
+
+p,
+.h2,
+table > *,
+label,
+.description,
+.spinner,
+#score-keeper-toggle
 {
-  color: #fff;
+  color: #FFFFFF;
+}
+
+.btn.spinner:hover
+{
+  color: #FFFFFF !important;
+}
+
+.spinner
+{
+  line-height: 1.8;
+  font-size: 20px;
+  cursor: default;
+}
+
+.btn-success
+{
+  color: #FFFFFF;
+  background-color: #1EBF38;
+  border-color: #1DBF38;
+}
+
+.btn-warning
+{
+  background-color: #F3FF14;
+  border-color: #F3FF14;
+}
+
+.btn-outline-warning
+{
+  color: #F3FF14;
+  border-color: #F3FF14;
+}
+
+.btn-outline-warning:hover
+{
+  color: #212529;
+  background-color: #E5EF1B;
+  border-color: #E5EF1B;
+}
+
+.btn-danger
+{
+  background-color: #E90821;
+  border-color: #E90821;
 }
 
 #title,
@@ -55,14 +118,56 @@ svg
 }
 
 /* Header */
-#instructions
+.btn-group-toggle
+{
+  width: 100%;
+}
+
+#tabs
+{
+  margin: 10px 0 15px 0;
+}
+
+#all-time-date
+{
+  font-size: 13px;
+}
+
+#all-time-date td
+{
+  padding: 0;
+}
+
+#new-badge
+{
+  font-size: 10px;
+  position: absolute;
+  z-index: 10;
+  top: 102px;
+  left: 200px;
+  background-color: #23C7E8;
+  color: #000000;
+
+  /* background: rgb(233,8,33);
+  background: linear-gradient(90deg, rgba(233,8,33,1) 0%, rgba(243,105,11,1) 20%, rgba(242,255,21,1) 40%, rgba(30,191,56,1) 60%, rgba(39,22,241,1) 80%, rgba(198,9,237,1) 100%); */
+
+  /* -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #000000; */
+  /* text-shadow: -1px 1px 0 #000,
+              1px 1px 0 #000,
+              1px -1px 0 #000;
+              -1px -1px 0 #000; */
+  /* -webkit-text-stroke: 1px #282828;
+  text-shadow: 0px 4px 4px #282828; */
+}
+
+.description
 {
   text-align: center;
   margin-bottom: 10px;
 }
 
-/* Form */
-
+/* Friend Finder */
 #pencil
 {
   height: 38px;
@@ -76,24 +181,6 @@ svg
   border-bottom-right-radius: 0;
 }
 
-.btn-success {
-  color: #fff;
-  background-color: #1DBF38;
-  border-color: #1DBF38;
-}
-
-.btn-warning
-{
-  background-color: #F3FF17;
-  border-color: #F3FF17;
-}
-
-.btn-danger
-{
-  background-color: #E80920;
-  border-color: #E80920;
-}
-
 #start-button,
 #resume-button,
 #pause-button,
@@ -102,6 +189,12 @@ svg
   margin-bottom: 15px;
 }
 
+#friend-finder .spinner
+{
+  padding: 5px 0 15px 0;
+}
+
+
 #friends button
 {
   margin: 0 10px 10px 0;
@@ -109,20 +202,20 @@ svg
 
 .friend-button
 {
-  color: #fff !important;
-  border-color: #fff !important;
+  color: #FFFFFF !important;
+  border-color: #FFFFFF !important;
 }
 
 .enabled-friend-button:hover
 {
-  color: #fff !important;
+  color: #FFFFFF !important;
   background-color: #c82333 !important;
   border-color: #bd2130 !important;
 }
 
-#minimized-option
+#friend-finder .custom-control.custom-switch
 {
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 
 label
@@ -133,15 +226,21 @@ label
 /* Enabled */
 .custom-control-input:checked~.custom-control-label::before
 {
-  border-color: #28A745 !important;
-  background-color: #28A745 !important;
+  border-color: #28A745;
+  background-color: #1EBF38;
 }
 
 /* Disabled */
 .custom-control-input:checked:disabled~.custom-control-label::before
 {
-  border-color: #28a745 !important;
-  background-color: #74C687 !important;
+  border-color: rgba(40, 167, 69, 50%) !important;
+  background-color: rgba(30, 191, 56, 50%) !important;
+}
+
+.custom-control-input:disabled~.custom-control-label,
+.custom-control-input[disabled]~.custom-control-label
+{
+  color: rgba(255, 255, 255, 50%);
 }
 
 .invalid-feedback
@@ -155,25 +254,26 @@ label
   font-size: 80%;
 }
 
-/* Search */
+/* Friend Finder */
 
-#spinner
-{
-  font-size: 20px;
-  cursor: default;
-}
-
-#spinner img
+.spinner img
 {
   height: 35px;
   vertical-align: top;
 }
 
-#stats th
+#stats th,
+#score-keeper th
 {
   font-weight: bold;
   text-align: right;
   width: 60%;
+}
+
+#stats td,
+#score-keeper td
+{
+  text-align: left;
 }
 
 #stats td
@@ -193,5 +293,147 @@ label
 {
   color: #FFFFFF;
   background-color: transparent;
-  border-color: #c3e6cb;
+  border-color: #C3E6CB;
+}
+
+/* Score Keeper */
+#score-keeper img
+{
+  vertical-align: top;
+}
+
+#high-scores table
+{
+  margin-bottom: .7rem;
+}
+
+#total-points table
+{
+  margin-bottom: .3rem;
+}
+
+#all-time-date td
+{
+  text-align: center;
+}
+
+#score-keeper-type-option
+{
+  margin-bottom: 10px
+}
+
+.toggle
+{
+  position: absolute;
+  top: 121px;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.reset
+{
+  padding: 1px 20px;
+  margin: 0;
+}
+
+.reset-warning
+{
+  padding-top: 10px;
+}
+
+#manual-toggle-text
+{
+  right: 180px;
+}
+
+#automatic-toggle-text
+{
+  left: 171px;
+}
+
+#score-keeper .spinner
+{
+  padding: 10px 0 0 0;
+}
+
+/* Avatars */
+#playerData table
+{
+  width: 100%;
+  height: 100%;
+  word-wrap:break-word;
+  table-layout: fixed;
+}
+
+#playerName
+{
+  margin: 0px;
+  text-align: center;
+  overflow-wrap: break-word;
+}
+
+#loginAvatarCustomizeContainer .avatarContainer
+{
+  flex: 0 0 auto;
+  width: 96px;
+  height: 96px;
+}
+
+#logoAvatarContainer
+{
+  margin-top: 17px;
+  padding-bottom: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.avatar
+{
+  pointer-events: none;
+  user-select: none;
+  position: relative;
+  flex: 0 0 auto;
+  height: 48px;
+  width: 48px;
+}
+
+.avatar .color,
+.avatar .eyes,
+.avatar .mouth,
+.avatar-fit
+{
+  width: 100%;
+  height: 100%;
+}
+
+.avatar .color
+{
+  position: absolute;
+  background-image: url("../img/color_atlas.gif");
+  background-repeat: no-repeat;
+}
+
+.avatar .eyes
+{
+  position: absolute;
+  background-image: url("../img/eyes_atlas.gif");
+  background-repeat: no-repeat;
+}
+
+.avatar .mouth
+{
+  position: absolute;
+  background-image: url("../img/mouth_atlas.gif");
+  background-repeat: no-repeat;
+}
+
+.avatar .special
+{
+  position: absolute;
+  left: -33%;
+  top: -33%;
+  width: 166%;
+  height: 166%;
+  background-image: url("../img/special_atlas.gif");
+  background-repeat: no-repeat;
 }
