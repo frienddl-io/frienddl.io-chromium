@@ -24,13 +24,13 @@
             High Scores
           </label>
         </div>
-        <span id="new" class="badge badge-warning">
+        <span id="#new-badge" class="badge badge-warning">
           New
         </span>
       </div>
 
       <div id="friend-finder" class="tabContent">
-        <p id="instructions"></p>
+        <p class="description"></p>
 
         <div class="input-group mb-3">
           <img id="pencil" src="../img/pencil.gif">
@@ -62,7 +62,8 @@
             id="minimized-text"
             class="custom-control-label"
             for="minimized-toggle"
-          ></label>
+          >
+          </label>
         </div>
 
         <button
@@ -162,8 +163,9 @@
       </div>
 
       <div id="high-scores" class="tabContent">
-        <p id="description"></p>
-        <table class="table table-borderless">
+        <p class="description"></p>
+
+        <table class="table table-borderless" >
           <tbody>
             <tr id="last-day">
               <th scope="row"></th>
@@ -186,6 +188,20 @@
             </tr>
           </tbody>
         </table>
+
+        <div id="opt-out-option" class="custom-control custom-switch center">
+          <input
+            id="opt-out-toggle"
+            type="checkbox"
+            class="custom-control-input"
+          >
+          <label
+            id="opt-out-text"
+            class="custom-control-label"
+            for="opt-out-toggle"
+          >
+          </label>
+        </div>
       </div>
     </div>
 

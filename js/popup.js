@@ -20,7 +20,7 @@ chrome.storage.local.get(
 );
 
 // Load translations
-$("#instructions").text(chrome.i18n.getMessage("instructions"));
+$("#friend-finder .description").text(chrome.i18n.getMessage("friendFinderDescription"));
 $("#friend-input").attr("placeholder", chrome.i18n.getMessage("addFriendPlaceholder"));
 $("#pencil").attr("alt", chrome.i18n.getMessage("altPencil"));
 $("#add-friend-button").text(chrome.i18n.getMessage("addFriendButton"));
@@ -38,7 +38,8 @@ $("#players-found th").text(chrome.i18n.getMessage("playersFound"));
 $("#run-time th").text(chrome.i18n.getMessage("runTime"));
 $("#found-friend-title").text(chrome.i18n.getMessage("foundFriendSingular"));
 
-$("#description").text(chrome.i18n.getMessage("highScoresDescription"));
+$("#high-scores .description").text(chrome.i18n.getMessage("highScoresDescription"));
+$("#opt-out-text").text(chrome.i18n.getMessage("highScoresOptOut"));
 $("#last-day th").text(chrome.i18n.getMessage("lastDay"));
 $("#last-seven-days th").text(chrome.i18n.getMessage("lastSevenDays"));
 $("#last-thirty-days th").text(chrome.i18n.getMessage("lastThirtyDays"));
@@ -303,9 +304,18 @@ document.addEventListener("DOMContentLoaded", function () {
           "sevenDayScore",
           "thirtyDayScore",
           "allTimeScore",
-          "allTimeScoreDate"
+          "allTimeScoreDate",
+          "highScoreOptOut"
         ],
         function(response) {
+          let highScoreOptOut = response.highScoreOptOut;
+          $("#opt-out-toggle").prop('checked', highScoreOptOut);
+          if (highScoreOptOut) {
+            $('#high-scores table').addClass("disabled");
+          } else {
+            $('#high-scores table').removeClass("disabled");
+          }
+
           let oneDayScore = response.oneDayScore || 0;
           let sevenDayScore = response.sevenDayScore || 0;
           let thirtyDayScore = response.thirtyDayScore || 0;
@@ -363,7 +373,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       );
     } else {
-      $(`input[name="${tabName}"]`).parent().addClass("active");
+      let label = $(`input[name="${tabName}"]`).parent();
+      label.addClass("active");
 
       $(".tabContent").each(
         function() {
@@ -699,7 +710,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     );
 
-    console.log("Sending join new game message");
+    console.log("Sending message to join new game");
     backgroundPort.postMessage(
       {
         windowId: tabId,
@@ -758,5 +769,41 @@ document.addEventListener("DOMContentLoaded", function () {
       currentTime = new Date().getTime();
     }
     return currentTime - startTime;
+  }
+
+  // Listen for button that resumes search
+  $("#opt-out-toggle").bind("click", toggleOptOut);
+
+  function toggleOptOut() {
+    let toggleChecked = $("#opt-out-toggle").is(':checked');
+    console.log(`Opting out: ${toggleChecked}`);
+
+    chrome.storage.sync.set(
+      {
+        highScoreOptOut: toggleChecked
+      }
+    );
+
+    if (toggleChecked) {
+      chrome.alarms.clearAll();
+      console.log();
+      $('#high-scores table').addClass("disabled");
+    } else {
+      $('#high-scores table').removeClass("disabled");
+
+      // Create port to send messages to background
+      let backgroundPort = chrome.runtime.connect(
+        {
+          name: "p2b"
+        }
+      );
+
+      console.log("Sending message to create alarms");
+      backgroundPort.postMessage(
+        {
+          task: "createAlarms"
+        }
+      );
+    }
   }
 }, false);

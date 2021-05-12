@@ -5,7 +5,7 @@
   "extensionDescription": {
     "message": "Tool to find friends in public rooms on skribbl.io"
   },
-  "instructions": {
+  "friendFinderDescription": {
     "message": "Enter your friends then search to find them on skribbl.io"
   },
   "altPencil": {
@@ -54,7 +54,10 @@
     "message": "Found Friends!"
   },
   "highScoresDescription": {
-    "message": "Checks your score every minute while playing"
+    "message": "Checks your score once a minute"
+  },
+  "highScoresOptOut": {
+    "message": "Opt Out"
   },
   "lastDay": {
     "message": "Last Day"

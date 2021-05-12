@@ -1,4 +1,5 @@
-console.log("frienddl.io content script loaded");
+const prefix = "frienddl.io | ";
+console.log(prefix + "Content script loaded");
 
 console.log("Setting up c2b port");
 let backgroundPort = chrome.runtime.connect(
@@ -11,7 +12,7 @@ function checkDisconnected() {
   let disconnectButton = $("#modalDisconnect button:contains('Ok')");
   let disconnectVisible = disconnectButton.is(":visible");
   if (disconnectVisible) {
-    console.log("Disconnected");
+    console.debug(prefix + "Disconnected");
     disconnectButton.click();
     return true;
   } else {
@@ -20,10 +21,11 @@ function checkDisconnected() {
 }
 
 function receiveRequest(request, sender, sendResponse) {
-  console.log("Request received");
-  console.dir(request);
+  let task = request.task;
 
-  if (request.task === "scoreSearch") {
+  console.log(prefix + `Received request: ${task}`);
+
+  if (task === "scoreSearch") {
     if ( $('.player').length > 1) {
       $('.player').each(
         function() {
@@ -31,49 +33,50 @@ function receiveRequest(request, sender, sendResponse) {
 
           if (playerName.includes("(You)")) {
             let score = $(this).find(".score").html().replace("Points: ", "");
-            console.log(`Your current score is ${score}`);
+            console.log(prefix + `Sending score: ${score}`);
 
             sendResponse(
               {
-                score: score
+                score: score,
+                tabId: request.tabId
               }
             );
           }
         }
       );
     } else {
-      console.log("Player less than one; won't check score");
+      console.log(prefix + "Player less than one; won't send score");
       sendResponse(
         {
           score: null
         }
       );
     }
-  } else if (request.task === "friendSearch") {
+  } else if (task === "friendSearch") {
     chrome.storage.local.get(
       [
         "state"
       ],
       function(response) {
         if (response.state === "search") {
-          console.log("Waiting for play button");
+          console.debug(prefix + "Waiting for play button");
           var checkIfPlayButtonExists = setInterval(
             function() {
               if ($("button[type='submit']").length >= 2) {
-                console.log("Play button exists, clicking now");
+                console.debug(prefix + "Play button exists, clicking now");
 
                 let playButton = $("button[type='submit']")[0];
-                console.log("Clicking play button");
+                console.debug(prefix + "Clicking play button");
                 playButton.click();
                 clearInterval(checkIfPlayButtonExists);
               } else {
-                console.log("Play button doesn't exist");
+                console.debug(prefix + "Play button doesn't exist");
               }
             },
             100
           );
 
-          console.log("Waiting for players");
+          console.debug(prefix + "Waiting for players");
           var checkIfPlayersExist = setInterval(
             function() {
               let disconnected = checkDisconnected();
@@ -87,7 +90,7 @@ function receiveRequest(request, sender, sendResponse) {
               }
 
               if ($('.player').length >= 2) {
-                console.log("Players exist");
+                console.debug(prefix + "Players exist");
 
                 let playersArray = [];
                 $('.player').each(
@@ -100,7 +103,7 @@ function receiveRequest(request, sender, sendResponse) {
                 );
 
                 clearInterval(checkIfPlayersExist);
-                console.log(`Sending response with playersArray: ${playersArray.toString()}`);
+                console.debug(prefix + `Sending playersArray: ${playersArray.toString()}`);
                 sendResponse(
                   {
                     players: playersArray,
@@ -108,7 +111,7 @@ function receiveRequest(request, sender, sendResponse) {
                   }
                 );
               } else {
-                console.log("Players don't exist");
+                console.debug(prefix + "Players don't exist");
               }
             },
             100

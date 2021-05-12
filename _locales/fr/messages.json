@@ -5,7 +5,7 @@
   "extensionDescription": {
     "message": "Outil pour chercher vos amis aux salons publics de skribbl.io"
   },
-  "instructions": {
+  "friendFinderDescription": {
     "message": "Inscrivez les noms de vos amis, puis chercher pour les trouver en skribbl.io"
   },
   "altPencil": {
@@ -52,5 +52,23 @@
   },
   "foundFriendPlural": {
     "message": "Des amis trouvés!"
+  },
+  "highScoresDescription": {
+    "message": ""
+  },
+  "highScoresOptOut": {
+    "message": ""
+  },
+  "lastDay": {
+    "message": ""
+  },
+  "lastSevenDays": {
+    "message": ""
+  },
+  "lastThirtyDays": {
+    "message": ""
+  },
+  "allTime": {
+    "message": ""
   }
 }

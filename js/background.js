@@ -1,4 +1,4 @@
-console.log("frienddl.io background script loaded");
+console.log("Background script loaded");
 
 const SKRIBBLIO_URL = "https://skribbl.io/";
 
@@ -11,15 +11,68 @@ const SUCCESS_BADGE_COLOR = "#17A2B8";
 
 let CONTENT_PORTS = [];
 
-function createAlarm() {
-  console.log("Creating alarm");
-  chrome.alarms.create(
-    "scoreCheck",
-    {
-      delayInMinutes: 1
+// Values for testing
+// chrome.storage.sync.set(
+//   {
+//     oneDayScore: 1000,
+//     oneDayScoreDate: new Date().getTime() - (2 * 24 * 60 * 60 * 1000),
+//     sevenDayScore: 2000,
+//     sevenDayScoreDate: new Date().getTime() - (10 * 24 * 60 * 60 * 1000),
+//     thirtyDayScore: 5000,
+//     thirtyDayScoreDate: new Date().getTime() - (45 * 24 * 60 * 60 * 1000),
+//     allTimeScore: 500,
+//     allTimeScoreDate: new Date().getTime() - (0 * 24 * 60 * 60 * 1000)
+//   }
+// );
+
+// Responds to alarms to check for new high score
+chrome.alarms.onAlarm.addListener(
+  function(alarm) {
+    console.log("Starting score search");
+    console.log(alarm);
+    console.dir(alarm);
+
+    let tabId = parseInt(alarm.name);
+    console.log(`tabId: ${tabId}`);
+
+    chrome.tabs.sendMessage(
+      tabId,
+      {
+        tabId: tabId,
+        task: "scoreSearch"
+      },
+      respondToScoreSearchContent
+    );
+  }
+);
+
+// Creates alarm to monitor current player's score
+function createAlarm(tabId) {
+  chrome.storage.sync.get(
+    [
+      "highScoreOptOut"
+    ],
+    function(response) {
+      let highScoreOptOut = response.highScoreOptOut || false;
+
+      console.dir(tabId);
+      let alarmName = tabId.toString();
+      console.log(`alarmName: ${alarmName}`)
+
+      if (!highScoreOptOut) {
+        console.log(`Creating alarm: ${alarmName}`);
+        chrome.alarms.create(
+          alarmName,
+          {
+            delayInMinutes: 1
+          }
+        );
+        console.log(`Alarm created: ${alarmName}`);
+      } else {
+        console.log("Opted out of high scores; not creating alarm");
+      }
     }
   );
-  console.log("Alarm created");
 }
 
 // Listen for messages from popup
@@ -33,37 +86,37 @@ chrome.runtime.onConnect.addListener(
 
           if (message.task === "joinNewGame") {
             joinNewGame(message.tabId);
+          } else if (message.task === "createAlarms") {
+            function forEachCreateAlarm(value, index, array) {
+              createAlarm(value);
+            }
+
+            CONTENT_PORTS.forEach(forEachCreateAlarm);
           }
         }
       );
-    } if (port.name === "c2b") {
+    } else if (port.name === "c2b") {
       let tabId = port.sender.tab.id;
       console.log(`Connected to c2b port with tabID: ${tabId}`)
       CONTENT_PORTS.push(tabId);
 
-      createAlarm();
-
-      chrome.alarms.onAlarm.addListener(
-        function(alarm) {
-          console.log("Starting score search");
-          chrome.tabs.sendMessage(
-            tabId,
-            {
-              tabId: tabId,
-              task: "scoreSearch"
-            },
-            respondToScoreSearchContent
-          );
-        }
-      );
+      createAlarm(tabId);
     } else {
       console.log("Port is not recognized: " + port.name);
     }
   }
 );
 
-function daysAgo(startDate, days) {
-  return new Date(startDate - (days * 24 * 60 * 60 * 1000));
+function scoreOutdated(currentScoreDate, today, days) {
+  let daysAgo = new Date(today - (days * 24 * 60 * 60 * 1000)).getTime();
+  console.log(`daysAgo: ${daysAgo}`);
+
+  if (currentScoreDate < daysAgo) {
+    console.log(`currentScoreDate is older than ${days} days: ${currentScoreDate} < ${daysAgo}`);
+    return true;
+  }
+
+  return false;
 }
 
 // Processes the response from the content of a game related to friend searching
@@ -75,10 +128,10 @@ function respondToScoreSearchContent(response) {
     let lastError = chrome.runtime.lastError.message;
     console.log(`Response was undefined, last error: ${lastError}`);
   } else {
-    console.log("Seeing if score is a new high");
+    console.log("Checking for new high score");
 
     let score = response.score;
-    console.log("score: " + score)
+    console.debug("score: " + score)
 
     if (score !== null && score !== 0) {
       chrome.storage.sync.get(
@@ -94,74 +147,93 @@ function respondToScoreSearchContent(response) {
         ],
         function(response) {
           let intScore = parseInt(score);
-          console.log("score: " + score)
+          console.debug("intScore: " + intScore)
 
+          let newScores = {};
           let today = new Date().getTime();
 
+          // 1 day high score
           let oneDayScore = response.oneDayScore || 0;
+          console.debug(`oneDayScore: ${oneDayScore}`);
+
           let oneDayScoreDate = response.oneDayScoreDate || today;
-          let oneDayAgo = daysAgo(today, 1);
-          if (oneDayScoreDate > oneDayAgo) {
-            oneDayScore = 0;
-            oneDayScoreDate = today;
+          console.debug(`oneDayScoreDate: ${oneDayScoreDate}`);
+
+          if (oneDayScore !== 0) {
+            if (scoreOutdated(oneDayScoreDate, today, 1)) {
+              oneDayScore = 0;
+              newScores.oneDayScore = oneDayScore;
+              newScores.oneDayScoreDate = today;
+            }
           }
 
+          // 7 days high score
           let sevenDayScore = response.sevenDayScore || 0;
+          console.debug(`sevenDayScore: ${sevenDayScore}`);
+
           let sevenDayScoreDate = response.sevenDayScoreDate || today;
-          let sevenDaysAgo = daysAgo(today, 7);
-          if (sevenDayScoreDate > sevenDaysAgo) {
-            sevenDayScore = 0;
-            sevenDayScoreDate = today;
+          console.debug(`sevenDayScoreDate: ${sevenDayScoreDate}`);
+
+          if (sevenDayScore !== 0) {
+            if (scoreOutdated(sevenDayScoreDate, today, 7)) {
+              sevenDayScore = 0;
+              newScores.sevenDayScore = sevenDayScore;
+              newScores.sevenDayScoreDate = today;
+            }
           }
 
+          // 30 days high score
           let thirtyDayScore = response.thirtyDayScore || 0;
+          console.debug(`thirtyDayScore: ${thirtyDayScore}`);
+
           let thirtyDayScoreDate = response.thirtyDayScoreDate || today;
-          let thirtyDaysAgo = daysAgo(today, 30);
-          if (thirtyDayScoreDate > thirtyDayScore) {
-            thirtyDayScore = 0;
-            thirtyDayScoreDate = today;
+          console.debug(`thirtyDayScoreDate: ${thirtyDayScoreDate}`);
+
+          if (thirtyDayScore !== 0) {
+            if (scoreOutdated(thirtyDayScoreDate, today, 30)) {
+              thirtyDayScore = 0;
+              newScores.thirtyDayScore = thirtyDayScore;
+              newScores.thirtyDayScoreDate = today;
+            }
           }
 
+          // All-time high score
           let allTimeScore = response.allTimeScore || 0;
-          let allTimeScoreDate = response.allTimeScoreDate || today;
-          let update = false
+          console.debug(`allTimeScore: ${allTimeScore}`);
 
-          if (intScore > sevenDayScore) {
-            update = true;
-            oneDayScore = intScore;
-            oneDayScoreDate = today;
+          let allTimeScoreDate = response.allTimeScoreDate || today;
+          console.debug(`allTimeScoreDate: ${allTimeScoreDate}`)
+
+          if (intScore > oneDayScore) {
+            console.log(`Setting new 1 day high score: ${oneDayScore} to ${intScore}`);
+
+            newScores.oneDayScore = intScore;
+            newScores.oneDayDate = today;
           }
 
           if (intScore > sevenDayScore) {
-            update = true;
-            sevenDayScore = intScore;
-            sevenDayScoreDate = today;
+            console.log(`Setting new 7 day high score: ${sevenDayScore} to ${intScore}`);
+
+            newScores.sevenDayScore = intScore;
+            newScores.sevenDayScoreDate = today;
           }
 
           if (intScore > thirtyDayScore) {
-            update = true;
-            thirtyDayScore = intScore;
-            thirtyDayScoreDate = today;
+            console.log(`Setting new 30 day high score: ${thirtyDayScore} to ${intScore}`);
+
+            newScores.thirtyDayScore = intScore;
+            newScores.thirtyDayScoreDate = today;
           }
 
           if (intScore > allTimeScore) {
-            update = true;
-            allTimeScore = intScore;
-            allTimeScoreDate = today;
+            console.log(`Setting new all-time high score: ${allTimeScore} to ${intScore}`);
+
+            newScores.allTimeScore = intScore;
+            newScores.allTimeScoreDate = today;
           }
 
-          if (update) {
-            let newScores = {
-              oneDayScore: oneDayScore,
-              oneDayScoreDate: oneDayScoreDate,
-              sevenDayScore: sevenDayScore,
-              sevenDayScoreDate: sevenDayScoreDate,
-              thirtyDayScore: thirtyDayScore,
-              thirtyDayScoreDate: thirtyDayScoreDate,
-              allTimeScore: allTimeScore,
-              allTimeScoreDate: allTimeScoreDate,
-            };
-            console.log("Updating scores");
+          if (Object.entries(newScores).length > 0) {
+            console.log("Updating high scores");
             console.dir(newScores);
             chrome.storage.sync.set(newScores);
           }
@@ -172,7 +244,7 @@ function respondToScoreSearchContent(response) {
     }
   }
 
-  createAlarm();
+  createAlarm(response.tabId);
 }
 
 // Listen for window to close
