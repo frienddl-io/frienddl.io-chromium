@@ -38,6 +38,7 @@ $("#players-found th").text(chrome.i18n.getMessage("playersFound"));
 $("#run-time th").text(chrome.i18n.getMessage("runTime"));
 $("#found-friend-title").text(chrome.i18n.getMessage("foundFriendSingular"));
 
+$("#description").text(chrome.i18n.getMessage("highScoresDescription"));
 $("#last-day th").text(chrome.i18n.getMessage("lastDay"));
 $("#last-seven-days th").text(chrome.i18n.getMessage("lastSevenDays"));
 $("#last-thirty-days th").text(chrome.i18n.getMessage("lastThirtyDays"));

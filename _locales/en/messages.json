@@ -53,6 +53,9 @@
   "foundFriendPlural": {
     "message": "Found Friends!"
   },
+  "highScoresDescription": {
+    "message": "Checks your score every minute while playing"
+  },
   "lastDay": {
     "message": "Last Day"
   },

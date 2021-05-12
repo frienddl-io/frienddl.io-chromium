@@ -29,6 +29,7 @@ body
 }
 
 #instructions,
+#description,
 th,
 td,
 #spinner,
@@ -55,7 +56,8 @@ svg
 }
 
 /* Header */
-#instructions
+#instructions,
+#description
 {
   text-align: center;
   margin-bottom: 10px;
@@ -256,4 +258,13 @@ label
 
 #all-time-date td {
   padding: 0;
+}
+
+#new {
+  font-size: 10px;
+  position: fixed;
+  z-index: 10;
+  top: 107px;
+  left: 200px;
+  background-color: #F3FF14;
 }
