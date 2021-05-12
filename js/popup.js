@@ -38,6 +38,11 @@ $("#players-found th").text(chrome.i18n.getMessage("playersFound"));
 $("#run-time th").text(chrome.i18n.getMessage("runTime"));
 $("#found-friend-title").text(chrome.i18n.getMessage("foundFriendSingular"));
 
+$("#last-day th").text(chrome.i18n.getMessage("lastDay"));
+$("#last-seven-days th").text(chrome.i18n.getMessage("lastSevenDays"));
+$("#last-thirty-days th").text(chrome.i18n.getMessage("lastThirtyDays"));
+$("#all-time th").text(chrome.i18n.getMessage("allTime"));
+
 // Text for badge
 const SUCCESS_BADGE_TEXT = "!";
 
@@ -222,6 +227,10 @@ function msToTime(duration) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+  // $("#last-seven td").text(100);
+  // $("#last-thirty td").text(200);
+  // $("#all-time td").text(300);
+
   // Set values of friends and stats from storage on popup startup
   chrome.storage.local.get(
     [
@@ -232,9 +241,16 @@ document.addEventListener("DOMContentLoaded", function () {
       "state",
       "startTime",
       "runTime",
-      "windowMinimized"
+      "windowMinimized",
+      "currentTab"
     ],
     function(response) {
+      if (response.currentTab === undefined || response.currentTab !== 'high-scores') {
+        openTab("friend-finder");
+      } else {
+        openTab(response.currentTab);
+      }
+
       let currentlySearching = response.state === "search";
       let friendsArray = response.friends;
       if (friendsArray !== undefined) {
@@ -279,8 +295,85 @@ document.addEventListener("DOMContentLoaded", function () {
       if (response.friendsFound !== undefined && response.friendsFound.length > 0) {
         foundFriend(response.friendsFound)
       }
+
+      chrome.storage.sync.get(
+        [
+          "oneDayScore",
+          "sevenDayScore",
+          "thirtyDayScore",
+          "allTimeScore",
+          "allTimeScoreDate"
+        ],
+        function(response) {
+          let oneDayScore = response.oneDayScore || 0;
+          let sevenDayScore = response.sevenDayScore || 0;
+          let thirtyDayScore = response.thirtyDayScore || 0;
+          let allTimeScore = response.allTimeScore || 0;
+
+          $("#last-day td").text(oneDayScore);
+          $("#last-seven-days td").text(sevenDayScore);
+          $("#last-thirty-days td").text(thirtyDayScore);
+          $("#all-time td").text(allTimeScore);
+
+          let language = chrome.i18n.getUILanguage().split('-')[0];
+          console.log(`Using language: ${language}`);
+
+          console.dir(new Date());
+          console.log(new Intl.DateTimeFormat(language).format(new Date()));
+
+          let allTimeScoreDate = response.allTimeScoreDate;
+          if (allTimeScoreDate !== null) {
+            let formattedDate = new Intl.DateTimeFormat(language).format(allTimeScoreDate);
+            console.log(formattedDate);
+            $("#all-time-date td").text(formattedDate);
+          }
+        }
+      );
     }
   );
+
+  $(".tablinks").bind("click", openTab);
+
+  function openTab(tabName) {
+    if (typeof tabName !== 'string') {
+      tabName = this.name;
+
+      $("#tabs label").each(
+        function() {
+          $(this).removeClass("active");
+        }
+      );
+
+      $(this).parent().addClass("active");
+
+      chrome.storage.local.set(
+        {
+          "currentTab": tabName
+        },
+        function() {
+          $(".tabContent").each(
+            function() {
+              $(this).css("display", "none");
+            }
+          );
+
+          let tab = $(`#${tabName}`);
+          tab.css("display", "block");
+        }
+      );
+    } else {
+      $(`input[name="${tabName}"]`).parent().addClass("active");
+
+      $(".tabContent").each(
+        function() {
+          $(this).css("display", "none");
+        }
+      );
+
+      let tab = $(`#${tabName}`);
+      tab.css("display", "block");
+    }
+  }
 
   // Check for enter press on friend input
   $("#friend-input").keypress(

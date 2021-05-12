@@ -11,6 +11,17 @@ const SUCCESS_BADGE_COLOR = "#17A2B8";
 
 let CONTENT_PORTS = [];
 
+function createAlarm() {
+  console.log("Creating alarm");
+  chrome.alarms.create(
+    "scoreCheck",
+    {
+      delayInMinutes: 1
+    }
+  );
+  console.log("Alarm created");
+}
+
 // Listen for messages from popup
 chrome.runtime.onConnect.addListener(
   function(port) {
@@ -27,12 +38,142 @@ chrome.runtime.onConnect.addListener(
       );
     } if (port.name === "c2b") {
       let tabId = port.sender.tab.id;
+      console.log(`Connected to c2b port with tabID: ${tabId}`)
       CONTENT_PORTS.push(tabId);
+
+      createAlarm();
+
+      chrome.alarms.onAlarm.addListener(
+        function(alarm) {
+          console.log("Starting score search");
+          chrome.tabs.sendMessage(
+            tabId,
+            {
+              tabId: tabId,
+              task: "scoreSearch"
+            },
+            respondToScoreSearchContent
+          );
+        }
+      );
     } else {
       console.log("Port is not recognized: " + port.name);
     }
   }
 );
+
+function daysAgo(startDate, days) {
+  return new Date(startDate - (days * 24 * 60 * 60 * 1000));
+}
+
+// Processes the response from the content of a game related to friend searching
+function respondToScoreSearchContent(response) {
+  console.log("Received response from content for score search");
+  console.dir(response);
+
+  if (response === undefined) {
+    let lastError = chrome.runtime.lastError.message;
+    console.log(`Response was undefined, last error: ${lastError}`);
+  } else {
+    console.log("Seeing if score is a new high");
+
+    let score = response.score;
+    console.log("score: " + score)
+
+    if (score !== null && score !== 0) {
+      chrome.storage.sync.get(
+        [
+          "oneDayScore",
+          "oneDayScoreDate",
+          "sevenDayScore",
+          "sevenDayScoreDate",
+          "thirtyDayScore",
+          "thirtyDayScoreDate",
+          "allTimeScore",
+          "allTimeScoreDate"
+        ],
+        function(response) {
+          let intScore = parseInt(score);
+          console.log("score: " + score)
+
+          let today = new Date().getTime();
+
+          let oneDayScore = response.oneDayScore || 0;
+          let oneDayScoreDate = response.oneDayScoreDate || today;
+          let oneDayAgo = daysAgo(today, 1);
+          if (oneDayScoreDate > oneDayAgo) {
+            oneDayScore = 0;
+            oneDayScoreDate = today;
+          }
+
+          let sevenDayScore = response.sevenDayScore || 0;
+          let sevenDayScoreDate = response.sevenDayScoreDate || today;
+          let sevenDaysAgo = daysAgo(today, 7);
+          if (sevenDayScoreDate > sevenDaysAgo) {
+            sevenDayScore = 0;
+            sevenDayScoreDate = today;
+          }
+
+          let thirtyDayScore = response.thirtyDayScore || 0;
+          let thirtyDayScoreDate = response.thirtyDayScoreDate || today;
+          let thirtyDaysAgo = daysAgo(today, 30);
+          if (thirtyDayScoreDate > thirtyDayScore) {
+            thirtyDayScore = 0;
+            thirtyDayScoreDate = today;
+          }
+
+          let allTimeScore = response.allTimeScore || 0;
+          let allTimeScoreDate = response.allTimeScoreDate || today;
+          let update = false
+
+          if (intScore > sevenDayScore) {
+            update = true;
+            oneDayScore = intScore;
+            oneDayScoreDate = today;
+          }
+
+          if (intScore > sevenDayScore) {
+            update = true;
+            sevenDayScore = intScore;
+            sevenDayScoreDate = today;
+          }
+
+          if (intScore > thirtyDayScore) {
+            update = true;
+            thirtyDayScore = intScore;
+            thirtyDayScoreDate = today;
+          }
+
+          if (intScore > allTimeScore) {
+            update = true;
+            allTimeScore = intScore;
+            allTimeScoreDate = today;
+          }
+
+          if (update) {
+            let newScores = {
+              oneDayScore: oneDayScore,
+              oneDayScoreDate: oneDayScoreDate,
+              sevenDayScore: sevenDayScore,
+              sevenDayScoreDate: sevenDayScoreDate,
+              thirtyDayScore: thirtyDayScore,
+              thirtyDayScoreDate: thirtyDayScoreDate,
+              allTimeScore: allTimeScore,
+              allTimeScoreDate: allTimeScoreDate,
+            };
+            console.log("Updating scores");
+            console.dir(newScores);
+            chrome.storage.sync.set(newScores);
+          }
+        }
+      );
+    } else {
+      console.log("Score not found or 0; skipping over");
+    }
+  }
+
+  createAlarm();
+}
 
 // Listen for window to close
 chrome.windows.onRemoved.addListener(
@@ -101,9 +242,9 @@ function joinNewGame(tabId) {
                     tabId,
                     {
                       tabId: tabId,
-                      task: "retrieveContent"
+                      task: "friendSearch"
                     },
-                    respondToContent
+                    respondToFriendSearchContent
                   );
                 } else {
                   console.log(`State is not search: ${response.state}`);
@@ -123,9 +264,9 @@ function joinNewGame(tabId) {
   )();
 }
 
-// Processes the response from the content of a game
-function respondToContent(response) {
-  console.log("Received response from content");
+// Processes the response from the content of a game related to friend searching
+function respondToFriendSearchContent(response) {
+  console.log("Received response from content for friend search");
   console.dir(response);
   updateStorage();
 

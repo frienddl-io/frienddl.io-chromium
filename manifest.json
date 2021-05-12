@@ -1,7 +1,7 @@
 {
   "name": "__MSG_extensionName__",
   "short_name": "frienddl.io",
-  "version": "1.2.1-SNAPSHOT",
+  "version": "1.2.1",
   "manifest_version": 2,
   "description": "__MSG_extensionDescription__",
   "default_locale": "en",
@@ -31,6 +31,7 @@
     "128": "img/favicon/favicon-128x128.png"
   },
   "permissions": [
+    "alarms",
     "storage"
   ]
 }

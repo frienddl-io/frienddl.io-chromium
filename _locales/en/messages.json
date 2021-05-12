@@ -52,5 +52,17 @@
   },
   "foundFriendPlural": {
     "message": "Found Friends!"
+  },
+  "lastDay": {
+    "message": "Last Day"
+  },
+  "lastSevenDays": {
+    "message": "Last 7 Days"
+  },
+  "lastThirtyDays": {
+    "message": "Last 30 Days"
+  },
+  "allTime": {
+    "message": "All-Time"
   }
 }

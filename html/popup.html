@@ -12,130 +12,172 @@
       <div  id="title" class="center">
         <img src="../img/title.png" alt="frienddl.io">
       </div>
-      <p id="instructions"></p>
 
-      <div class="input-group mb-3">
-        <img id="pencil" src="../img/pencil.gif">
-        <input
-          id="friend-input"
-          type="text"
-          class="form-control"
-          aria-describedby="basic-addon2"
+      <div id="tabs" class="center">
+        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+          <label class="btn btn-secondary">
+            <input class="tablinks" type="radio" name="friend-finder" autocomplete="off" checked>
+            Friend Finder
+          </label>
+          <label class="btn btn-secondary">
+            <input class="tablinks" type="radio" name="high-scores" autocomplete="off">
+            High Scores
+          </label>
+        </div>
+      </div>
+
+      <div id="friend-finder" class="tabContent">
+        <p id="instructions"></p>
+
+        <div class="input-group mb-3">
+          <img id="pencil" src="../img/pencil.gif">
+          <input
+            id="friend-input"
+            type="text"
+            class="form-control"
+            aria-describedby="basic-addon2"
+          >
+          <div class="input-group-append">
+            <button
+              id="add-friend-button"
+              class="btn btn-secondary"
+              type="button"
+            ></button>
+          </div>
+        </div>
+
+        <div id="friends"></div>
+
+        <div id="minimized-option" class="custom-control custom-switch">
+          <input
+            id="minimized-toggle"
+            type="checkbox"
+            class="custom-control-input"
+            checked
+          >
+          <label
+            id="minimized-text"
+            class="custom-control-label"
+            for="minimized-toggle"
+          ></label>
+        </div>
+
+        <button
+          id="start-button"
+          class="search-hidden pause-hidden btn btn-success btn-lg btn-block"
+          type="submit"
         >
-        <div class="input-group-append">
-          <button
-            id="add-friend-button"
-            class="btn btn-secondary"
-            type="button"
-          ></button>
+          <svg width="1.25em" height="1.25em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
+            <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
+          </svg>
+        </button>
+        <div id="search-buttons" class="stop-hidden success-hidden row">
+          <div id="resume-col" class="search-hidden col">
+            <button
+              id="resume-button"
+              class="btn btn-success btn-lg btn-block"
+              type="submit"
+            >
+              <svg width="1.25em" height="1.25em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
+                <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
+              </svg>
+            </button>
+          </div>
+          <div id="pause-col" class="pause-hidden col">
+            <button
+              id="pause-button"
+              class="btn btn-warning btn-lg btn-block"
+              type="submit"
+            >
+              <svg width="1.25em" height="1.25em" viewBox="0 0 16 16" class="bi bi-pause" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5zm4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5z"/>
+              </svg>
+            </button>
+          </div>
+          <div id="stop-col" class="col">
+            <button
+              id="stop-button"
+              class="btn btn-danger btn-lg btn-block"
+              type="submit"
+            >
+              <svg width="1.25em" height="1.25em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+              </svg>
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div id="friends"></div>
-
-      <div id="minimized-option" class="custom-control custom-switch">
-        <input
-          id="minimized-toggle"
-          type="checkbox"
-          class="custom-control-input"
-          checked
-        >
-        <label
-          id="minimized-text"
-          class="custom-control-label"
-          for="minimized-toggle"
-        ></label>
-      </div>
-
-      <button
-        id="start-button"
-        class="search-hidden pause-hidden btn btn-success btn-lg btn-block"
-        type="submit"
-      >
-        <svg width="1.25em" height="1.25em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-          <path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
-          <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
-        </svg>
-      </button>
-      <div id="search-buttons" class="stop-hidden success-hidden row">
-        <div id="resume-col" class="search-hidden col">
-          <button
-            id="resume-button"
-            class="btn btn-success btn-lg btn-block"
-            type="submit"
-          >
-            <svg width="1.25em" height="1.25em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
-              <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
-            </svg>
-          </button>
+        <div id="form-input-feedback" class="center">
+          <div id="character-error" class="invalid-feedback"></div>
+          <div id="duplicate-error" class="invalid-feedback"></div>
+          <div id="friend-error" class="invalid-feedback"></div>
+          <div
+            id="pause-instruction"
+            class="pause-hidden stop-hidden success-hidden warning"
+          ></div>
         </div>
-        <div id="pause-col" class="pause-hidden col">
-          <button
-            id="pause-button"
-            class="btn btn-warning btn-lg btn-block"
-            type="submit"
-          >
-            <svg width="1.25em" height="1.25em" viewBox="0 0 16 16" class="bi bi-pause" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5zm4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5z"/>
-            </svg>
-          </button>
-        </div>
-        <div id="stop-col" class="col">
-          <button
-            id="stop-button"
-            class="btn btn-danger btn-lg btn-block"
-            type="submit"
-          >
-            <svg width="1.25em" height="1.25em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
-              <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
-            </svg>
-          </button>
-        </div>
-      </div>
 
-      <div id="form-input-feedback" class="center">
-        <div id="character-error" class="invalid-feedback"></div>
-        <div id="duplicate-error" class="invalid-feedback"></div>
-        <div id="friend-error" class="invalid-feedback"></div>
         <div
-          id="pause-instruction"
-          class="pause-hidden stop-hidden success-hidden warning"
-        ></div>
+          id="spinner"
+          class="pause-hidden stop-hidden success-hidden btn btn-block"
+        >
+          <img id="spinner-icon" src="../img/spinner.gif">
+          &nbsp;<span id="spinner-text"></span>
+        </div>
+
+        <div
+          id="found-friend"
+          class="search-hidden pause-hidden stop-hidden center alert alert-success"
+          role="alert"
+        >
+          <h3 id="found-friend-title" class="h3 center"></h3>
+          <hr>
+          <p id="found-friend-p" class="mb-0"></p>
+        </div>
+
+        <div id="stats">
+          <table class="table table-borderless">
+            <tbody>
+              <tr id="games-joined">
+                <th scope="row"></th>
+                <td colspan="2"></td>
+              </tr>
+              <tr id="players-found">
+                <th scope="row"></th>
+                <td colspan="2"></td>
+              </tr>
+              <tr id="run-time">
+                <th scope="row"></th>
+                <td colspan="2"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div
-        id="spinner"
-        class="pause-hidden stop-hidden success-hidden btn btn-block"
-      >
-        <img id="spinner-icon" src="../img/spinner.gif">
-        &nbsp;<span id="spinner-text"></span>
-      </div>
-
-      <div
-        id="found-friend"
-        class="search-hidden pause-hidden stop-hidden center alert alert-success"
-        role="alert"
-      >
-        <h3 id="found-friend-title" class="h3 center"></h3>
-        <hr>
-        <p id="found-friend-p" class="mb-0"></p>
-      </div>
-
-      <div id="stats">
+      <div id="high-scores" class="tabContent">
         <table class="table table-borderless">
           <tbody>
-            <tr id="games-joined">
+            <tr id="last-day">
               <th scope="row"></th>
               <td colspan="2"></td>
             </tr>
-            <tr id="players-found">
+            <tr id="last-seven-days">
               <th scope="row"></th>
               <td colspan="2"></td>
             </tr>
-            <tr id="run-time">
+            <tr id="last-thirty-days">
               <th scope="row"></th>
+              <td colspan="2"></td>
+            </tr>
+            <tr id="all-time">
+              <th scope="row"></th>
+              <td colspan="2"></td>
+            </tr>
+            <tr id="all-time-date" class="center">
               <td colspan="2"></td>
             </tr>
           </tbody>
