@@ -60,16 +60,7 @@ svg
 }
 
 #tabs {
-  margin-top: 15px;
-  margin-bottom: 15px;
-}
-
-.tab {
-  overflow: hidden;
-}
-
-.tabContent {
-  display: none;
+  margin: 10px 0 15px 0;
 }
 
 #all-time-date {
@@ -86,7 +77,7 @@ svg
   font-size: 10px;
   position: fixed;
   z-index: 10;
-  top: 106px;
+  top: 102px;
   left: 200px;
   background-color: #F3FF14;
 }
