@@ -374,7 +374,6 @@ function respondToFriendSearchContent(response) {
 
           if (friendsFound.length === 0) {
             console.log("No friends found");
-            foundFriend(friendsFound, tabId);
             if (response.state === "search") {
               joinNewGame(tabId);
             }
