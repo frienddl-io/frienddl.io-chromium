@@ -11,20 +11,6 @@ const SUCCESS_BADGE_COLOR = "#17A2B8";
 
 let CONTENT_PORTS = [];
 
-// Values for testing
-// chrome.storage.sync.set(
-//   {
-//     oneDayScore: 1000,
-//     oneDayScoreDate: new Date().getTime() - (2 * 24 * 60 * 60 * 1000),
-//     sevenDayScore: 2000,
-//     sevenDayScoreDate: new Date().getTime() - (10 * 24 * 60 * 60 * 1000),
-//     thirtyDayScore: 5000,
-//     thirtyDayScoreDate: new Date().getTime() - (45 * 24 * 60 * 60 * 1000),
-//     allTimeScore: 500,
-//     allTimeScoreDate: new Date().getTime() - (0 * 24 * 60 * 60 * 1000)
-//   }
-// );
-
 // Responds to alarms to check for new high score
 chrome.alarms.onAlarm.addListener(
   function(alarm) {
@@ -209,6 +195,7 @@ function respondToScoreSearchContent(response) {
           let allTimeScoreDate = response.allTimeScoreDate || today;
           console.debug(`allTimeScoreDate: ${allTimeScoreDate}`)
 
+          // Compare current score to existing high scores
           if (intScore > oneDayScore) {
             console.log(`Setting new 1 day high score: ${oneDayScore} to ${intScore}`);
 
@@ -479,7 +466,7 @@ function updatePlayersFound(playersArray, tabId) {
       let totalPlayersFound = newPlayersFound.concat(playersFound);
 
       let newTotalPlayersSeen = playersArray.length;
-      if (typeof response.totalPlayersSeen !== 'undefined') {
+      if (typeof response.totalPlayersSeen !== "undefined") {
         newTotalPlayersSeen += response.totalPlayersSeen;
       }
 
@@ -547,7 +534,7 @@ function foundFriend(friendsArray, tabId) {
           console.log(`audioAlert: ${audioAlert}`);
 
           if (audioAlert === null || audioAlert) {
-            let language = chrome.i18n.getUILanguage().split('-')[0];
+            let language = chrome.i18n.getUILanguage().split("-")[0];
             console.log(`Using language: ${language}`);
             let audio = new Audio(`../_locales/${language}/success.mp3`);
             audio.play();

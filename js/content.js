@@ -26,8 +26,8 @@ function receiveRequest(request, sender, sendResponse) {
   console.log(prefix + `Received request: ${task}`);
 
   if (task === "scoreSearch") {
-    if ( $('.player').length > 1) {
-      $('.player').each(
+    if ( $(".player").length > 1) {
+      $(".player").each(
         function() {
           let playerName = $(this).find(".name").html();
 
@@ -89,11 +89,11 @@ function receiveRequest(request, sender, sendResponse) {
                 );
               }
 
-              if ($('.player').length >= 2) {
+              if ($(".player").length >= 2) {
                 console.debug(prefix + "Players exist");
 
                 let playersArray = [];
-                $('.player').each(
+                $(".player").each(
                   function() {
                     let playerName = $(this).find(".name").html();
                     if (playerName !== null && playerName !== "" && !(playersArray.includes(playerName))) {
