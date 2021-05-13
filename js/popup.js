@@ -103,6 +103,8 @@ function foundFriend(friendsArray) {
       $("#run-time td").text(msToTime(response.runTime));
     }
   );
+
+  $("#found-friend").removeClass("hidden");
 }
 
 // Steps to take when searching has been stopped
