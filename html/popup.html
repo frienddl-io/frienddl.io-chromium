@@ -17,11 +17,11 @@
         <div class="btn-group btn-group-toggle" data-toggle="buttons">
           <label class="btn btn-secondary">
             <input class="tablinks" type="radio" name="friend-finder" autocomplete="off" checked>
-            Friend Finder
+            <span id="friend-finder-tab"></span>
           </label>
           <label class="btn btn-secondary">
-            <input class="tablinks" type="radio" name="high-scores" autocomplete="off">
-            High Scores
+            <input class="tablinks" type="radio" name="score-keeper" autocomplete="off">
+            <span id="score-keeper-tab"></span>
           </label>
         </div>
         <span id="new-badge" class="badge badge-warning">
@@ -152,7 +152,7 @@
           class="search-hidden pause-hidden stop-hidden center alert alert-success"
           role="alert"
         >
-          <h3 id="found-friend-title" class="h3 center"></h3>
+          <h2 id="found-friend-title" class="h2 center"></h2>
           <hr>
           <p id="found-friend-p" class="mb-0"></p>
         </div>
@@ -177,45 +177,102 @@
         </div>
       </div>
 
-      <div id="high-scores" class="tabContent">
-        <p class="description"></p>
+      <div id="score-keeper" class="tabContent center">
+        <div id="header">
+          <p class="description"></p>
 
-        <table class="table table-borderless" >
-          <tbody>
-            <tr id="last-day">
-              <th scope="row"></th>
-              <td colspan="2"></td>
-            </tr>
-            <tr id="last-seven-days">
-              <th scope="row"></th>
-              <td colspan="2"></td>
-            </tr>
-            <tr id="last-thirty-days">
-              <th scope="row"></th>
-              <td colspan="2"></td>
-            </tr>
-            <tr id="all-time">
-              <th scope="row"></th>
-              <td colspan="2"></td>
-            </tr>
-            <tr id="all-time-date" class="center">
-              <td colspan="2"></td>
-            </tr>
-          </tbody>
-        </table>
+          <div id="opt-out-option" class="custom-control custom-switch center">
+            <input
+              id="opt-out-toggle"
+              type="checkbox"
+              class="custom-control-input"
+            >
+            <label
+              id="opt-out-text"
+              class="custom-control-label"
+              for="opt-out-toggle"
+            >
+            </label>
+          </div>
+        </div>
 
-        <div id="opt-out-option" class="custom-control custom-switch center">
-          <input
-            id="opt-out-toggle"
-            type="checkbox"
-            class="custom-control-input"
+        <div id="high-scores">
+          <h2 id="high-scores-header" class="h2 opt-out-disabled"></h2>
+          <table class="table table-borderless opt-out-disabled" >
+            <tbody>
+              <tr class="last-day">
+                <th scope="row"></th>
+                <td colspan="2"></td>
+              </tr>
+              <tr class="last-seven-days">
+                <th scope="row"></th>
+                <td colspan="2"></td>
+              </tr>
+              <tr class="last-thirty-days">
+                <th scope="row"></th>
+                <td colspan="2"></td>
+              </tr>
+              <tr class="all-time">
+                <th scope="row"></th>
+                <td colspan="2"></td>
+              </tr>
+              <tr id="all-time-date">
+                <td colspan="2"></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <button
+            id="reset-score-keeper-button"
+            class="reset btn btn-outline-warning"
+            type="submit"
           >
-          <label
-            id="opt-out-text"
-            class="custom-control-label"
-            for="opt-out-toggle"
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+              <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+            </svg>
+            &nbsp;<span></span>
+          </button>
+          <div class="reset-warning warning hidden"></div>
+        </div>
+
+        <hr>
+
+        <div id="total-points">
+          <h2 id="total-points-header" class="h2 opt-out-disabled"></h2>
+          <table class="table table-borderless opt-out-disabled" >
+            <tbody>
+              <tr class="last-day">
+                <th scope="row"></th>
+                <td colspan="2"></td>
+              </tr>
+              <tr class="last-seven-days">
+                <th scope="row"></th>
+                <td colspan="2"></td>
+              </tr>
+              <tr class="last-thirty-days">
+                <th scope="row"></th>
+                <td colspan="2"></td>
+              </tr>
+              <tr class="all-time">
+                <th scope="row"></th>
+                <td colspan="2"></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <button
+            id="reset-score-keeper-button"
+            class="reset btn btn-outline-warning"
+            type="submit"
           >
-          </label>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+              <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+            </svg>
+            &nbsp;<span></span>
+          </button>
+          <div class="reset-warning warning hidden"></div>
         </div>
       </div>
     </div>

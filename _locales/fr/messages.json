@@ -56,10 +56,13 @@
   "foundFriendPlural": {
     "message": "Des amis trouvés!"
   },
-  "highScoresDescription": {
+  "scoreKeeperDescription": {
     "message": "Votre score est vérifié toutes les minutes"
   },
-  "highScoresOptOut": {
+  "highScores": {
+    "message": ""
+  },
+  "scoreKeeperOptOut": {
     "message": "Désactiver"
   },
   "lastDay": {

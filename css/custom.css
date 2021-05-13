@@ -5,11 +5,18 @@ body
   width: 300px;
   height: 150px;
   background-image: url("../img/background.png");
+  background-color: #255294;
 }
 
 body
 {
   padding: 10px;
+}
+
+h2,
+.h2
+{
+  font-size: 1.7rem;
 }
 
 .container-fluid
@@ -28,13 +35,19 @@ body
   text-align: center;
 }
 
+p,
+.h2,
+table > *,
+label,
 .description,
-th,
-td,
-#spinner,
-label
+#spinner
 {
   color: #fff;
+}
+
+hr
+{
+  border-top-color: #ffffff;
 }
 
 #title,
@@ -75,9 +88,9 @@ svg
 
 #new-badge {
   font-size: 10px;
-  position: fixed;
+  position: absolute;
   z-index: 10;
-  top: 102px;
+  top: 100px;
   left: 200px;
   background-color: #F3FF14;
 }
@@ -147,7 +160,8 @@ svg
   border-color: #bd2130 !important;
 }
 
-#friend-finder .custom-control.custom-switch
+#friend-finder .custom-control.custom-switch,
+.reset
 {
   margin-bottom: 10px;
 }
@@ -190,11 +204,21 @@ label
 }
 
 #stats th,
-#high-scores th
+#score-keeper th
 {
   font-weight: bold;
   text-align: right;
   width: 60%;
+}
+
+#stats td,
+#score-keeper td
+{
+  text-align: left;
+}
+
+#all-time-date td {
+  text-align: center;
 }
 
 #stats td
@@ -217,6 +241,11 @@ label
   border-color: #c3e6cb;
 }
 
+#opt-out-option
+{
+  margin-bottom: 10px
+}
+
 /* Enabled */
 #opt-out-option .custom-control-input:checked~.custom-control-label::before
 {
@@ -224,8 +253,13 @@ label
   background-color: #AD3233;
 }
 
-table.disabled th,
-table.disabled td
+.disabled .opt-out-disabled,
+.disabled .opt-out-disabled *
 {
   color: rgba(247, 248, 247, 0.42);
+}
+
+#score-keeper.disabled hr
+{
+  border-top-color: rgba(247, 248, 247, 0.42);
 }

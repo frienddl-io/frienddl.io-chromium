@@ -5,6 +5,9 @@
   "extensionDescription": {
     "message": "Tool to find friends in public rooms on skribbl.io and keep track of high scores"
   },
+  "friendFinderTabName": {
+    "message": "Friend Finder"
+  },
   "friendFinderDescription": {
     "message": "Enter your friends then search to find them on skribbl.io"
   },
@@ -56,10 +59,19 @@
   "foundFriendPlural": {
     "message": "Found Friends!"
   },
-  "highScoresDescription": {
+  "scoreKeeperTabName": {
+    "message": "Score Keeper"
+  },
+  "scoreKeeperDescription": {
     "message": "Checks your score once a minute"
   },
-  "highScoresOptOut": {
+  "highScores": {
+    "message": "High Scores"
+  },
+  "totalPoints": {
+    "message": "Total Points"
+  },
+  "scoreKeeperOptOut": {
     "message": "Opt Out"
   },
   "lastDay": {
@@ -73,5 +85,11 @@
   },
   "allTime": {
     "message": "All-Time"
+  },
+  "resetButton": {
+    "message": "Reset"
+  },
+  "resetWarning": {
+    "message": "Click again to permanently delete data."
   }
 }
