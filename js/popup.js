@@ -10,7 +10,7 @@ chrome.storage.local.get(
     if (response.state === undefined) {
       state = "stop";
     }
-    console.log(`state: ${state}`);
+    console.log(`Friend finder search state: ${state}`);
 
     $(`.${state}-hidden`).addClass("hidden");
     if (state === "stop") {
@@ -84,6 +84,12 @@ chrome.storage.onChanged.addListener(
     }
   }
 );
+
+let language = chrome.i18n.getUILanguage().split('-')[0];
+console.log(`Using language: ${language}`);
+if (language === "fr") {
+  $("#high-scores th").css("width", "70%");
+}
 
 // Steps to take when one or more friends are found
 function foundFriend(friendsArray) {
@@ -341,13 +347,12 @@ document.addEventListener("DOMContentLoaded", function () {
           let language = chrome.i18n.getUILanguage().split('-')[0];
           console.log(`Using language: ${language}`);
 
-          console.dir(new Date());
-          console.log(new Intl.DateTimeFormat(language).format(new Date()));
-
           let allTimeScoreDate = response.allTimeScoreDate;
+          console.debug(`allTimeScoreDate: ${allTimeScoreDate}`);
+
           if (allTimeScoreDate !== null) {
             let formattedDate = new Intl.DateTimeFormat(language).format(allTimeScoreDate);
-            console.log(formattedDate);
+            console.debug(`formattedDate: ${formattedDate}`);
             $("#all-time-date td").text(formattedDate);
           }
         }

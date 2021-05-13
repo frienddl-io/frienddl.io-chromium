@@ -1,9 +1,9 @@
 {
   "extensionName": {
-    "message": "frienddl.io - skribbl.io friend finder"
+    "message": "frienddl.io - skribbl.io chercheur des amis, et marqueur"
   },
   "extensionDescription": {
-    "message": "Outil pour chercher vos amis aux salons publics de skribbl.io"
+    "message": "Outil pour chercher vos amis aux salons publics de skribbl.io et suivre des meilleurs scores"
   },
   "friendFinderDescription": {
     "message": "Inscrivez les noms de vos amis, puis chercher pour les trouver en skribbl.io"
@@ -21,7 +21,7 @@
     "message": "Une fenêtre chercheuse est ouverte et réduit"
   },
   "audioAlert": {
-    "message": ""
+    "message": "Jouer un message audio lorsqu'un ami est trouvé"
   },
   "characterError": {
     "message": "S'il vous plaît, inscrivez au moins un caractère. "
@@ -57,21 +57,21 @@
     "message": "Des amis trouvés!"
   },
   "highScoresDescription": {
-    "message": ""
+    "message": "Votre score est vérifié toutes les minutes"
   },
   "highScoresOptOut": {
-    "message": ""
+    "message": "Désactiver"
   },
   "lastDay": {
-    "message": ""
+    "message": "Dernier 24h"
   },
   "lastSevenDays": {
-    "message": ""
+    "message": "Dernier 7 jours"
   },
   "lastThirtyDays": {
-    "message": ""
+    "message": "Dernier 30 jours"
   },
   "allTime": {
-    "message": ""
+    "message": "De tous les temps"
   }
 }
