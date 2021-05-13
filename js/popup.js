@@ -85,7 +85,7 @@ chrome.storage.onChanged.addListener(
   }
 );
 
-let language = chrome.i18n.getUILanguage().split('-')[0];
+let language = chrome.i18n.getUILanguage().split("-")[0];
 console.log(`Using language: ${language}`);
 if (language === "fr") {
   $("#high-scores th").css("width", "70%");
@@ -258,7 +258,7 @@ document.addEventListener("DOMContentLoaded", function () {
       "currentTab"
     ],
     function(response) {
-      if (response.currentTab === undefined || response.currentTab !== 'high-scores') {
+      if (response.currentTab === undefined || response.currentTab !== "high-scores") {
         openTab("friend-finder");
       } else {
         openTab(response.currentTab);
@@ -327,11 +327,11 @@ document.addEventListener("DOMContentLoaded", function () {
         ],
         function(response) {
           let highScoreOptOut = response.highScoreOptOut;
-          $("#opt-out-toggle").prop('checked', highScoreOptOut);
+          $("#opt-out-toggle").prop("checked", highScoreOptOut);
           if (highScoreOptOut) {
-            $('#high-scores table').addClass("disabled");
+            $("#high-scores table").addClass("disabled");
           } else {
-            $('#high-scores table').removeClass("disabled");
+            $("#high-scores table").removeClass("disabled");
           }
 
           let oneDayScore = response.oneDayScore || 0;
@@ -344,7 +344,7 @@ document.addEventListener("DOMContentLoaded", function () {
           $("#last-thirty-days td").text(thirtyDayScore);
           $("#all-time td").text(allTimeScore);
 
-          let language = chrome.i18n.getUILanguage().split('-')[0];
+          let language = chrome.i18n.getUILanguage().split("-")[0];
           console.log(`Using language: ${language}`);
 
           let allTimeScoreDate = response.allTimeScoreDate;
@@ -363,7 +363,7 @@ document.addEventListener("DOMContentLoaded", function () {
   $(".tablinks").bind("click", openTab);
 
   function openTab(tabName) {
-    if (typeof tabName !== 'string') {
+    if (typeof tabName !== "string") {
       tabName = this.name;
 
       $("#tabs label").each(
@@ -408,7 +408,7 @@ document.addEventListener("DOMContentLoaded", function () {
   $("#friend-input").keypress(
     function(event) {
       let keycode = (event.keyCode ? event.keyCode : event.which);
-      if (keycode == '13') {
+      if (keycode == "13") {
         console.log("Enter was pressed on input");
         addFriend();
       }
@@ -429,7 +429,7 @@ document.addEventListener("DOMContentLoaded", function () {
       $("#character-error").show();
     } else {
       $("#character-error").hide();
-      $("#friend-input").val('');
+      $("#friend-input").val("");
 
       let id = `${friendName}-entered`;
       let exists = $(`#${id}`).length !== 0;
@@ -482,7 +482,7 @@ document.addEventListener("DOMContentLoaded", function () {
     btn.onclick = removeFriend;
 
     console.log(`Adding friend button: ${friendName}`);
-    document.querySelector('#friends').append(btn);
+    document.querySelector("#friends").append(btn);
   }
 
   // Removes a button for a friend and updates storage
@@ -597,7 +597,7 @@ document.addEventListener("DOMContentLoaded", function () {
           );
 
           let windowSettings = {};
-          let minimizeChecked = $("#minimized-toggle").is(':checked');
+          let minimizeChecked = $("#minimized-toggle").is(":checked");
           if (minimizeChecked) {
             console.log("Setting window to minimized");
             windowSettings["state"] = "minimized";
@@ -801,11 +801,11 @@ document.addEventListener("DOMContentLoaded", function () {
     return currentTime - startTime;
   }
 
-  // Listen for button that resumes search
+  // Listen for opt out toggle
   $("#opt-out-toggle").bind("click", toggleOptOut);
 
   function toggleOptOut() {
-    let toggleChecked = $("#opt-out-toggle").is(':checked');
+    let toggleChecked = $("#opt-out-toggle").is(":checked");
     console.log(`Opting out: ${toggleChecked}`);
 
     chrome.storage.sync.set(
@@ -817,9 +817,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (toggleChecked) {
       chrome.alarms.clearAll();
       console.log();
-      $('#high-scores table').addClass("disabled");
+      $("#high-scores table").addClass("disabled");
     } else {
-      $('#high-scores table').removeClass("disabled");
+      $("#high-scores table").removeClass("disabled");
 
       // Create port to send messages to background
       let backgroundPort = chrome.runtime.connect(
