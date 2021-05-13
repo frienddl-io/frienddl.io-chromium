@@ -2,6 +2,7 @@
   "name": "__MSG_extensionName__",
   "short_name": "frienddl.io",
   "version": "1.2.1",
+  "version_name": "1.2.1-SNAPSHOT",
   "manifest_version": 2,
   "description": "__MSG_extensionDescription__",
   "default_locale": "en",
