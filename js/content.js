@@ -32,12 +32,14 @@ function receiveRequest(request, sender, sendResponse) {
           let playerName = $(this).find(".name").html();
 
           if (playerName.includes("(You)")) {
-            let score = $(this).find(".score").html().replace("Points: ", "");
-            console.log(prefix + `Sending score: ${score}`);
+            let points = parseInt($(this).find(".score").html().replace("Points: ", ""));
+            let round = parseInt($("#round")[0].innerText.split(" ").pop());
+            console.log(prefix + `Sending points: ${points}`);
 
             sendResponse(
               {
-                score: score,
+                points: points,
+                round: round,
                 tabId: request.tabId
               }
             );
@@ -48,7 +50,7 @@ function receiveRequest(request, sender, sendResponse) {
       console.log(prefix + "Player less than one; won't send score");
       sendResponse(
         {
-          score: null
+          points: null
         }
       );
     }

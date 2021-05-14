@@ -33,19 +33,23 @@ $("#duplicate-error").text(chrome.i18n.getMessage("duplicateError"));
 $("#friend-error").text(chrome.i18n.getMessage("friendError"));
 $("#pause-instruction").text(chrome.i18n.getMessage("pauseInstruction"));
 
-$("#spinner-icon").attr("alt", chrome.i18n.getMessage("altSpinner"));
-$("#spinner-text").text(chrome.i18n.getMessage("searchText"));
+$(".spinner-icon").attr("alt", chrome.i18n.getMessage("altSpinner"));
+$("#friend-finder .spinner-text").text(chrome.i18n.getMessage("searchText"));
 $("#games-joined th").text(chrome.i18n.getMessage("gamesJoined"));
 $("#players-found th").text(chrome.i18n.getMessage("playersFound"));
 $("#run-time th").text(chrome.i18n.getMessage("runTime"));
 $("#found-friend-title").text(chrome.i18n.getMessage("foundFriendSingular"));
 
 $("#score-keeper-tab").text(chrome.i18n.getMessage("scoreKeeperTabName"));
-$("#score-keeper .description").text(chrome.i18n.getMessage("scoreKeeperDescription"));
-$("#opt-out-text").text(chrome.i18n.getMessage("scoreKeeperOptOut"));
+$("#automatic-toggle-text").text(chrome.i18n.getMessage("scoreKeeperAutomatic"));
+$("#manual-toggle-text").text(chrome.i18n.getMessage("scoreKeeperManual"));
+$("#manual-update-button span").text(chrome.i18n.getMessage("scoreKeeperUpdateButton"));
+$("#score-keeper .spinner-text").text(chrome.i18n.getMessage("updateText"));
 
-$("#high-scores-header").text(chrome.i18n.getMessage("highScores"));
-$("#total-points-header").text(chrome.i18n.getMessage("totalPoints"));
+$("#high-scores-header span").text(chrome.i18n.getMessage("highScores"));
+$("#crown").attr("alt", chrome.i18n.getMessage("altCrown"));
+$("#total-points-header span").text(chrome.i18n.getMessage("totalPoints"));
+$("#rolling-die").attr("alt", chrome.i18n.getMessage("altRollingDie"));
 
 $(".last-day th").text(chrome.i18n.getMessage("lastDay"));
 $(".last-seven-days th").text(chrome.i18n.getMessage("lastSevenDays"));
@@ -69,25 +73,45 @@ chrome.storage.onChanged.addListener(
   function(changes, namespace) {
     for (let key in changes) {
       let storageChange = changes[key];
+      console.log("Key " + key)
       switch(key) {
-        case "state":
-          if (storageChange.newValue === "stop") {
-            searchIsStopped();
-          }
-          break;
         case "friendsFound":
           if (storageChange.newValue.length > 0) {
             foundFriend(storageChange.newValue);
           }
           break;
         case "gamesJoined":
-          $("#games-joined td").text(storageChange.newValue);
+          $("#games-joined td").text(storageChange.newValue.toLocaleString());
+          break;
+        case "playersFound":
+          $("#players-found td").text(storageChange.newValue.length.toLocaleString());
           break;
         case "runTime":
           $("#run-time td").text(msToTime(storageChange.newValue));
           break;
-        case "playersFound":
-          $("#players-found td").text(storageChange.newValue.length);
+        case "scoreKeeperSpinner":
+          $("#score-keeper .spinner").addClass("hidden");
+          break;
+        case "state":
+          if (storageChange.newValue === "stop") {
+            searchIsStopped();
+          }
+          break;
+        case "audioAlert":
+        case "currentTab":
+        case "endTime":
+        case "friends":
+        case "totalFriendsFound":
+        case "totalGamesJoined":
+        case "startTime":
+        case "totalPlayersSeen":
+        case "totalRunTime":
+        case "totalTimesSearched":
+        case "windowId":
+        case "windowMinimized":
+          break;
+        default:
+          updateScoreKeeperValues();
           break;
       }
     }
@@ -247,11 +271,66 @@ function msToTime(duration) {
   return minutes + ":" + seconds + "." + milliseconds;
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  // $("#last-seven td").text(100);
-  // $("#last-thirty td").text(200);
-  // $("#all-time td").text(300);
+function updateScoreKeeperValues() {
+  console.log("Updating score keeper values");
+  chrome.storage.sync.get(
+    [
+      "oneDayScore",
+      "sevenDayScore",
+      "thirtyDayScore",
+      "allTimeScore",
+      "allTimeScoreDate"
+    ],
+    function(response) {
+      let oneDayScore = response.oneDayScore || 0;
+      let sevenDayScore = response.sevenDayScore || 0;
+      let thirtyDayScore = response.thirtyDayScore || 0;
+      let allTimeScore = response.allTimeScore || 0;
 
+      $("#high-scores .last-day td").text(oneDayScore.toLocaleString());
+      $("#high-scores .last-seven-days td").text(sevenDayScore.toLocaleString());
+      $("#high-scores .last-thirty-days td").text(thirtyDayScore.toLocaleString());
+      $("#high-scores .all-time td").text(allTimeScore.toLocaleString());
+
+      let language = chrome.i18n.getUILanguage().split("-")[0];
+      console.log(`Using language: ${language}`);
+
+      let allTimeScoreDate = response.allTimeScoreDate;
+      console.debug(`allTimeScoreDate: ${allTimeScoreDate}`);
+
+      if (allTimeScoreDate !== null && allTimeScoreDate !== 0) {
+        let formattedDate = new Intl.DateTimeFormat(language).format(allTimeScoreDate);
+        console.debug(`formattedDate: ${formattedDate}`);
+        $("#all-time-date td").text(formattedDate);
+      }
+    }
+  );
+
+  chrome.storage.sync.get(
+    [
+      "oneDayPoints",
+      "sevenDayPoints",
+      "thirtyDayPoints",
+      "allTimePoints"
+    ],
+    function(response) {
+
+      let oneDayPoints = response.oneDayPoints || 0;
+      let sevenDayPoints = response.sevenDayPoints || 0;
+      let thirtyDayPoints = response.thirtyDayPoints || 0;
+      let allTimePoints = response.allTimePoints || 0;
+
+      $("#total-points .last-day td").text(oneDayPoints.toLocaleString());
+      $("#total-points .last-seven-days td").text(sevenDayPoints.toLocaleString());
+      $("#total-points .last-thirty-days td").text(thirtyDayPoints.toLocaleString());
+      $("#total-points .all-time td").text(allTimePoints.toLocaleString());
+    }
+  );
+
+  $("#score-keeper .spinner").addClass("hidden");
+}
+
+document.addEventListener("DOMContentLoaded", function () {
   // Set values of friends and stats from storage on popup startup
   chrome.storage.local.get(
     [
@@ -327,66 +406,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
       chrome.storage.sync.get(
         [
-          "oneDayScore",
-          "sevenDayScore",
-          "thirtyDayScore",
-          "allTimeScore",
-          "allTimeScoreDate",
-          "scoreKeeperOptOut"
+          "scoreKeeperAutomatic"
         ],
         function(response) {
-          let scoreKeeperOptOut = response.scoreKeeperOptOut;
-          $("#opt-out-toggle").prop("checked", scoreKeeperOptOut);
-          if (scoreKeeperOptOut) {
-            $("#score-keeper").addClass("disabled");
-            $("#score-keeper button").prop("disabled", true);
+          let scoreKeeperAutomatic = response.scoreKeeperAutomatic;
+          console.debug(`scoreKeeperAutomatic: ${scoreKeeperAutomatic}`);
+
+          if (scoreKeeperAutomatic !== false) {
+            scoreKeeperAutomatic = true;
+          }
+          console.debug(`scoreKeeperAutomatic: ${scoreKeeperAutomatic}`);
+
+          $("#score-keeper-type").prop("checked", scoreKeeperAutomatic);
+
+          if (scoreKeeperAutomatic) {
+            $("#score-keeper .description").text(chrome.i18n.getMessage("scoreKeeperAutomaticDescription"));
+            $("#score-keeper #manual-update-button").css("display", "none");
           } else {
-            $("#score-keeper").removeClass("disabled");
-            $("#score-keeper button").prop("disabled", false);
+            $("#score-keeper .description").text(chrome.i18n.getMessage("scoreKeeperManualDescription"));
+            $("#score-keeper #manual-update-button").css("display", "inline");
           }
-
-          let oneDayScore = response.oneDayScore || 0;
-          let sevenDayScore = response.sevenDayScore || 0;
-          let thirtyDayScore = response.thirtyDayScore || 0;
-          let allTimeScore = response.allTimeScore || 0;
-
-          $("#high-scores .last-day td").text(oneDayScore);
-          $("#high-scores .last-seven-days td").text(sevenDayScore);
-          $("#high-scores .last-thirty-days td").text(thirtyDayScore);
-          $("#high-scores .all-time td").text(allTimeScore);
-
-          let language = chrome.i18n.getUILanguage().split("-")[0];
-          console.log(`Using language: ${language}`);
-
-          let allTimeScoreDate = response.allTimeScoreDate;
-          console.debug(`allTimeScoreDate: ${allTimeScoreDate}`);
-
-          if (allTimeScoreDate !== null && allTimeScoreDate !== 0) {
-            let formattedDate = new Intl.DateTimeFormat(language).format(allTimeScoreDate);
-            console.debug(`formattedDate: ${formattedDate}`);
-            $("#all-time-date td").text(formattedDate);
-          }
-        }
-      );
-
-      chrome.storage.sync.get(
-        [
-          "oneDayPoints",
-          "sevenDayPoints",
-          "thirtyDayPoints",
-          "allTimePoints"
-        ],
-        function(response) {
-
-          let oneDayPoints = response.oneDayPoints || 0;
-          let sevenDayPoints = response.sevenDayPoints || 0;
-          let thirtyDayPoints = response.thirtyDayPoints || 0;
-          let allTimePoints = response.allTimePoints || 0;
-
-          $("#total-points .last-day td").text(oneDayPoints);
-          $("#total-points .last-seven-days td").text(sevenDayPoints);
-          $("#total-points .last-thirty-days td").text(thirtyDayPoints);
-          $("#total-points .all-time td").text(allTimePoints);
+          updateScoreKeeperValues();
         }
       );
     }
@@ -834,27 +874,22 @@ document.addEventListener("DOMContentLoaded", function () {
     return currentTime - startTime;
   }
 
-  // Listen for opt out toggle
-  $("#opt-out-toggle").bind("click", toggleOptOut);
+  // Listen for score keeper type toggle
+  $("#score-keeper-type").bind("click", toggleScoreKeeperType);
 
-  function toggleOptOut() {
-    let toggleChecked = $("#opt-out-toggle").is(":checked");
-    console.log(`Opting out: ${toggleChecked}`);
+  function toggleScoreKeeperType() {
+    let toggleIsAutomatic = $("#score-keeper-type").is(":checked");
+    console.log(`Toggling score keeper type: ${toggleIsAutomatic}`);
 
     chrome.storage.sync.set(
       {
-        scoreKeeperOptOut: toggleChecked
+        scoreKeeperAutomatic: toggleIsAutomatic
       }
     );
 
-    if (toggleChecked) {
-      chrome.alarms.clearAll();
-      console.log();
-      $("#score-keeper").addClass("disabled");
-      $("#score-keeper button").prop("disabled", true);
-    } else {
-      $("#score-keeper").removeClass("disabled");
-      $("#score-keeper button").prop("disabled", false);
+    if (toggleIsAutomatic) {
+      $("#score-keeper .description").text(chrome.i18n.getMessage("scoreKeeperAutomaticDescription"));
+      $("#score-keeper #manual-update-button").css("display", "none");
 
       // Create port to send messages to background
       let backgroundPort = chrome.runtime.connect(
@@ -869,14 +904,40 @@ document.addEventListener("DOMContentLoaded", function () {
           task: "createAlarms"
         }
       );
+    } else {
+      chrome.alarms.clearAll();
+      console.log("Cleared alarms");
+
+      $("#score-keeper .description").text(chrome.i18n.getMessage("scoreKeeperManualDescription"));
+      $("#score-keeper #manual-update-button").css("display", "inline");
     }
   }
 
-  // Listen for opt out toggle
+  // Listen for score keeper type toggle
+  $("#manual-update-button").bind("click", manualUpdateScoreKeeper);
+
+  function manualUpdateScoreKeeper() {
+    $("#score-keeper .spinner").removeClass("hidden");
+
+    // Create port to send messages to background
+    let backgroundPort = chrome.runtime.connect(
+      {
+        name: "p2b"
+      }
+    );
+
+    console.log("Sending message to update score keeper");
+    backgroundPort.postMessage(
+      {
+        task: "updateScoreKeeper"
+      }
+    );
+  }
+
+  // Listen for reset toggle
   $(".reset").bind("click", resetButtonClicked);
 
   function resetButtonClicked() {
-    // console.log();
     let firstClick = $(this).hasClass("btn-outline-warning");
     console.log(`firstClick: ${firstClick}`);
 
@@ -889,6 +950,8 @@ document.addEventListener("DOMContentLoaded", function () {
       $(`#${sectionId} .reset-warning.warning`).removeClass("hidden");
     } else {
       console.log("Resetting data");
+
+      $(`#${sectionId} .reset-warning.warning`).addClass("hidden");
 
       let resetValues = {};
 
@@ -903,10 +966,7 @@ document.addEventListener("DOMContentLoaded", function () {
           allTimeScore: 0,
           allTimeScoreDate: 0
         }
-        $("#high-scores .last-day td").text(0);
-        $("#high-scores .last-seven-days td").text(0);
-        $("#high-scores .last-thirty-days td").text(0);
-        $("#high-scores .all-time td").text(0);
+
         $("#all-time-date td").css("display", "none");
       } else if (sectionId === "total-points") {
         resetValues = {
@@ -918,43 +978,15 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
 
+      $(`#${sectionId} .last-day td`).text(0);
+      $(`#${sectionId} .last-seven-days td`).text(0);
+      $(`#${sectionId} .last-thirty-days td`).text(0);
+      $(`#${sectionId} .all-time td`).text(0);
+
       chrome.storage.sync.set(resetValues);
 
       $(this).addClass("btn-outline-warning");
       $(this).removeClass("btn-outline-danger");
     }
-
-    // let toggleChecked = $("#opt-out-toggle").is(":checked");
-    // console.log(`Opting out: ${toggleChecked}`);
-
-    // chrome.storage.sync.set(
-    //   {
-    //     scoreKeeperOptOut: toggleChecked
-    //   }
-    // );
-
-    // if (toggleChecked) {
-    //   chrome.alarms.clearAll();
-    //   console.log();
-    //   $("#score-keeper").addClass("disabled");
-    //   $("#score-keeper button").prop("disabled", true);
-    // } else {
-    //   $("#score-keeper").removeClass("disabled");
-    //   $("#score-keeper button").prop("disabled", false);
-
-    //   // Create port to send messages to background
-    //   let backgroundPort = chrome.runtime.connect(
-    //     {
-    //       name: "p2b"
-    //     }
-    //   );
-
-    //   console.log("Sending message to create alarms");
-    //   backgroundPort.postMessage(
-    //     {
-    //       task: "createAlarms"
-    //     }
-    //   );
-    // }
   }
 }, false);

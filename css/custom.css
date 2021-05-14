@@ -40,7 +40,8 @@ p,
 table > *,
 label,
 .description,
-#spinner
+.spinner,
+#score-keeper-toggle
 {
   color: #fff;
 }
@@ -68,25 +69,28 @@ svg
 }
 
 /* Header */
-.btn-group-toggle {
+.btn-group-toggle
+{
   width: 100%;
 }
 
-#tabs {
+#tabs
+{
   margin: 10px 0 15px 0;
 }
 
-#all-time-date {
+#all-time-date
+{
   font-size: 13px;
-  margin-top: -5px;
-
 }
 
-#all-time-date td {
+#all-time-date td
+{
   padding: 0;
 }
 
-#new-badge {
+#new-badge
+{
   font-size: 10px;
   position: absolute;
   z-index: 10;
@@ -99,6 +103,26 @@ svg
 {
   text-align: center;
   margin-bottom: 10px;
+}
+
+.btn.spinner:hover
+{
+  color: #FFF !important;
+}
+
+.spinner
+{
+  line-height: 1.8;
+}
+
+#friend-finder .spinner
+{
+  padding: 5px 0 15px 0;
+}
+
+#score-keeper .spinner
+{
+  padding: 10px 0 0 0;
 }
 
 /* Form */
@@ -116,7 +140,8 @@ svg
   border-bottom-right-radius: 0;
 }
 
-.btn-success {
+.btn-success
+{
   color: #fff;
   background-color: #1DBF38;
   border-color: #1DBF38;
@@ -172,7 +197,7 @@ label
 }
 
 /* Enabled */
-#friend-finder .custom-control-input:checked~.custom-control-label::before
+.custom-control-input:checked~.custom-control-label::before
 {
   border-color: #28A745;
   background-color: #28A745;
@@ -189,15 +214,15 @@ label
   font-size: 80%;
 }
 
-/* Search */
+/* Friend Finder */
 
-#spinner
+.spinner
 {
   font-size: 20px;
   cursor: default;
 }
 
-#spinner img
+.spinner img
 {
   height: 35px;
   vertical-align: top;
@@ -215,10 +240,6 @@ label
 #score-keeper td
 {
   text-align: left;
-}
-
-#all-time-date td {
-  text-align: center;
 }
 
 #stats td
@@ -241,25 +262,35 @@ label
   border-color: #c3e6cb;
 }
 
-#opt-out-option
+/* Score Keeper */
+#score-keeper img
+{
+  vertical-align: top;
+}
+
+#all-time-date td
+{
+  text-align: center;
+}
+
+#score-keeper-type-option
 {
   margin-bottom: 10px
 }
 
-/* Enabled */
-#opt-out-option .custom-control-input:checked~.custom-control-label::before
+.toggle
 {
-  border-color: #7a2931;
-  background-color: #AD3233;
+  position: absolute;
+  top: 121px;
+  font-weight: bold;
 }
 
-.disabled .opt-out-disabled,
-.disabled .opt-out-disabled *
+#manual-toggle-text
 {
-  color: rgba(247, 248, 247, 0.42);
+  right: 180px;
 }
 
-#score-keeper.disabled hr
+#automatic-toggle-text
 {
-  border-top-color: rgba(247, 248, 247, 0.42);
+  left: 171px;
 }

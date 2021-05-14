@@ -62,8 +62,11 @@
   "highScores": {
     "message": ""
   },
-  "scoreKeeperOptOut": {
-    "message": "Désactiver"
+  "scoreKeeperAutomatic": {
+    "message": "Auto"
+  },
+  "scoreKeeperManual": {
+    "message": "Manuel"
   },
   "lastDay": {
     "message": "Dernier 24h"

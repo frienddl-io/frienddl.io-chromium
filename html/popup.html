@@ -140,11 +140,10 @@
         </div>
 
         <div
-          id="spinner"
-          class="pause-hidden stop-hidden success-hidden btn btn-block"
+          class="pause-hidden stop-hidden success-hidden center spinner"
         >
-          <img id="spinner-icon" src="../img/spinner.gif">
-          &nbsp;<span id="spinner-text"></span>
+          <img class="spinner-icon" src="../img/spinner.gif">
+          &nbsp;<span class="spinner-text"></span>
         </div>
 
         <div
@@ -179,26 +178,48 @@
 
       <div id="score-keeper" class="tabContent center">
         <div id="header">
+          <div id="score-keeper-toggle">
+            <span id="manual-toggle-text" class="toggle"></span>
+            <div id="score-keeper-type-option" class="custom-control custom-switch center">
+              <input
+                id="score-keeper-type"
+                type="checkbox"
+                class="custom-control-input"
+                checked
+              >
+              <label
+                class="custom-control-label"
+                for="score-keeper-type"
+              >
+              </label>
+            </div>
+            <span id="automatic-toggle-text" class="toggle"></span>
+          </div>
           <p class="description"></p>
 
-          <div id="opt-out-option" class="custom-control custom-switch center">
-            <input
-              id="opt-out-toggle"
-              type="checkbox"
-              class="custom-control-input"
-            >
-            <label
-              id="opt-out-text"
-              class="custom-control-label"
-              for="opt-out-toggle"
-            >
-            </label>
+          <button id="manual-update-button" class="btn btn-success">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+              <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
+              <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
+            </svg>
+            &nbsp;<span></span>
+          </button>
+
+          <div
+            class="center spinner hidden"
+          >
+            <img class="spinner-icon" src="../img/spinner.gif">
+            &nbsp;<span class="spinner-text"></span>
           </div>
         </div>
 
+        <hr>
+
         <div id="high-scores">
-          <h2 id="high-scores-header" class="h2 opt-out-disabled"></h2>
-          <table class="table table-borderless opt-out-disabled" >
+          <h2 id="high-scores-header" class="h2">
+            <img id="crown" src="../img/crown.gif">&nbsp;<span></span>
+          </h2>
+          <table class="table table-borderless" >
             <tbody>
               <tr class="last-day">
                 <th scope="row"></th>
@@ -239,8 +260,10 @@
         <hr>
 
         <div id="total-points">
-          <h2 id="total-points-header" class="h2 opt-out-disabled"></h2>
-          <table class="table table-borderless opt-out-disabled" >
+          <h2 id="total-points-header" class="h2">
+            <img id="rolling-die" src="../img/die.gif">&nbsp;<span></span>
+          </h2>
+          <table class="table table-borderless" >
             <tbody>
               <tr class="last-day">
                 <th scope="row"></th>

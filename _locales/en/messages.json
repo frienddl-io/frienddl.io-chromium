@@ -62,17 +62,35 @@
   "scoreKeeperTabName": {
     "message": "Score Keeper"
   },
-  "scoreKeeperDescription": {
-    "message": "Checks your score once a minute"
+  "scoreKeeperAutomaticDescription": {
+    "message": "Updates once a minute"
+  },
+  "scoreKeeperManualDescription": {
+    "message": "Click button to update"
   },
   "highScores": {
     "message": "High Scores"
   },
+  "altCrown": {
+    "message": "crown icon"
+  },
   "totalPoints": {
     "message": "Total Points"
   },
-  "scoreKeeperOptOut": {
-    "message": "Opt Out"
+  "altRollingDie": {
+    "message": "rolling die icon"
+  },
+  "scoreKeeperAutomatic": {
+    "message": "Auto"
+  },
+  "scoreKeeperManual": {
+    "message": "Manual"
+  },
+  "scoreKeeperUpdateButton": {
+    "message": "Update"
+  },
+  "updateText": {
+    "message": "Updating..."
   },
   "lastDay": {
     "message": "Last Day"
