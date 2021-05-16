@@ -3,7 +3,10 @@
     "message": "frienddl.io - skribbl.io chercheur des amis, et marqueur"
   },
   "extensionDescription": {
-    "message": "Outil pour chercher vos amis aux salons publics de skribbl.io et suivre des meilleurs scores"
+    "message": ""
+  },
+  "friendFinderTabName": {
+    "message": ""
   },
   "friendFinderDescription": {
     "message": "Inscrivez les noms de vos amis, puis chercher pour les trouver en skribbl.io"
@@ -56,10 +59,25 @@
   "foundFriendPlural": {
     "message": "Des amis trouvés!"
   },
-  "scoreKeeperDescription": {
-    "message": "Votre score est vérifié toutes les minutes"
+  "scoreKeeperTabName": {
+    "message": ""
+  },
+  "scoreKeeperAutomaticDescription": {
+    "message": ""
+  },
+  "scoreKeeperManualDescription": {
+    "message": ""
   },
   "highScores": {
+    "message": ""
+  },
+  "altCrown": {
+    "message": ""
+  },
+  "totalPoints": {
+    "message": ""
+  },
+  "altRollingDie": {
     "message": ""
   },
   "scoreKeeperAutomatic": {
@@ -67,6 +85,12 @@
   },
   "scoreKeeperManual": {
     "message": "Manuel"
+  },
+  "scoreKeeperUpdateButton": {
+    "message": ""
+  },
+  "updateText": {
+    "message": ""
   },
   "lastDay": {
     "message": "Dernier 24h"
@@ -79,5 +103,11 @@
   },
   "allTime": {
     "message": "De tous les temps"
+  },
+  "resetButton": {
+    "message": ""
+  },
+  "resetWarning": {
+    "message": ""
   }
 }
