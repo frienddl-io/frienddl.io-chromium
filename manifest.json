@@ -10,7 +10,6 @@
     "default_popup": "html/popup.html",
     "default_title": "frienddl.io"
   },
-  "options_page": "html/options.html",
   "content_scripts": [
     {
       "matches": [
