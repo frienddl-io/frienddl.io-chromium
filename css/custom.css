@@ -43,12 +43,12 @@ label,
 .spinner,
 #score-keeper-toggle
 {
-  color: #fff;
+  color: #FFFFFF;
 }
 
 hr
 {
-  border-top-color: #ffffff;
+  border-top-color: #FFFFFF;
 }
 
 #title,
@@ -96,7 +96,20 @@ svg
   z-index: 10;
   top: 100px;
   left: 200px;
-  background-color: #F3FF14;
+  background-color: #23C7E8;
+  color: #000000;
+
+  /* background: rgb(233,8,33);
+  background: linear-gradient(90deg, rgba(233,8,33,1) 0%, rgba(243,105,11,1) 20%, rgba(242,255,21,1) 40%, rgba(30,191,56,1) 60%, rgba(39,22,241,1) 80%, rgba(198,9,237,1) 100%); */
+
+  /* -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #000000; */
+  /* text-shadow: -1px 1px 0 #000,
+              1px 1px 0 #000,
+              1px -1px 0 #000;
+              -1px -1px 0 #000; */
+  /* -webkit-text-stroke: 1px #282828;
+  text-shadow: 0px 4px 4px #282828; */
 }
 
 .description
@@ -107,7 +120,7 @@ svg
 
 .btn.spinner:hover
 {
-  color: #FFF !important;
+  color: #FFFFFF !important;
 }
 
 .spinner
@@ -142,21 +155,34 @@ svg
 
 .btn-success
 {
-  color: #fff;
-  background-color: #1DBF38;
+  color: #FFFFFF;
+  background-color: #1EBF38;
   border-color: #1DBF38;
 }
 
 .btn-warning
 {
-  background-color: #F3FF17;
-  border-color: #F3FF17;
+  background-color: #F3FF14;
+  border-color: #F3FF14;
+}
+
+.btn-outline-warning
+{
+  color: #F3FF14;
+  border-color: #F3FF14;
+}
+
+.btn-outline-warning:hover
+{
+  color: #212529;
+  background-color: #E5EF1B;
+  border-color: #E5EF1B;
 }
 
 .btn-danger
 {
-  background-color: #E80920;
-  border-color: #E80920;
+  background-color: #E90821;
+  border-color: #E90821;
 }
 
 #start-button,
@@ -174,13 +200,13 @@ svg
 
 .friend-button
 {
-  color: #fff !important;
-  border-color: #fff !important;
+  color: #FFFFFF !important;
+  border-color: #FFFFFF !important;
 }
 
 .enabled-friend-button:hover
 {
-  color: #fff !important;
+  color: #FFFFFF !important;
   background-color: #c82333 !important;
   border-color: #bd2130 !important;
 }
@@ -200,7 +226,7 @@ label
 .custom-control-input:checked~.custom-control-label::before
 {
   border-color: #28A745;
-  background-color: #28A745;
+  background-color: #1EBF38;
 }
 
 .invalid-feedback
@@ -257,7 +283,7 @@ label
 
 .alert-success
 {
-  color: #FFFFFF;
+  color: #FFFFFFFFF;
   background-color: transparent;
   border-color: #c3e6cb;
 }
@@ -282,6 +308,7 @@ label
 {
   position: absolute;
   top: 121px;
+  font-size: 17px;
   font-weight: bold;
 }
 
@@ -293,4 +320,65 @@ label
 #automatic-toggle-text
 {
   left: 171px;
+}
+
+
+/* Avatars */
+#logoAvatarContainer
+{
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.avatar
+{
+  pointer-events: none;
+  user-select: none;
+  position: relative;
+  flex: 0 0 auto;
+  height: 48px;
+  width: 48px;
+}
+
+.avatar .color,
+.avatar .eyes,
+.avatar .mouth,
+.avatar-fit
+{
+  width: 100%;
+  height: 100%;
+}
+
+.avatar .color
+{
+  position: absolute;
+  background-image: url("../img/color_atlas.gif");
+  background-repeat: no-repeat;
+}
+
+.avatar .eyes
+{
+  position: absolute;
+  background-image: url("../img/eyes_atlas.gif");
+  background-repeat: no-repeat;
+}
+
+.avatar .mouth
+{
+  position: absolute;
+  background-image: url("../img/mouth_atlas.gif");
+  background-repeat: no-repeat;
+}
+
+.avatar .special
+{
+  position: absolute;
+  left: -33%;
+  top: -33%;
+  width: 166%;
+  height: 166%;
+  background-image: url("../img/special_atlas.gif)";
+  background-repeat: no-repeat;
 }

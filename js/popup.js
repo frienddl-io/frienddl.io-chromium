@@ -73,7 +73,6 @@ chrome.storage.onChanged.addListener(
   function(changes, namespace) {
     for (let key in changes) {
       let storageChange = changes[key];
-      console.log("Key " + key)
       switch(key) {
         case "friendsFound":
           if (storageChange.newValue.length > 0) {
@@ -275,31 +274,31 @@ function updateScoreKeeperValues() {
   console.log("Updating score keeper values");
   chrome.storage.sync.get(
     [
-      "oneDayScore",
-      "sevenDayScore",
-      "thirtyDayScore",
-      "allTimeScore",
-      "allTimeScoreDate"
+      "oneDayHighScore",
+      "sevenDayHighScore",
+      "thirtyDayHighScore",
+      "allTimeHighScore",
+      "allTimeHighScoreDate"
     ],
     function(response) {
-      let oneDayScore = response.oneDayScore || 0;
-      let sevenDayScore = response.sevenDayScore || 0;
-      let thirtyDayScore = response.thirtyDayScore || 0;
-      let allTimeScore = response.allTimeScore || 0;
+      let oneDayHighScore = response.oneDayHighScore || 0;
+      let sevenDayHighScore = response.sevenDayHighScore || 0;
+      let thirtyDayHighScore = response.thirtyDayHighScore || 0;
+      let allTimeHighScore = response.allTimeHighScore || 0;
 
-      $("#high-scores .last-day td").text(oneDayScore.toLocaleString());
-      $("#high-scores .last-seven-days td").text(sevenDayScore.toLocaleString());
-      $("#high-scores .last-thirty-days td").text(thirtyDayScore.toLocaleString());
-      $("#high-scores .all-time td").text(allTimeScore.toLocaleString());
+      $("#high-scores .last-day td").text(oneDayHighScore.toLocaleString());
+      $("#high-scores .last-seven-days td").text(sevenDayHighScore.toLocaleString());
+      $("#high-scores .last-thirty-days td").text(thirtyDayHighScore.toLocaleString());
+      $("#high-scores .all-time td").text(allTimeHighScore.toLocaleString());
 
       let language = chrome.i18n.getUILanguage().split("-")[0];
       console.log(`Using language: ${language}`);
 
-      let allTimeScoreDate = response.allTimeScoreDate;
-      console.debug(`allTimeScoreDate: ${allTimeScoreDate}`);
+      let allTimeHighScoreDate = response.allTimeHighScoreDate;
+      console.debug(`allTimeHighScoreDate: ${allTimeHighScoreDate}`);
 
-      if (allTimeScoreDate !== null && allTimeScoreDate !== 0) {
-        let formattedDate = new Intl.DateTimeFormat(language).format(allTimeScoreDate);
+      if (allTimeHighScoreDate !== null && allTimeHighScoreDate !== 0) {
+        let formattedDate = new Intl.DateTimeFormat(language).format(allTimeHighScoreDate);
         console.debug(`formattedDate: ${formattedDate}`);
         $("#all-time-date td").text(formattedDate);
       }
@@ -330,7 +329,7 @@ function updateScoreKeeperValues() {
   $("#score-keeper .spinner").addClass("hidden");
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
   // Set values of friends and stats from storage on popup startup
   chrome.storage.local.get(
     [
@@ -890,24 +889,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (toggleIsAutomatic) {
       $("#score-keeper .description").text(chrome.i18n.getMessage("scoreKeeperAutomaticDescription"));
       $("#score-keeper #manual-update-button").css("display", "none");
-
-      // Create port to send messages to background
-      let backgroundPort = chrome.runtime.connect(
-        {
-          name: "p2b"
-        }
-      );
-
-      console.log("Sending message to create alarms");
-      backgroundPort.postMessage(
-        {
-          task: "createAlarms"
-        }
-      );
     } else {
-      chrome.alarms.clearAll();
-      console.log("Cleared alarms");
-
       $("#score-keeper .description").text(chrome.i18n.getMessage("scoreKeeperManualDescription"));
       $("#score-keeper #manual-update-button").css("display", "inline");
     }
@@ -957,14 +939,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (sectionId === "high-scores") {
         resetValues = {
-          oneDayScore: 0,
-          oneDayScoreDate: 0,
-          sevenDayScore: 0,
-          sevenDayScoreDate: 0,
-          thirtyDayScore: 0,
-          thirtyDayScoreDate: 0,
-          allTimeScore: 0,
-          allTimeScoreDate: 0
+          oneDayHighScore: 0,
+          oneDayHighScoreDate: 0,
+          sevenDayHighScore: 0,
+          sevenDayHighScoreDate: 0,
+          thirtyDayHighScore: 0,
+          thirtyDayHighScoreDate: 0,
+          allTimeHighScore: 0,
+          allTimeHighScoreDate: 0
         }
 
         $("#all-time-date td").css("display", "none");

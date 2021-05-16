@@ -10,64 +10,299 @@ const STOP_BADGE_COLOR = "#dc3545";
 const SUCCESS_BADGE_COLOR = "#17A2B8";
 
 let CONTENT_PORTS = [];
+let PROCESS_NEW_POINTS_LOCK = false;
+let PROCESS_NEW_POINTS_QUEUE = [];
+let PROCESS_NEW_POINTS_QUEUE_INTERVAL;
 
-function getScore(tabId) {
-  console.debug(`Starting score search on tabId: ${tabId}`);
-  chrome.tabs.sendMessage(
-    tabId,
-    {
-      tabId: tabId,
-      task: "scoreSearch"
-    },
-    respondToScoreSearchContent
-  );
+function daysAgo(now, days) {
+  return new Date(now - (days * 24 * 60 * 60 * 1000)).getTime();
 }
 
-// Responds to alarms to check for new high score
-chrome.alarms.onAlarm.addListener(
-  function(alarm) {
-    let tabId = parseInt(alarm.name);
-    getScore(tabId)
+function calculateHighScores(updatedScoreKeeper, response, totalGamePoints, now) {
+  function scoreOutdated(currentHighScoreDate, now, days) {
+    let currentDaysAgo = daysAgo(now, days);
+    console.debug(`daysAgo: ${daysAgo}`);
+
+    if (currentHighScoreDate < daysAgo) {
+      console.log(`currentScoreDate is older than ${days} days: ${currentHighScoreDate} < ${daysAgo}`);
+      return true;
+    }
+
+    return false;
   }
-);
 
-// Creates alarm to monitor current player's score
-function createAlarm(tabId) {
-  console.debug(`tabId: ${tabId}`);
+  // 1 day high score
+  let oneDayHighScore = response.oneDayHighScore || 0;
+  console.debug(`oneDayHighScore: ${oneDayHighScore}`);
 
-  if (tabId === undefined || tabId === null) {
-    console.log("tabId is null or undefined; not creating alarm");
+  let oneDayHighScoreDate = response.oneDayHighScoreDate || now;
+  console.debug(`oneDayHighScoreDate: ${oneDayHighScoreDate}`);
+
+  if (oneDayHighScore !== 0) {
+    if (scoreOutdated(oneDayHighScoreDate, now, 1)) {
+      oneDayHighScore = 0;
+      updatedScoreKeeper.oneDayHighScore = oneDayHighScore;
+      updatedScoreKeeper.oneDayHighScoreDate = now;
+    }
+  }
+
+  // 7 days high score
+  let sevenDayHighScore = response.sevenDayHighScore || 0;
+  console.debug(`sevenDayHighScore: ${sevenDayHighScore}`);
+
+  let sevenDayHighScoreDate = response.sevenDayHighScoreDate || now;
+  console.debug(`sevenDayHighScoreDate: ${sevenDayHighScoreDate}`);
+
+  if (sevenDayHighScore !== 0) {
+    if (scoreOutdated(sevenDayHighScoreDate, now, 7)) {
+      sevenDayHighScore = 0;
+      updatedScoreKeeper.sevenDayHighScore = sevenDayHighScore;
+      updatedScoreKeeper.sevenDayHighScoreDate = now;
+    }
+  }
+
+  // 30 days high score
+  let thirtyDayHighScore = response.thirtyDayHighScore || 0;
+  console.debug(`thirtyDayHighScore: ${thirtyDayHighScore}`);
+
+  let thirtyDayHighScoreDate = response.thirtyDayHighScoreDate || now;
+  console.debug(`thirtyDayHighScoreDate: ${thirtyDayHighScoreDate}`);
+
+  if (thirtyDayHighScore !== 0) {
+    if (scoreOutdated(thirtyDayHighScoreDate, now, 30)) {
+      thirtyDayHighScore = 0;
+      updatedScoreKeeper.thirtyDayHighScore = thirtyDayHighScore;
+      updatedScoreKeeper.thirtyDayHighScoreDate = now;
+    }
+  }
+
+  // All-time high score
+  let allTimeHighScore = response.allTimeHighScore || 0;
+  console.debug(`allTimeHighScore: ${allTimeHighScore}`);
+
+  let allTimeHighScoreDate = response.allTimeHighScoreDate || now;
+  console.debug(`allTimeHighScoreDate: ${allTimeHighScoreDate}`)
+
+  // Compare current score to existing high scores
+  if (totalGamePoints > oneDayHighScore) {
+    console.log(`Setting new 1 day high score: ${oneDayHighScore} to ${totalGamePoints}`);
+
+    updatedScoreKeeper.oneDayHighScore = totalGamePoints;
+    updatedScoreKeeper.oneDayHighScoreDate = now;
+  }
+
+  if (totalGamePoints > sevenDayHighScore) {
+    console.log(`Setting new 7 day high score: ${sevenDayHighScore} to ${totalGamePoints}`);
+
+    updatedScoreKeeper.sevenDayHighScore = totalGamePoints;
+    updatedScoreKeeper.sevenDayHighScoreDate = now;
+  }
+
+  if (totalGamePoints > thirtyDayHighScore) {
+    console.log(`Setting new 30 day high score: ${thirtyDayHighScore} to ${totalGamePoints}`);
+
+    updatedScoreKeeper.thirtyDayHighScore = totalGamePoints;
+    updatedScoreKeeper.thirtyDayHighScoreDate = now;
+  }
+
+  if (totalGamePoints > allTimeHighScore) {
+    console.log(`Setting new all-time high score: ${allTimeHighScore} to ${totalGamePoints}`);
+
+    updatedScoreKeeper.allTimeHighScore = totalGamePoints;
+    updatedScoreKeeper.allTimeHighScoreDate = now;
+  }
+
+  return updatedScoreKeeper;
+}
+
+function calculateTotalPoints(updatedScoreKeeper, response, currentPoints, now) {
+  let pointsArray = response.pointsArray;
+  console.log("pointsArray at start");
+  console.dir(pointsArray);
+
+  let allTimePoints = response.allTimePoints;
+  console.debug(`allTimePoints: ${allTimePoints}`);
+
+  if (pointsArray === undefined || pointsArray === null) {
+    console.log("pointsArray is undefined or null");
+    pointsArray = [];
+  }
+
+  console.log("updatedScoreKeeper");
+  console.dir(updatedScoreKeeper);
+
+  if (pointsArray.length < 1) {
+    console.log("pointsArray is less than 1");
+
+    updatedScoreKeeper.thirtyDayPoints = currentPoints;
+    updatedScoreKeeper.sevenDayPoints = currentPoints;
+    updatedScoreKeeper.oneDayPoints = currentPoints;
+    updatedScoreKeeper.allTimePoints = currentPoints;
+  }
+
+  pointsArray.push(
+    {
+      time: now,
+      points: currentPoints
+    }
+  );
+  updatedScoreKeeper.allTimePoints = allTimePoints + currentPoints;
+  updatedScoreKeeper.pointsArray = pointsArray;
+
+  if (pointsArray.length >= 2) {
+    // Filter and remove if 30 days old
+    let cutoff = daysAgo(now, 30)
+    function checkTime(i) {
+      return i.time> cutoff;
+    }
+
+    pointsArray = pointsArray.filter(checkTime);
+    updatedScoreKeeper.pointsArray = pointsArray;
+
+    let thirtyDayPoints = pointsArray.reduce(
+      function(previousValue, currentValue) {
+        return {
+          points: previousValue.points + currentValue.points
+        }
+      }
+    ).points;
+
+    console.log(`thirtyDayPoints: ${thirtyDayPoints}`);
+    if (thirtyDayPoints !== response.thirtyDayPoints) {
+      updatedScoreKeeper.thirtyDayPoints = thirtyDayPoints;
+    }
+
+    // 7 days
+    cutoff = daysAgo(now, 7);
+
+    let sevenDayPoints = pointsArray.filter(checkTime).reduce(
+      function(previousValue, currentValue) {
+        return {
+          points: previousValue.points + currentValue.points
+        }
+      }
+    ).points;
+
+    console.log(`sevenDayPoints: ${sevenDayPoints}`);
+    if (sevenDayPoints !== response.sevenDayPoints) {
+      updatedScoreKeeper.sevenDayPoints = sevenDayPoints;
+    }
+
+    // 1 day
+    cutoff = daysAgo(now, 1)
+
+    let oneDayPoints = pointsArray.filter(checkTime).reduce(
+      function(previousValue, currentValue) {
+        return {
+          points: previousValue.points + currentValue.points
+        }
+      }
+    ).points;
+
+    console.log(`oneDayPoints: ${oneDayPoints}`);
+    if (oneDayPoints !== response.oneDayPoints) {
+      updatedScoreKeeper.oneDayPoints = oneDayPoints;
+    }
+  }
+
+  return updatedScoreKeeper;
+}
+
+// Processes new points from a tab
+function processNewPoints(message) {
+  if (message === undefined) {
+    let lastError = chrome.runtime.lastError.message;
+    console.log(`Message was undefined, last error: ${lastError}`);
   } else {
     chrome.storage.sync.get(
       [
-        "scoreKeeperAutomatic"
+        "oneDayHighScore",
+        "oneDayHighScoreDate",
+        "sevenDayHighScore",
+        "sevenDayHighScoreDate",
+        "thirtyDayHighScore",
+        "thirtyDayHighScoreDate",
+        "allTimeHighScore",
+        "allTimeHighScoreDate",
+        "pointsArray",
+        "oneDayPoints",
+        "sevenDayPoints",
+        "thirtyDayPoints",
+        "allTimePoints"
       ],
       function(response) {
-        let scoreKeeperAutomatic = response.scoreKeeperAutomatic;
-        console.debug(`scoreKeeperAutomatic: ${scoreKeeperAutomatic}`);
+        let currentPoints = parseInt(message.points);
+        console.debug(`currentPoints: ${currentPoints}`);
 
-        if (scoreKeeperAutomatic !== false) {
-          scoreKeeperAutomatic = true;
-        }
-        console.debug(`scoreKeeperAutomatic: ${scoreKeeperAutomatic}`);
+        let totalGamePoints = parseInt(message.totalGamePoints);
+        console.debug(`totalGamePoints: ${totalGamePoints}`);
 
-        let alarmName = tabId.toString();
-        console.debug(`alarmName: ${alarmName}`)
+        let now = new Date().getTime();
+        let updatedScoreKeeper = {};
 
-        if (scoreKeeperAutomatic) {
-          console.log(`Creating alarm for tabId: ${alarmName}`);
-          chrome.alarms.create(
-            alarmName,
-            {
-              delayInMinutes: 1
+        updatedScoreKeeper = calculateHighScores(
+          updatedScoreKeeper,
+          response,
+          totalGamePoints,
+          now
+        );
+
+        updatedScoreKeeper = calculateTotalPoints(
+          updatedScoreKeeper,
+          response,
+          currentPoints,
+          now
+        );
+
+        console.log("updatedScoreKeeper");
+        console.dir(updatedScoreKeeper);
+
+        if (Object.entries(updatedScoreKeeper).length < 1) {
+          console.log("Not updating score keeper values");
+          PROCESS_NEW_POINTS_LOCK = false;
+        } else {
+          console.log("Updating score keeper values");
+          chrome.storage.sync.set(
+            updatedScoreKeeper,
+            function() {
+              console.log("Unlocking");
+              PROCESS_NEW_POINTS_LOCK = false;
             }
           );
-          console.debug(`Alarm created: ${alarmName}`);
-        } else {
-          console.log("Manual score keeper type; not setting alarm");
         }
       }
     );
+  }
+}
+
+function manageContentPort(action, tabId) {
+  if (action === "add") {
+    if (CONTENT_PORTS.includes(tabId)) {
+      console.log(`Content ports already includes tabId: ${tabId}`);
+    } else {
+      CONTENT_PORTS.push(tabId);
+      console.log(`Added tabId to content ports: ${tabId}`);
+
+      if (CONTENT_PORTS.length === 1) {
+        PROCESS_NEW_POINTS_QUEUE_INTERVAL = setInterval(
+          function() {
+            let queueNotEmpty = PROCESS_NEW_POINTS_QUEUE.length > 0;
+            if (PROCESS_NEW_POINTS_LOCK === false && queueNotEmpty) {
+              PROCESS_NEW_POINTS_LOCK = true;
+              processNewPoints(PROCESS_NEW_POINTS_QUEUE.shift());
+            }
+          },
+          100
+        );
+      }
+    }
+  } else if (action === "remove") {
+    CONTENT_PORTS = CONTENT_PORTS.filter(i => i !== tabId);
+    console.log(`Removed tabId from content ports: ${tabId}`);
+
+    if (CONTENT_PORTS.length === 0) {
+      clearInterval(PROCESS_NEW_POINTS_QUEUE_INTERVAL);
+    }
   }
 }
 
@@ -75,7 +310,7 @@ function createAlarm(tabId) {
 chrome.runtime.onConnect.addListener(
   function(port) {
     if (port.name === "p2b") {
-      console.debug("Connected to p2b");
+      console.log("Connected to p2b");
 
       port.onMessage.addListener(
         function(message) {
@@ -84,21 +319,21 @@ chrome.runtime.onConnect.addListener(
 
           if (task === "joinNewGame") {
             joinNewGame(message.tabId);
-          } else if (task === "createAlarms") {
-            function forEachCreateAlarm(value, index, array) {
-              console.debug(`Creating alarm for tabId: ${value}`)
-              createAlarm(value);
-            }
-
-            CONTENT_PORTS.forEach(forEachCreateAlarm);
           } else if (task === "updateScoreKeeper") {
-            function forEachGetScore(value, index, array) {
-              getScore(value);
+            function forEachGetPoints(value, index, array) {
+              console.debug(`Starting score search on tabId: ${tabId}`);
+              chrome.tabs.sendMessage(
+                tabId,
+                {
+                  tabId: tabId,
+                  task: "getPoints"
+                }
+              );
             }
 
-            CONTENT_PORTS.forEach(forEachGetScore);
+            CONTENT_PORTS.forEach(forEachGetPoints);
 
-            let waitSeconds = .5;
+            let defaultWaitTimeSeconds = .9;
             setTimeout(
               function() {
                 chrome.storage.local.set(
@@ -107,7 +342,7 @@ chrome.runtime.onConnect.addListener(
                   }
                 );
               },
-              waitSeconds * 1000
+              defaultWaitTimeSeconds * 1000
             );
           }
         }
@@ -115,340 +350,33 @@ chrome.runtime.onConnect.addListener(
     } else if (port.name === "c2b") {
       let tabId = port.sender.tab.id;
       console.log(`Connected to c2b port with tabId: ${tabId}`)
-      CONTENT_PORTS.push(tabId);
+      manageContentPort("add", tabId);
 
-      createAlarm(tabId);
+      port.onMessage.addListener(
+        function(message) {
+          let task = message.task;
+          console.dir(message);
+
+          if (task === "logPoints") {
+            console.log(`Pushing message to process new points for tabID: ${tabId}`);
+            PROCESS_NEW_POINTS_QUEUE.push(message);
+          }
+        }
+      );
     } else {
       console.log(`Port is not recognized: ${port.name}`);
     }
   }
 );
 
-function daysAgo(now, days) {
-  return new Date(now - (days * 24 * 60 * 60 * 1000)).getTime();
-}
-
-function scoreOutdated(currentHighScoreDate, now, days) {
-  let currentDaysAgo = daysAgo(now, days);
-  console.debug(`daysAgo: ${daysAgo}`);
-
-  if (currentHighScoreDate < daysAgo) {
-    console.log(`currentScoreDate is older than ${days} days: ${currentHighScoreDate} < ${daysAgo}`);
-    return true;
-  }
-
-  return false;
-}
-
-// Processes the response from the content of a game related to friend searching
-function respondToScoreSearchContent(response) {
-  console.debug("Received response from content for score search");
-
-  if (response === undefined) {
-    let lastError = chrome.runtime.lastError.message;
-    console.log(`Response was undefined, last error: ${lastError}`);
-  } else {
-    let tabId = response.tabId;
-    console.debug(`Checking for new high score in tab with id: ${tabId}`);
-
-    let currentPoints = response.points;
-    console.debug(`currentPoints: ${currentPoints}`);
-
-    let round = response.round;
-    console.debug(`round: ${round}`);
-
-    if (currentPoints === null || currentPoints === 0) {
-      console.log("currentPoints is null or 0; skipping over");
-    } else {
-      console.debug(`currentPoints is not null or 0: ${currentPoints}`);
-
-      let now = new Date().getTime();
-
-      chrome.storage.sync.get(
-        [
-          "oneDayScore",
-          "oneDayScoreDate",
-          "sevenDayScore",
-          "sevenDayScoreDate",
-          "thirtyDayScore",
-          "thirtyDayScoreDate",
-          "allTimeScore",
-          "allTimeScoreDate"
-        ],
-        function(response) {
-          currentPoints = parseInt(currentPoints);
-          console.debug(`currentPoints: ${currentPoints}`)
-
-          let updatedHighScores = {};
-
-          // 1 day high score
-          let oneDayScore = response.oneDayScore || 0;
-          console.debug(`oneDayScore: ${oneDayScore}`);
-
-          let oneDayScoreDate = response.oneDayScoreDate || now;
-          console.debug(`oneDayScoreDate: ${oneDayScoreDate}`);
-
-          if (oneDayScore !== 0) {
-            if (scoreOutdated(oneDayScoreDate, now, 1)) {
-              oneDayScore = 0;
-              updatedHighScores.oneDayScore = oneDayScore;
-              updatedHighScores.oneDayScoreDate = now;
-            }
-          }
-
-          // 7 days high score
-          let sevenDayScore = response.sevenDayScore || 0;
-          console.debug(`sevenDayScore: ${sevenDayScore}`);
-
-          let sevenDayScoreDate = response.sevenDayScoreDate || now;
-          console.debug(`sevenDayScoreDate: ${sevenDayScoreDate}`);
-
-          if (sevenDayScore !== 0) {
-            if (scoreOutdated(sevenDayScoreDate, now, 7)) {
-              sevenDayScore = 0;
-              updatedHighScores.sevenDayScore = sevenDayScore;
-              updatedHighScores.sevenDayScoreDate = now;
-            }
-          }
-
-          // 30 days high score
-          let thirtyDayScore = response.thirtyDayScore || 0;
-          console.debug(`thirtyDayScore: ${thirtyDayScore}`);
-
-          let thirtyDayScoreDate = response.thirtyDayScoreDate || now;
-          console.debug(`thirtyDayScoreDate: ${thirtyDayScoreDate}`);
-
-          if (thirtyDayScore !== 0) {
-            if (scoreOutdated(thirtyDayScoreDate, now, 30)) {
-              thirtyDayScore = 0;
-              updatedHighScores.thirtyDayScore = thirtyDayScore;
-              updatedHighScores.thirtyDayScoreDate = now;
-            }
-          }
-
-          // All-time high score
-          let allTimeScore = response.allTimeScore || 0;
-          console.debug(`allTimeScore: ${allTimeScore}`);
-
-          let allTimeScoreDate = response.allTimeScoreDate || now;
-          console.debug(`allTimeScoreDate: ${allTimeScoreDate}`)
-
-          // Compare current score to existing high scores
-          if (currentPoints > oneDayScore) {
-            console.log(`Setting new 1 day high score: ${oneDayScore} to ${currentPoints}`);
-
-            updatedHighScores.oneDayScore = currentPoints;
-            updatedHighScores.oneDayDate = now;
-          }
-
-          if (currentPoints > sevenDayScore) {
-            console.log(`Setting new 7 day high score: ${sevenDayScore} to ${currentPoints}`);
-
-            updatedHighScores.sevenDayScore = currentPoints;
-            updatedHighScores.sevenDayScoreDate = now;
-          }
-
-          if (currentPoints > thirtyDayScore) {
-            console.log(`Setting new 30 day high score: ${thirtyDayScore} to ${currentPoints}`);
-
-            updatedHighScores.thirtyDayScore = currentPoints;
-            updatedHighScores.thirtyDayScoreDate = now;
-          }
-
-          if (currentPoints > allTimeScore) {
-            console.log(`Setting new all-time high score: ${allTimeScore} to ${currentPoints}`);
-
-            updatedHighScores.allTimeScore = currentPoints;
-            updatedHighScores.allTimeScoreDate = now;
-          }
-
-          if (Object.entries(updatedHighScores).length > 0) {
-            console.log("Updating high scores");
-            console.dir(updatedHighScores);
-            chrome.storage.sync.set(updatedHighScores);
-          } else {
-            console.log("Not updating high scores");
-          }
-        }
-      );
-
-      chrome.storage.sync.get(
-        [
-          "pointsArray",
-          "oneDayPoints",
-          "sevenDayPoints",
-          "thirtyDayPoints",
-          "allTimePoints",
-          "allTimePoints"
-        ],
-        function(response) {
-          let pointsArray = response.pointsArray;
-          console.log("pointsArray at start");
-          console.dir(pointsArray);
-
-          let allTimePoints = response.allTimePoints;
-          console.debug(`allTimePoints: ${allTimePoints}`);
-
-          let updatedTotalPoints = {};
-
-          if (pointsArray === undefined || pointsArray === null || pointsArray.length < 1) {
-            console.log("pointsArray is undefined, null, or less than 1");
-
-            pointsArray.push(
-              {
-                tabId: tabId,
-                date: now,
-                points: currentPoints,
-                round: round,
-                totalGamePoints: currentPoints
-              }
-            );
-
-            updatedTotalPoints.pointsArray = pointsArray;
-            updatedTotalPoints.thirtyDayPoints = currentPoints;
-            updatedTotalPoints.sevenDayPoints = currentPoints;
-            updatedTotalPoints.oneDayPoints = currentPoints;
-            updatedTotalPoints.allTimePoints = currentPoints;
-          } else {
-            let lastPointsRecorded = pointsArray[pointsArray.length - 1];
-
-            let tabsMatch = lastPointsRecorded.tabId === tabId;
-            let roundsMatch = lastPointsRecorded.round === round;
-            let pointsMatch = lastPointsRecorded.points === currentPoints;
-
-            let roundLower = round < lastPointsRecorded.round;
-
-            if (tabsMatch && roundsMatch && pointsMatch) {
-              console.log("New points not found; updating date on last element in pointsArray");
-
-              pointsArray[pointsArray.length - 1].date = now;
-              updatedTotalPoints.pointsArray = pointsArray;
-            } else if (!tabsMatch || roundLower) {
-              console.log(`tabs (${tabsMatch}) don't match or round (${roundLower}) lower; pushing without comparing`);
-
-              pointsArray.push(
-                {
-                  tabId: tabId,
-                  date: now,
-                  points: currentPoints,
-                  round: round,
-                  totalGamePoints: currentPoints
-                }
-              );
-
-              updatedTotalPoints.allTimePoints = allTimePoints + currentPoints;
-            } else {
-              let timeDifference = now - lastPointsRecorded.date;
-              const threeMinutes = 3 * 60 * 1000;
-
-              let newPoints;
-              let totalGamePoints = lastPointsRecorded.totalGamePoints;;
-
-              if (timeDifference > threeMinutes || currentPoints < totalGamePoints) {
-                newPoints = currentPoints;
-                totalGamePoints = currentPoints;
-              } else {
-                console.log(`Subtracting last points to prevent double-counting: ${currentPoints} - ${totalGamePoints}`);
-                newPoints = currentPoints - totalGamePoints;
-                totalGamePoints = currentPoints;
-              }
-
-              console.log(`newPoints: ${newPoints}`);
-
-              if (newPoints === 0) {
-                console.log("Updating date on last element in pointsArray");
-
-                pointsArray[pointsArray.length - 1].date = now;
-                updatedTotalPoints.pointsArray = pointsArray;
-              } else {
-                console.log("Pushing new element to pointsArray");
-                pointsArray.push(
-                  {
-                    tabId: tabId,
-                    date: now,
-                    points: newPoints,
-                    round: round,
-                    totalGamePoints: totalGamePoints
-                  }
-                );
-              }
-
-              updatedTotalPoints.pointsArray = pointsArray;
-              updatedTotalPoints.allTimePoints = allTimePoints + newPoints;
-            }
-
-            function checkDate(i) {
-              return i.date > cutoff;
-            }
-
-            // Filter and remove if 30 days old
-            let cutoff = daysAgo(now, 30)
-            pointsArray = pointsArray.filter(checkDate);
-            updatedTotalPoints.pointsArray = pointsArray;
-
-            if (pointsArray.length >= 2) {
-              let thirtyDayPoints = pointsArray.reduce(
-                function(previousValue, currentValue) {
-                  return {
-                    points: previousValue.points + currentValue.points
-                  }
-                }
-              ).points;
-
-              console.debug(`thirtyDayPoints: ${thirtyDayPoints}`);
-              if (thirtyDayPoints !== response.thirtyDayPoints) {
-                updatedTotalPoints.thirtyDayPoints = thirtyDayPoints;
-              }
-
-              // 7 days
-              cutoff = daysAgo(now, 7)
-
-              let sevenDayPoints = pointsArray.filter(checkDate).reduce(
-                function(previousValue, currentValue) {
-                  return {
-                    points: previousValue.points + currentValue.points
-                  }
-                }
-              ).points;
-
-              console.debug(`sevenDayPoints: ${sevenDayPoints}`);
-              if (thirtyDayPoints !== response.thirtyDayPoints) {
-                updatedTotalPoints.sevenDayPoints = thirtyDayPoints;
-              }
-
-              // 1 day
-              cutoff = daysAgo(now, 1)
-
-              let oneDayPoints = pointsArray.filter(checkDate).reduce(
-                function(previousValue, currentValue) {
-                  return {
-                    points: previousValue.points + currentValue.points
-                  }
-                }
-              ).points;
-
-              console.debug(`oneDayPoints: ${oneDayPoints}`);
-              if (thirtyDayPoints !== response.oneDayPoints) {
-                updatedTotalPoints.oneDayPoints = oneDayPoints;
-              }
-            }
-          }
-
-          console.log("updatedTotalPoints");
-          console.dir(updatedTotalPoints);
-
-          if (Object.entries(updatedTotalPoints).length > 0) {
-            console.log("Updating total points");
-            chrome.storage.sync.set(updatedTotalPoints);
-          } else {
-            console.log("Not updating total points");
-          }
-        }
-      );
+// Listen for window to close
+chrome.tabs.onRemoved.addListener(
+  function(tabId) {
+    if (CONTENT_PORTS.includes(tabId)) {
+      manageContentPort("remove", tabId);
     }
-    createAlarm(tabId);
   }
-}
+);
 
 // Listen for window to close
 chrome.windows.onRemoved.addListener(
@@ -458,7 +386,7 @@ chrome.windows.onRemoved.addListener(
         "windowId"
       ],
       function(response) {
-        if(windowId === response.windowId) {
+        if (windowId === response.windowId) {
           stopSearch();
         }
       }
@@ -616,7 +544,7 @@ function stopSearch() {
   );
 }
 
-// Updates values in storage
+// Updates values in storage for friend finder
 function updateStorage() {
   chrome.storage.local.get(
     [

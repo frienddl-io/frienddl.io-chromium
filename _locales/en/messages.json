@@ -63,7 +63,7 @@
     "message": "Score Keeper"
   },
   "scoreKeeperAutomaticDescription": {
-    "message": "Updates once a minute"
+    "message": "Updates as you earn points"
   },
   "scoreKeeperManualDescription": {
     "message": "Click button to update"
@@ -87,7 +87,7 @@
     "message": "Manual"
   },
   "scoreKeeperUpdateButton": {
-    "message": "Update"
+    "message": "Sync"
   },
   "updateText": {
     "message": "Updating..."
