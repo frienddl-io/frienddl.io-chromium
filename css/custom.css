@@ -19,6 +19,11 @@ h2,
   font-size: 1.7rem;
 }
 
+hr
+{
+  border-top-color: #FFFFFF;
+}
+
 .container-fluid
 {
   padding-bottom: 5px;
@@ -35,6 +40,11 @@ h2,
   text-align: center;
 }
 
+.row {
+  margin-right: 0px;
+  margin-left: 0px;
+}
+
 p,
 .h2,
 table > *,
@@ -46,9 +56,48 @@ label,
   color: #FFFFFF;
 }
 
-hr
+.btn.spinner:hover
 {
-  border-top-color: #FFFFFF;
+  color: #FFFFFF !important;
+}
+
+.spinner
+{
+  line-height: 1.8;
+  font-size: 20px;
+  cursor: default;
+}
+
+.btn-success
+{
+  color: #FFFFFF;
+  background-color: #1EBF38;
+  border-color: #1DBF38;
+}
+
+.btn-warning
+{
+  background-color: #F3FF14;
+  border-color: #F3FF14;
+}
+
+.btn-outline-warning
+{
+  color: #F3FF14;
+  border-color: #F3FF14;
+}
+
+.btn-outline-warning:hover
+{
+  color: #212529;
+  background-color: #E5EF1B;
+  border-color: #E5EF1B;
+}
+
+.btn-danger
+{
+  background-color: #E90821;
+  border-color: #E90821;
 }
 
 #title,
@@ -118,28 +167,7 @@ svg
   margin-bottom: 10px;
 }
 
-.btn.spinner:hover
-{
-  color: #FFFFFF !important;
-}
-
-.spinner
-{
-  line-height: 1.8;
-}
-
-#friend-finder .spinner
-{
-  padding: 5px 0 15px 0;
-}
-
-#score-keeper .spinner
-{
-  padding: 10px 0 0 0;
-}
-
-/* Form */
-
+/* Friend Finder */
 #pencil
 {
   height: 38px;
@@ -153,38 +181,6 @@ svg
   border-bottom-right-radius: 0;
 }
 
-.btn-success
-{
-  color: #FFFFFF;
-  background-color: #1EBF38;
-  border-color: #1DBF38;
-}
-
-.btn-warning
-{
-  background-color: #F3FF14;
-  border-color: #F3FF14;
-}
-
-.btn-outline-warning
-{
-  color: #F3FF14;
-  border-color: #F3FF14;
-}
-
-.btn-outline-warning:hover
-{
-  color: #212529;
-  background-color: #E5EF1B;
-  border-color: #E5EF1B;
-}
-
-.btn-danger
-{
-  background-color: #E90821;
-  border-color: #E90821;
-}
-
 #start-button,
 #resume-button,
 #pause-button,
@@ -192,6 +188,12 @@ svg
 {
   margin-bottom: 15px;
 }
+
+#friend-finder .spinner
+{
+  padding: 5px 0 15px 0;
+}
+
 
 #friends button
 {
@@ -229,6 +231,19 @@ label
   background-color: #1EBF38;
 }
 
+/* Disabled */
+.custom-control-input:checked:disabled~.custom-control-label::before
+{
+  border-color: rgba(40, 167, 69, 50%) !important;
+  background-color: rgba(30, 191, 56, 50%) !important;
+}
+
+.custom-control-input:disabled~.custom-control-label,
+.custom-control-input[disabled]~.custom-control-label
+{
+  color: rgba(255, 255, 255, 50%);
+}
+
 .invalid-feedback
 {
   color: rgb(255, 154, 154);
@@ -241,12 +256,6 @@ label
 }
 
 /* Friend Finder */
-
-.spinner
-{
-  font-size: 20px;
-  cursor: default;
-}
 
 .spinner img
 {
@@ -283,9 +292,9 @@ label
 
 .alert-success
 {
-  color: #FFFFFFFFF;
+  color: #FFFFFF;
   background-color: transparent;
-  border-color: #c3e6cb;
+  border-color: #C3E6CB;
 }
 
 /* Score Keeper */
@@ -322,12 +331,38 @@ label
   left: 171px;
 }
 
+#score-keeper .spinner
+{
+  padding: 10px 0 0 0;
+}
 
 /* Avatars */
+#playerData table
+{
+  width: 100%;
+  height: 100%;
+  word-wrap:break-word;
+  table-layout: fixed;
+}
+
+#playerName
+{
+  margin: 0px;
+  text-align: center;
+  overflow-wrap: break-word;
+}
+
+#loginAvatarCustomizeContainer .avatarContainer
+{
+  flex: 0 0 auto;
+  width: 96px;
+  height: 96px;
+}
+
 #logoAvatarContainer
 {
   margin-top: 10px;
-  margin-bottom: 10px;
+  padding-bottom: 10px;
   display: flex;
   justify-content: center;
 }
@@ -379,6 +414,6 @@ label
   top: -33%;
   width: 166%;
   height: 166%;
-  background-image: url("../img/special_atlas.gif)";
+  background-image: url("../img/special_atlas.gif");
   background-repeat: no-repeat;
 }

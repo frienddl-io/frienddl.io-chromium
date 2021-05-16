@@ -138,44 +138,87 @@ function logPointsAsync(currentPoints, currentRound, forceUpdate) {
   );
 }
 
+function setPlayerObserver() {
+  $(".player").each(
+    function() {
+      let playerName = $(this).find(".name").html();
+      if (playerName.includes("(You)")) {
+        // Credit: https://forum.freecodecamp.org/t/how-can-i-detect-or-trigger-an-event-when-text-in-p-tag-is-changed/270692/4
+        // Select the node that will be observed for mutations
+        var targetNode = $(this).find('.score')[0];
+
+        // Options for the observer (which mutations to observe)
+        var config = { childList: true };
+
+        // Callback function to execute when mutations are observed
+        var callback = async function(mutationsList, observer) {
+          for (var mutation of mutationsList) {
+            let currentPoints = parseInt(mutation.target.innerText.replace("Points: ", ""));
+            let currentRound = parseInt($("#round")[0].innerText.split(" ")[1]);
+            let forceUpdate = false;
+
+            await logPointsAsync(currentPoints, currentRound, forceUpdate);
+          }
+        };
+        console.log(prefix + "Score observer set");
+
+        // Create an observer instance linked to the callback function
+        var observer = new MutationObserver(callback);
+
+        // Start observing the target node for configured mutations
+        observer.observe(targetNode, config);
+      }
+    }
+  );
+}
+
+function updatePlayerData() {
+  if (typeof chrome.app.isInstalled !== 'undefined') {
+    chrome.storage.local.get(
+      [
+        "playerName",
+        "playerAvatar"
+      ],
+      function(response) {
+        let currentPlayerName = $("#inputName")[0].value;
+        let currentPlayerAvatar = $("#loginAvatarCustomizeContainer").prop('outerHTML');
+        let playerDataUpdates = {};
+
+        if (response.playerName !== currentPlayerName) {
+          console.log(prefix + "Updating player name");
+          playerDataUpdates.playerName = currentPlayerName;
+        }
+
+        if (response.playerAvatar !== currentPlayerAvatar) {
+          console.log(prefix + "Updating player avatar");
+          playerDataUpdates.playerAvatar = currentPlayerAvatar;
+        }
+
+        if (Object.entries(playerDataUpdates).length > 0) {
+          chrome.storage.local.set(
+            playerDataUpdates,
+            function() {}
+          );
+        }
+      }
+    );
+  }
+}
+
+// Check for player name input change
+$("#inputName").on("propertychange input", updatePlayerData);
+
+// Check for avatar arrows clicked
+$(".avatarArrows").click(updatePlayerData);
+
 function checkIfInGame() {
   console.debug(prefix + "Waiting for players");
+
   var checkIfPlayersExist = setInterval(
     function() {
       if ($(".player").length >= 2) {
         console.debug(prefix + "Players exist");
-        $(".player").each(
-          function() {
-            let playerName = $(this).find(".name").html();
-            if (playerName.includes("(You)")) {
-              // Credit: https://forum.freecodecamp.org/t/how-can-i-detect-or-trigger-an-event-when-text-in-p-tag-is-changed/270692/4
-              // Select the node that will be observed for mutations
-              var targetNode = $(this).find('.score')[0];
-
-              // Options for the observer (which mutations to observe)
-              var config = { childList: true };
-
-              // Callback function to execute when mutations are observed
-              var callback = async function(mutationsList, observer) {
-                for (var mutation of mutationsList) {
-                  let currentPoints = parseInt(mutation.target.innerText.replace("Points: ", ""));
-                  let currentRound = parseInt($("#round")[0].innerText.split(" ")[1]);
-                  let forceUpdate = false;
-
-                  await logPointsAsync(currentPoints, currentRound, forceUpdate);
-                }
-              };
-              console.log(prefix + "Score observer set");
-
-              // Create an observer instance linked to the callback function
-              var observer = new MutationObserver(callback);
-
-              // Start observing the target node for configured mutations
-              observer.observe(targetNode, config);
-            }
-          }
-        );
-
+        setPlayerObserver();
         clearInterval(checkIfPlayersExist);
       }
     },

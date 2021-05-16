@@ -82,6 +82,12 @@ chrome.storage.onChanged.addListener(
         case "gamesJoined":
           $("#games-joined td").text(storageChange.newValue.toLocaleString());
           break;
+        case "playerName":
+          $("#playerName").text(storageChange.newValue);
+          break;
+        case "playerAvatar":
+          $("#playerAvatar").html(storageChange.newValue.toString());
+          break;
         case "playersFound":
           $("#players-found td").text(storageChange.newValue.length.toLocaleString());
           break;
@@ -342,7 +348,9 @@ document.addEventListener("DOMContentLoaded", function() {
       "runTime",
       "windowMinimized",
       "audioAlert",
-      "currentTab"
+      "currentTab",
+      "playerName",
+      "playerAvatar"
     ],
     function(response) {
       if (response.currentTab === undefined || response.currentTab !== "score-keeper") {
@@ -403,6 +411,8 @@ document.addEventListener("DOMContentLoaded", function() {
         foundFriend(response.friendsFound)
       }
 
+      $("#playerName").text(response.playerName);
+      $("#playerAvatar").html(response.playerAvatar.toString());
       chrome.storage.sync.get(
         [
           "scoreKeeperAutomatic"

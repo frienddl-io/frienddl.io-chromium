@@ -321,6 +321,7 @@ chrome.runtime.onConnect.addListener(
             joinNewGame(message.tabId);
           } else if (task === "updateScoreKeeper") {
             function forEachGetPoints(value, index, array) {
+              let tabId = value;
               console.debug(`Starting score search on tabId: ${tabId}`);
               chrome.tabs.sendMessage(
                 tabId,
