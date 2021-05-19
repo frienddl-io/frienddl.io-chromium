@@ -103,6 +103,7 @@ chrome.storage.onChanged.addListener(
           break;
         case "scoreKeeperSpinner":
           $("#score-keeper .spinner").addClass("hidden");
+          $("#manual-update-button").prop("disabled", false);
           break;
         case "state":
           if (storageChange.newValue === "stop") {
@@ -926,6 +927,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function manualUpdateScoreKeeper() {
     this.blur();
+    $(this).prop("disabled", true);
     $("#score-keeper .spinner").removeClass("hidden");
 
     // Create port to send messages to background
