@@ -51,7 +51,9 @@ More information is on the [support repository](https://github.com/frienddl-io/f
 
 ## Contributions
 
-This project is open for anyone to contribute. Follow these steps:
+This project's code is open for anyone to contribute. It's formatted for easy reading, with the hope that JavaScript novices are able to understand the core logic.
+
+Follow these steps to contribute:
 
 1. Fork this repository
 2. Follow the [Getting Started](#getting-started) steps
