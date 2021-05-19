@@ -925,6 +925,7 @@ document.addEventListener("DOMContentLoaded", function() {
   $("#manual-update-button").bind("click", manualUpdateScoreKeeper);
 
   function manualUpdateScoreKeeper() {
+    this.blur();
     $("#score-keeper .spinner").removeClass("hidden");
 
     // Create port to send messages to background
@@ -978,8 +979,12 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             let pointsArray = response.pointsArray;
-            pointsArray.forEach(forEachDeleteTotalGamePoints);
-            pointsArray = pointsArray.filter(checkEmptyPoints);
+            if (pointsArray === undefined || pointsArray === null || pointsArray.length === 0) {
+              console.debug("pointsArray is undefined, null, or 0");
+            } else {
+              pointsArray.forEach(forEachDeleteTotalGamePoints);
+              pointsArray = pointsArray.filter(checkEmptyPoints);
+            }
 
             resetValues = {
               pointsArray: pointsArray,
@@ -988,7 +993,7 @@ document.addEventListener("DOMContentLoaded", function() {
               sevenDayHighScore: 0,
               sevenDayHighScoreTime: 0,
               thirtyDayHighScore: 0,
-              thirtyDayHighScoreDate: 0,
+              thirtyDayHighScoreTime: 0,
               allTimeHighScore: 0,
               allTimeHighScoreTime: 0
             }
@@ -1009,8 +1014,12 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             let pointsArray = response.pointsArray;
-            pointsArray.forEach(forEachDeletePoints);
-            pointsArray = pointsArray.filter(checkEmptyPoints);
+            if (pointsArray === undefined || pointsArray === null || pointsArray.length === 0) {
+              console.debug("pointsArray is undefined, null, or 0");
+            } else {
+              pointsArray.forEach(forEachDeletePoints);
+              pointsArray = pointsArray.filter(checkEmptyPoints);
+            }
 
             resetValues = {
               pointsArray: pointsArray,

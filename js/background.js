@@ -110,6 +110,17 @@ function calculateHighScores(updatedScoreKeeper, response, pointsArray, now) {
 }
 
 function calculateTotalPoints(updatedScoreKeeper, response, pointsArray, now) {
+  let allTimePoints = pointsArray.reduce(
+    function(previousValue, currentValue) {
+      return {
+        points: previousValue.points + currentValue.points
+      }
+    }
+  ).points;
+  if (allTimePoints !== response.allTimePoints) {
+    updatedScoreKeeper.allTimePoints = allTimePoints;
+  }
+
   // 30 days
   let cutoff = daysAgo(now, 30)
   function checkTime(i) {
@@ -194,7 +205,9 @@ function processNewPoints(message) {
         console.debug(`totalGamePoints: ${totalGamePoints}`);
 
         let now = new Date().getTime();
-        let updatedScoreKeeper = {};
+        let updatedScoreKeeper = {
+          scoreKeeperSpinner: now
+        };
 
         let pointsArray = response.pointsArray;
 
@@ -203,65 +216,44 @@ function processNewPoints(message) {
         } else {
           if (pointsArray === undefined || pointsArray === null || pointsArray.length === 0) {
             console.log("pointsArray is undefined, null, or 0");
-
-            updatedScoreKeeper.thirtyDayHighScore = totalGamePoints;
-            updatedScoreKeeper.thirtyDayHighScoreTime = now;
-
-            updatedScoreKeeper.sevenDayHighScore = totalGamePoints;
-            updatedScoreKeeper.sevenDayHighScoreTime = now;
-
-            updatedScoreKeeper.oneDayHighScore = totalGamePoints;
-            updatedScoreKeeper.oneDayHighScoreTime = now;
-
-            updatedScoreKeeper.thirtyDayPoints = currentPoints;
-            updatedScoreKeeper.sevenDayPoints = currentPoints;
-            updatedScoreKeeper.oneDayPoints = currentPoints;
-            updatedScoreKeeper.allTimePoints = currentPoints;
-          } else {
-            updatedScoreKeeper.allTimePoints = response.allTimePoints + currentPoints;
+            pointsArray = [];
           }
 
           pointsArray.push(
             {
               time: now,
-              points: currentPoints
+              points: currentPoints,
+              totalGamePoints: totalGamePoints
             }
           );
           updatedScoreKeeper.pointsArray = pointsArray;
         }
 
-        if (pointsArray.length >= 2) {
-          updatedScoreKeeper = calculateHighScores(
-            updatedScoreKeeper,
-            response,
-            pointsArray,
-            now
-          );
+        updatedScoreKeeper = calculateHighScores(
+          updatedScoreKeeper,
+          response,
+          pointsArray,
+          now
+        );
 
-          updatedScoreKeeper = calculateTotalPoints(
-            updatedScoreKeeper,
-            response,
-            pointsArray,
-            now
-          );
-        }
+        updatedScoreKeeper = calculateTotalPoints(
+          updatedScoreKeeper,
+          response,
+          pointsArray,
+          now
+        );
 
         console.log("updatedScoreKeeper");
         console.dir(updatedScoreKeeper);
 
-        if (Object.entries(updatedScoreKeeper).length < 1) {
-          console.log("Not updating score keeper values");
-          PROCESS_NEW_POINTS_LOCK = false;
-        } else {
-          console.log("Updating score keeper values");
-          chrome.storage.sync.set(
-            updatedScoreKeeper,
-            function() {
-              console.log("Unlocking");
-              PROCESS_NEW_POINTS_LOCK = false;
-            }
-          );
-        }
+        console.log("Updating score keeper values");
+        chrome.storage.sync.set(
+          updatedScoreKeeper,
+          function() {
+            console.log("Unlocking");
+            PROCESS_NEW_POINTS_LOCK = false;
+          }
+        );
       }
     );
   }
@@ -347,18 +339,6 @@ chrome.runtime.onConnect.addListener(
             }
 
             CONTENT_PORTS.forEach(forEachGetPoints);
-
-            let defaultWaitTimeSeconds = .9;
-            setTimeout(
-              function() {
-                chrome.storage.local.set(
-                  {
-                    scoreKeeperSpinner: new Date().getTime()
-                  }
-                );
-              },
-              defaultWaitTimeSeconds * 1000
-            );
           }
         }
       );

@@ -9,6 +9,7 @@ let BACKGROUND_PORT = chrome.runtime.connect(
 console.log(prefix + "c2b port set up");
 
 let GAME_POINTS = [];
+let IN_GAME = false;
 
 function getTotalGamePoints() {
   let totalGamePoints = 0;
@@ -138,7 +139,7 @@ function logPointsAsync(currentPoints, currentRound, forceUpdate) {
   );
 }
 
-function checkDisconnected() {
+function bypassDisconnected() {
   let disconnectButton = $("#modalDisconnect button:contains('Ok')");
   let disconnectVisible = disconnectButton.is(":visible");
   if (disconnectVisible) {
@@ -204,7 +205,7 @@ function receiveRequest(request, sender, sendResponse) {
           console.debug(prefix + "Waiting for players");
           var checkIfPlayersExist = setInterval(
             function() {
-              let disconnected = checkDisconnected();
+              let disconnected = bypassDisconnected();
               if (disconnected) {
                 sendResponse(
                   {
@@ -323,18 +324,33 @@ function setPlayerObserver() {
 
         // Start observing the target node for configured mutations
         observer.observe(targetNode, config);
+
+        IN_GAME = true;
       }
     }
   );
 }
 
+function checkKicked() {
+  let disconnectButton = $("#modalKicked button:contains('Ok')");
+  let disconnectVisible = disconnectButton.is(":visible");
+  if (disconnectVisible) {
+    console.debug(prefix + "Kicked");
+    return true;
+  } else {
+    return false;
+  }
+}
+
 console.debug(prefix + "Waiting for players");
 var checkIfPlayersExist = setInterval(
   function() {
-    if ($(".player").length >= 2) {
-      console.debug(prefix + "Players exist");
-      setPlayerObserver();
-      clearInterval(checkIfPlayersExist);
+    if ($(".player").length >= 2 && $(".player").is(":visible")) {
+      if (!IN_GAME) {
+        setPlayerObserver();
+      }
+    } else {
+      IN_GAME = false;
     }
   },
   100
