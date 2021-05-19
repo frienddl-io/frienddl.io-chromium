@@ -291,7 +291,7 @@ function updateScoreKeeperValues() {
       "sevenDayHighScore",
       "thirtyDayHighScore",
       "allTimeHighScore",
-      "allTimeHighScoreDate"
+      "allTimeHighScoreTime"
     ],
     function(response) {
       let oneDayHighScore = response.oneDayHighScore || 0;
@@ -307,11 +307,11 @@ function updateScoreKeeperValues() {
       let language = chrome.i18n.getUILanguage().split("-")[0];
       console.log(`Using language: ${language}`);
 
-      let allTimeHighScoreDate = response.allTimeHighScoreDate;
-      console.debug(`allTimeHighScoreDate: ${allTimeHighScoreDate}`);
+      let allTimeHighScoreTime = response.allTimeHighScoreTime;
+      console.debug(`allTimeHighScoreTime: ${allTimeHighScoreTime}`);
 
-      if (allTimeHighScoreDate !== null && allTimeHighScoreDate !== 0) {
-        let formattedDate = new Intl.DateTimeFormat(language).format(allTimeHighScoreDate);
+      if (allTimeHighScoreTime !== null && allTimeHighScoreTime !== 0) {
+        let formattedDate = new Intl.DateTimeFormat(language).format(allTimeHighScoreTime);
         console.debug(`formattedDate: ${formattedDate}`);
         $("#all-time-date td").text(formattedDate);
       }
@@ -966,13 +966,13 @@ document.addEventListener("DOMContentLoaded", function() {
       if (sectionId === "high-scores") {
         resetValues = {
           oneDayHighScore: 0,
-          oneDayHighScoreDate: 0,
+          oneDayHighScoreTime: 0,
           sevenDayHighScore: 0,
-          sevenDayHighScoreDate: 0,
+          sevenDayHighScoreTime: 0,
           thirtyDayHighScore: 0,
           thirtyDayHighScoreDate: 0,
           allTimeHighScore: 0,
-          allTimeHighScoreDate: 0
+          allTimeHighScoreTime: 0
         }
 
         $("#all-time-date td").css("display", "none");

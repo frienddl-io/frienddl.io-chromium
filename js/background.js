@@ -14,195 +14,151 @@ let PROCESS_NEW_POINTS_LOCK = false;
 let PROCESS_NEW_POINTS_QUEUE = [];
 let PROCESS_NEW_POINTS_QUEUE_INTERVAL;
 
+// Values for testing
+chrome.storage.sync.set(
+  {
+    pointsArray: [
+      {
+        time: new Date().getTime(),
+        points: 100,
+        totalGamePoints: 100
+      },
+      {
+        time: new Date().getTime() - (2 * 24 * 60 * 60 * 1000),
+        points: 200,
+        totalGamePoints: 200
+      },
+      {
+        time: new Date().getTime() - (8 * 24 * 60 * 60 * 1000),
+        points: 300,
+        totalGamePoints: 300
+      },
+      {
+        time: new Date().getTime() - (31 * 24 * 60 * 60 * 1000),
+        points: 500,
+        totalGamePoints: 500
+      },
+    ],
+    oneDayHighScore: 0,
+    oneDayHighScoreTime: new Date().getTime() - (2 * 24 * 60 * 60 * 1000),
+    sevenDayHighScore: 0,
+    sevenDayHighScoreTime: new Date().getTime() - (10 * 24 * 60 * 60 * 1000),
+    thirtyDayHighScore: 0,
+    thirtyDayHighScoreTime: new Date().getTime() - (45 * 24 * 60 * 60 * 1000),
+    allTimeHighScore: 0,
+    allTimeHighScoreTime: new Date().getTime() - (60 * 24 * 60 * 60 * 1000),
+    oneDayPoints: 1000,
+    sevenDayPoints: 1000,
+    thirtyDayPoints: 1000,
+    allTimePoints: 1000
+  }
+);
+
 function daysAgo(now, days) {
   return new Date(now - (days * 24 * 60 * 60 * 1000)).getTime();
 }
 
-function calculateHighScores(updatedScoreKeeper, response, totalGamePoints, now) {
-  function scoreOutdated(currentHighScoreDate, now, days) {
-    let currentDaysAgo = daysAgo(now, days);
-    console.debug(`daysAgo: ${daysAgo}`);
-
-    if (currentHighScoreDate < daysAgo) {
-      console.log(`currentScoreDate is older than ${days} days: ${currentHighScoreDate} < ${daysAgo}`);
-      return true;
-    }
-
-    return false;
+function calculateHighScores(updatedScoreKeeper, response, pointsArray, now) {
+  function findHighestTotalGamePoints(array) {
+    return array.reduce(
+      (acc, val) => {
+        acc = ( acc !== undefined && acc.totalGamePoints > val.totalGamePoints) ? acc : val;
+        return acc;
+      },
+      []
+    );
   }
 
   // 1 day high score
-  let oneDayHighScore = response.oneDayHighScore || 0;
-  console.debug(`oneDayHighScore: ${oneDayHighScore}`);
-
-  let oneDayHighScoreDate = response.oneDayHighScoreDate || now;
-  console.debug(`oneDayHighScoreDate: ${oneDayHighScoreDate}`);
-
-  if (oneDayHighScore !== 0) {
-    if (scoreOutdated(oneDayHighScoreDate, now, 1)) {
-      oneDayHighScore = 0;
-      updatedScoreKeeper.oneDayHighScore = oneDayHighScore;
-      updatedScoreKeeper.oneDayHighScoreDate = now;
-    }
+  let cutoff = daysAgo(now, 1);
+  function checkTime(i) {
+    return i.time > cutoff;
   }
 
-  // 7 days high score
-  let sevenDayHighScore = response.sevenDayHighScore || 0;
-  console.debug(`sevenDayHighScore: ${sevenDayHighScore}`);
+  let oneDayHighScore = findHighestTotalGamePoints(pointsArray.filter(checkTime));
+  console.debug(`oneDayHighScore: ${oneDayHighScore.totalGamePoints}`);
 
-  let sevenDayHighScoreDate = response.sevenDayHighScoreDate || now;
-  console.debug(`sevenDayHighScoreDate: ${sevenDayHighScoreDate}`);
+  updatedScoreKeeper.oneDayHighScore = oneDayHighScore.totalGamePoints;
+  updatedScoreKeeper.oneDayHighScoreTime = oneDayHighScore.time;
 
-  if (sevenDayHighScore !== 0) {
-    if (scoreOutdated(sevenDayHighScoreDate, now, 7)) {
-      sevenDayHighScore = 0;
-      updatedScoreKeeper.sevenDayHighScore = sevenDayHighScore;
-      updatedScoreKeeper.sevenDayHighScoreDate = now;
-    }
-  }
+  // 7 day high score
+  cutoff = daysAgo(now, 7);
 
-  // 30 days high score
-  let thirtyDayHighScore = response.thirtyDayHighScore || 0;
-  console.debug(`thirtyDayHighScore: ${thirtyDayHighScore}`);
+  let sevenDayHighScore = findHighestTotalGamePoints(pointsArray.filter(checkTime));
+  console.debug(`sevenDayHighScore: ${sevenDayHighScore.totalGamePoints}`);
 
-  let thirtyDayHighScoreDate = response.thirtyDayHighScoreDate || now;
-  console.debug(`thirtyDayHighScoreDate: ${thirtyDayHighScoreDate}`);
+  updatedScoreKeeper.sevenDayHighScore = sevenDayHighScore.totalGamePoints;
+  updatedScoreKeeper.sevenDayHighScoreTime = sevenDayHighScore.time;
 
-  if (thirtyDayHighScore !== 0) {
-    if (scoreOutdated(thirtyDayHighScoreDate, now, 30)) {
-      thirtyDayHighScore = 0;
-      updatedScoreKeeper.thirtyDayHighScore = thirtyDayHighScore;
-      updatedScoreKeeper.thirtyDayHighScoreDate = now;
-    }
-  }
+  // 30 day high score
+  cutoff = daysAgo(now, 30);
+
+  let thirtyDayHighScore = findHighestTotalGamePoints(pointsArray.filter(checkTime));
+  console.debug(`thirtyDayHighScore: ${thirtyDayHighScore.totalGamePoints}`);
+
+  updatedScoreKeeper.thirtyDayHighScore = thirtyDayHighScore.totalGamePoints;
+  updatedScoreKeeper.thirtyDayHighScoreTime = thirtyDayHighScore.time;
 
   // All-time high score
-  let allTimeHighScore = response.allTimeHighScore || 0;
-  console.debug(`allTimeHighScore: ${allTimeHighScore}`);
+  let allTimeHighScore = findHighestTotalGamePoints(pointsArray);
+  console.debug(`allTimeHighScore: ${allTimeHighScore.totalGamePoints}`);
 
-  let allTimeHighScoreDate = response.allTimeHighScoreDate || now;
-  console.debug(`allTimeHighScoreDate: ${allTimeHighScoreDate}`)
-
-  // Compare current score to existing high scores
-  if (totalGamePoints > oneDayHighScore) {
-    console.log(`Setting new 1 day high score: ${oneDayHighScore} to ${totalGamePoints}`);
-
-    updatedScoreKeeper.oneDayHighScore = totalGamePoints;
-    updatedScoreKeeper.oneDayHighScoreDate = now;
-  }
-
-  if (totalGamePoints > sevenDayHighScore) {
-    console.log(`Setting new 7 day high score: ${sevenDayHighScore} to ${totalGamePoints}`);
-
-    updatedScoreKeeper.sevenDayHighScore = totalGamePoints;
-    updatedScoreKeeper.sevenDayHighScoreDate = now;
-  }
-
-  if (totalGamePoints > thirtyDayHighScore) {
-    console.log(`Setting new 30 day high score: ${thirtyDayHighScore} to ${totalGamePoints}`);
-
-    updatedScoreKeeper.thirtyDayHighScore = totalGamePoints;
-    updatedScoreKeeper.thirtyDayHighScoreDate = now;
-  }
-
-  if (totalGamePoints > allTimeHighScore) {
-    console.log(`Setting new all-time high score: ${allTimeHighScore} to ${totalGamePoints}`);
-
-    updatedScoreKeeper.allTimeHighScore = totalGamePoints;
-    updatedScoreKeeper.allTimeHighScoreDate = now;
-  }
+  updatedScoreKeeper.allTimeHighScore = allTimeHighScore.totalGamePoints;
+  updatedScoreKeeper.allTimeHighScoreTime = allTimeHighScore.time;
 
   return updatedScoreKeeper;
 }
 
-function calculateTotalPoints(updatedScoreKeeper, response, currentPoints, now) {
-  let pointsArray = response.pointsArray;
-  console.log("pointsArray at start");
-  console.dir(pointsArray);
-
-  let allTimePoints = response.allTimePoints;
-  console.debug(`allTimePoints: ${allTimePoints}`);
-
-  if (pointsArray === undefined || pointsArray === null) {
-    console.log("pointsArray is undefined or null");
-    pointsArray = [];
+function calculateTotalPoints(updatedScoreKeeper, response, pointsArray, now) {
+  // 30 days
+  let cutoff = daysAgo(now, 30)
+  function checkTime(i) {
+    return i.time > cutoff;
   }
 
-  console.log("updatedScoreKeeper");
-  console.dir(updatedScoreKeeper);
+  let thirtyDayPoints = pointsArray.filter(checkTime).reduce(
+    function(previousValue, currentValue) {
+      return {
+        points: previousValue.points + currentValue.points
+      }
+    }
+  ).points;
 
-  if (pointsArray.length < 1) {
-    console.log("pointsArray is less than 1");
-
-    updatedScoreKeeper.thirtyDayPoints = currentPoints;
-    updatedScoreKeeper.sevenDayPoints = currentPoints;
-    updatedScoreKeeper.oneDayPoints = currentPoints;
-    updatedScoreKeeper.allTimePoints = currentPoints;
+  console.debug(`thirtyDayPoints: ${thirtyDayPoints}`);
+  if (thirtyDayPoints !== response.thirtyDayPoints) {
+    updatedScoreKeeper.thirtyDayPoints = thirtyDayPoints;
   }
 
-  pointsArray.push(
-    {
-      time: now,
-      points: currentPoints
-    }
-  );
-  updatedScoreKeeper.allTimePoints = allTimePoints + currentPoints;
-  updatedScoreKeeper.pointsArray = pointsArray;
+  // 7 days
+  cutoff = daysAgo(now, 7);
 
-  if (pointsArray.length >= 2) {
-    // Filter and remove if 30 days old
-    let cutoff = daysAgo(now, 30)
-    function checkTime(i) {
-      return i.time> cutoff;
-    }
-
-    pointsArray = pointsArray.filter(checkTime);
-    updatedScoreKeeper.pointsArray = pointsArray;
-
-    let thirtyDayPoints = pointsArray.reduce(
-      function(previousValue, currentValue) {
-        return {
-          points: previousValue.points + currentValue.points
-        }
+  let sevenDayPoints = pointsArray.filter(checkTime).reduce(
+    function(previousValue, currentValue) {
+      return {
+        points: previousValue.points + currentValue.points
       }
-    ).points;
-
-    console.log(`thirtyDayPoints: ${thirtyDayPoints}`);
-    if (thirtyDayPoints !== response.thirtyDayPoints) {
-      updatedScoreKeeper.thirtyDayPoints = thirtyDayPoints;
     }
+  ).points;
 
-    // 7 days
-    cutoff = daysAgo(now, 7);
+  console.debug(`sevenDayPoints: ${sevenDayPoints}`);
+  if (sevenDayPoints !== response.sevenDayPoints) {
+    updatedScoreKeeper.sevenDayPoints = sevenDayPoints;
+  }
 
-    let sevenDayPoints = pointsArray.filter(checkTime).reduce(
-      function(previousValue, currentValue) {
-        return {
-          points: previousValue.points + currentValue.points
-        }
+  // 1 day
+  cutoff = daysAgo(now, 1)
+
+  let oneDayPoints = pointsArray.filter(checkTime).reduce(
+    function(previousValue, currentValue) {
+      return {
+        points: previousValue.points + currentValue.points
       }
-    ).points;
-
-    console.log(`sevenDayPoints: ${sevenDayPoints}`);
-    if (sevenDayPoints !== response.sevenDayPoints) {
-      updatedScoreKeeper.sevenDayPoints = sevenDayPoints;
     }
+  ).points;
 
-    // 1 day
-    cutoff = daysAgo(now, 1)
-
-    let oneDayPoints = pointsArray.filter(checkTime).reduce(
-      function(previousValue, currentValue) {
-        return {
-          points: previousValue.points + currentValue.points
-        }
-      }
-    ).points;
-
-    console.log(`oneDayPoints: ${oneDayPoints}`);
-    if (oneDayPoints !== response.oneDayPoints) {
-      updatedScoreKeeper.oneDayPoints = oneDayPoints;
-    }
+  console.debug(`oneDayPoints: ${oneDayPoints}`);
+  if (oneDayPoints !== response.oneDayPoints) {
+    updatedScoreKeeper.oneDayPoints = oneDayPoints;
   }
 
   return updatedScoreKeeper;
@@ -217,13 +173,13 @@ function processNewPoints(message) {
     chrome.storage.sync.get(
       [
         "oneDayHighScore",
-        "oneDayHighScoreDate",
+        "oneDayHighScoreTime",
         "sevenDayHighScore",
-        "sevenDayHighScoreDate",
+        "sevenDayHighScoreTime",
         "thirtyDayHighScore",
-        "thirtyDayHighScoreDate",
+        "thirtyDayHighScoreTime",
         "allTimeHighScore",
-        "allTimeHighScoreDate",
+        "allTimeHighScoreTime",
         "pointsArray",
         "oneDayPoints",
         "sevenDayPoints",
@@ -240,19 +196,55 @@ function processNewPoints(message) {
         let now = new Date().getTime();
         let updatedScoreKeeper = {};
 
-        updatedScoreKeeper = calculateHighScores(
-          updatedScoreKeeper,
-          response,
-          totalGamePoints,
-          now
-        );
+        let pointsArray = response.pointsArray;
 
-        updatedScoreKeeper = calculateTotalPoints(
-          updatedScoreKeeper,
-          response,
-          currentPoints,
-          now
-        );
+        if (currentPoints === undefined || currentPoints === null || currentPoints === 0) {
+          console.log("currentPoints is undefined, null, or 0");
+        } else {
+          if (pointsArray === undefined || pointsArray === null || pointsArray.length === 0) {
+            console.log("pointsArray is undefined, null, or 0");
+
+            updatedScoreKeeper.thirtyDayHighScore = totalGamePoints;
+            updatedScoreKeeper.thirtyDayHighScoreTime = now;
+
+            updatedScoreKeeper.sevenDayHighScore = totalGamePoints;
+            updatedScoreKeeper.sevenDayHighScoreTime = now;
+
+            updatedScoreKeeper.oneDayHighScore = totalGamePoints;
+            updatedScoreKeeper.oneDayHighScoreTime = now;
+
+            updatedScoreKeeper.thirtyDayPoints = currentPoints;
+            updatedScoreKeeper.sevenDayPoints = currentPoints;
+            updatedScoreKeeper.oneDayPoints = currentPoints;
+            updatedScoreKeeper.allTimePoints = currentPoints;
+          } else {
+            updatedScoreKeeper.allTimePoints = response.allTimePoints + currentPoints;
+          }
+
+          pointsArray.push(
+            {
+              time: now,
+              points: currentPoints
+            }
+          );
+          updatedScoreKeeper.pointsArray = pointsArray;
+        }
+
+        if (pointsArray.length >= 2) {
+          updatedScoreKeeper = calculateHighScores(
+            updatedScoreKeeper,
+            response,
+            pointsArray,
+            now
+          );
+
+          updatedScoreKeeper = calculateTotalPoints(
+            updatedScoreKeeper,
+            response,
+            pointsArray,
+            now
+          );
+        }
 
         console.log("updatedScoreKeeper");
         console.dir(updatedScoreKeeper);
@@ -320,9 +312,31 @@ chrome.runtime.onConnect.addListener(
           if (task === "joinNewGame") {
             joinNewGame(message.tabId);
           } else if (task === "updateScoreKeeper") {
+            PROCESS_NEW_POINTS_QUEUE.push(
+              {
+                points: 0,
+                totalGamePoints: 0
+              }
+            );
+            PROCESS_NEW_POINTS_QUEUE_INTERVAL = setInterval(
+              function() {
+                let queueNotEmpty = PROCESS_NEW_POINTS_QUEUE.length > 0;
+                if (PROCESS_NEW_POINTS_LOCK === false) {
+                  if (queueNotEmpty) {
+                    PROCESS_NEW_POINTS_LOCK = true;
+                    processNewPoints(PROCESS_NEW_POINTS_QUEUE.shift());
+                  } else {
+                    clearInterval(PROCESS_NEW_POINTS_QUEUE_INTERVAL);
+                  }
+                }
+              },
+              100
+            );
+
             function forEachGetPoints(value, index, array) {
               let tabId = value;
               console.debug(`Starting score search on tabId: ${tabId}`);
+
               chrome.tabs.sendMessage(
                 tabId,
                 {
