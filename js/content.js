@@ -251,7 +251,7 @@ function receiveRequest(request, sender, sendResponse) {
 chrome.runtime.onMessage.addListener(receiveRequest);
 
 function updatePlayerData() {
-  if (typeof chrome.app.isInstalled !== 'undefined') {
+  if (chrome.app !== undefined || typeof chrome.app.isInstalled !== "undefined") {
     chrome.storage.local.get(
       [
         "playerName",

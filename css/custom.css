@@ -336,9 +336,14 @@ label
   margin: 0;
 }
 
-#total-points .reset
+.reset-warning
 {
-  margin-bottom: 7px;
+  padding-top: 10px;
+}
+
+#total-points .reset-warning
+{
+  margin-bottom: 12px;
 }
 
 #manual-toggle-text
