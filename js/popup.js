@@ -68,6 +68,8 @@ const PAUSE_BADGE_COLOR = "#ffc107";
 const STOP_BADGE_COLOR = "#dc3545";
 const SUCCESS_BADGE_COLOR = "#17A2B8";
 
+const DEFAULT_AVATAR = "<div id=\"loginAvatarCustomizeContainer\"><div id=\"buttonAvatarCustomizerRandomize\"></div><div class=\"avatarArrows\" id=\"loginAvatarArrowsLeft\"><div class=\"avatarArrow avatarArrowLeft\" data-avatarindex=\"1\"></div><div class=\"avatarArrow avatarArrowLeft\" data-avatarindex=\"2\"></div><div class=\"avatarArrow avatarArrowLeft\" data-avatarindex=\"0\"></div></div><div class=\"avatarContainer\"><div class=\"avatar avatar-fit\" id=\"loginAvatar\"><div class=\"color\" style=\"background-size: 960px 960px; background-position: -576px 0px;\"></div><div class=\"eyes\" style=\"background-size: 960px 960px; background-position: -864px -96px;\"></div><div class=\"mouth\" style=\"background-size: 960px 960px; background-position: -672px 0px;\"></div><div class=\"special\" style=\"display: none;\"></div></div></div><div class=\"avatarArrows\" id=\"loginAvatarArrowsLeft\"><div class=\"avatarArrow avatarArrowRight\" data-avatarindex=\"1\"></div><div class=\"avatarArrow avatarArrowRight\" data-avatarindex=\"2\"></div><div class=\"avatarArrow avatarArrowRight\" data-avatarindex=\"0\"></div></div></div>";
+
 // Listen for changes to storage
 chrome.storage.onChanged.addListener(
   function(changes, namespace) {
@@ -86,7 +88,12 @@ chrome.storage.onChanged.addListener(
           $("#playerName").text(storageChange.newValue);
           break;
         case "playerAvatar":
-          $("#playerAvatar").html(storageChange.newValue.toString());
+          let playerAvatar = storageChange.newValue;
+          if (playerAvatar === undefined || playerAvatar === null) {
+            $("#playerAvatar").html(DEFAULT_AVATAR);
+          } else {
+            $("#playerAvatar").html(playerAvatar.toString());
+          }
           break;
         case "playersFound":
           $("#players-found td").text(storageChange.newValue.length.toLocaleString());
@@ -412,7 +419,14 @@ document.addEventListener("DOMContentLoaded", function() {
       }
 
       $("#playerName").text(response.playerName);
-      $("#playerAvatar").html(response.playerAvatar.toString());
+
+      let playerAvatar = response.playerAvatar;
+      if (playerAvatar === undefined || playerAvatar === null) {
+        $("#playerAvatar").html(DEFAULT_AVATAR);
+      } else {
+        $("#playerAvatar").html(playerAvatar.toString());
+      }
+
       chrome.storage.sync.get(
         [
           "scoreKeeperAutomatic"
