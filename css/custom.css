@@ -213,8 +213,7 @@ svg
   border-color: #bd2130 !important;
 }
 
-#friend-finder .custom-control.custom-switch,
-.reset
+#friend-finder .custom-control.custom-switch
 {
   margin-bottom: 10px;
 }
@@ -303,6 +302,16 @@ label
   vertical-align: top;
 }
 
+#high-scores table
+{
+  margin-bottom: .7rem;
+}
+
+#total-points table
+{
+  margin-bottom: .3rem;
+}
+
 #all-time-date td
 {
   text-align: center;
@@ -319,6 +328,17 @@ label
   top: 121px;
   font-size: 17px;
   font-weight: bold;
+}
+
+.reset
+{
+  padding: 1px 20px;
+  margin: 0;
+}
+
+#total-points .reset
+{
+  margin-bottom: 7px;
 }
 
 #manual-toggle-text

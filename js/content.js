@@ -289,6 +289,9 @@ $("#inputName").on("propertychange input", updatePlayerData);
 // Check for avatar arrows clicked
 $(".avatarArrows").click(updatePlayerData);
 
+// Check for randomize button clicked
+$("#buttonAvatarCustomizerRandomize").click(updatePlayerData);
+
 function setPlayerObserver() {
   $(".player").each(
     function() {
