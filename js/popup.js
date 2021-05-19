@@ -527,6 +527,8 @@ document.addEventListener("DOMContentLoaded", function() {
       $("#character-error").hide();
       $("#friend-input").val("");
 
+      friendName = friendName.replace(",", "");
+
       let id = `${friendName}-entered`;
       let exists = $(`#${id}`).length !== 0;
 
