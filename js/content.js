@@ -18,19 +18,19 @@ function getTotalGamePoints() {
   }
 
   GAME_POINTS.forEach(countPoints);
-  console.debug(`totalGamePoints: ${totalGamePoints}`);
+  console.debug(prefix + `totalGamePoints: ${totalGamePoints}`);
 
   return totalGamePoints;
 }
 
 function calculateNewPoints(currentPoints, currentRound) {
-  console.debug(`currentPoints: ${currentPoints}`);
+  console.debug(prefix + `currentPoints: ${currentPoints}`);
 
   if (currentPoints === null || currentPoints === undefined) {
-    console.log("currentPoints is null or undefined");
+    console.debug(prefix + "currentPoints is null or undefined");
     return null;
   } else if (currentPoints === 0) {
-    console.log("currentPoints is 0; skipping")
+    console.debug(prefix + "currentPoints is 0; skipping")
     return 0;
   } else if (GAME_POINTS.length === 0) {
     return currentPoints;
@@ -41,7 +41,7 @@ function calculateNewPoints(currentPoints, currentRound) {
   let totalGamePoints = getTotalGamePoints();
 
   let latestRound = lastPointObject.round;
-  console.debug(`latestRound: ${latestRound}`);
+  console.debug(prefix + `latestRound: ${latestRound}`);
 
   if (currentPoints === totalGamePoints) {
     let now = new Date().getTime();
@@ -68,7 +68,7 @@ function logPointsAsync(currentPoints, currentRound, forceUpdate) {
         function(response) {
           let scoreKeeperAutomatic = response.scoreKeeperAutomatic;
 
-          console.debug(`scoreKeeperAutomatic: ${scoreKeeperAutomatic}`);
+          console.debug(prefix + `scoreKeeperAutomatic: ${scoreKeeperAutomatic}`);
 
           if (scoreKeeperAutomatic !== false) {
             scoreKeeperAutomatic = true;
@@ -77,9 +77,9 @@ function logPointsAsync(currentPoints, currentRound, forceUpdate) {
           let now = new Date().getTime();
 
           if (newPoints === undefined || newPoints === null || newPoints <= 0) {
-            console.log("newPoints is undefined, null, 0, or negative; skipping");
+            console.debug(prefix + "newPoints is undefined, null, 0, or negative; skipping");
           } else {
-            console.log(prefix + `Score keeper set to manual; won't send new points: ${newPoints}`);
+            console.debug(prefix + `Score keeper set to manual; won't send new points: ${newPoints}`);
             GAME_POINTS.push(
               {
                 time: now,
@@ -112,13 +112,12 @@ function logPointsAsync(currentPoints, currentRound, forceUpdate) {
               GAME_POINTS.forEach(countPointsAndMarkSent);
             }
 
-            console.dir(GAME_POINTS);
-            console.log(`totalUnsentPoints: ${totalUnsentPoints}`);
+            console.debug(prefix + `totalUnsentPoints: ${totalUnsentPoints}`);
 
             if (totalUnsentPoints.length === 0 || totalUnsentPoints === 0) {
-              console.log(prefix + "No unsent points found");
+              console.debug(prefix + "No unsent points found");
             } else {
-              console.log(prefix + `Sending unsent points: ${totalUnsentPoints}`);
+              console.debug(prefix + `Sending unsent points: ${totalUnsentPoints}`);
               BACKGROUND_PORT.postMessage(
                 {
                   points: totalUnsentPoints,
@@ -128,8 +127,7 @@ function logPointsAsync(currentPoints, currentRound, forceUpdate) {
               );
             }
           } else {
-            console.log(prefix + `Score keeper set to manual; won't send new points: ${newPoints}`);
-            console.dir(GAME_POINTS);
+            console.debug(prefix + `Score keeper set to manual; won't send new points: ${newPoints}`);
           }
 
           resolve(true);
@@ -162,7 +160,7 @@ function bypassModals() {
 function receiveRequest(request, sender, sendResponse) {
   let task = request.task;
 
-  console.log(prefix + `Received request: ${task}`);
+  console.debug(prefix + `Received request: ${task}`);
 
   if (task === "getScore") {
     if ($(".player").length < 2) {
@@ -272,12 +270,12 @@ function updatePlayerData() {
         let playerDataUpdates = {};
 
         if (response.playerName !== currentPlayerName) {
-          console.log(prefix + "Updating player name");
+          console.debug(prefix + "Updating player name");
           playerDataUpdates.playerName = currentPlayerName;
         }
 
         if (response.playerAvatar !== currentPlayerAvatar) {
-          console.log(prefix + "Updating player avatar");
+          console.debug(prefix + "Updating player avatar");
           playerDataUpdates.playerAvatar = currentPlayerAvatar;
         }
 
@@ -325,7 +323,7 @@ function setPlayerObserver() {
             await logPointsAsync(currentPoints, currentRound, forceUpdate);
           }
         };
-        console.log(prefix + "Score observer set");
+        console.debug(prefix + "Score observer set");
 
         // Create an observer instance linked to the callback function
         var observer = new MutationObserver(callback);
