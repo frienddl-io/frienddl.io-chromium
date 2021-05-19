@@ -139,16 +139,24 @@ function logPointsAsync(currentPoints, currentRound, forceUpdate) {
   );
 }
 
-function bypassDisconnected() {
-  let disconnectButton = $("#modalDisconnect button:contains('Ok')");
-  let disconnectVisible = disconnectButton.is(":visible");
-  if (disconnectVisible) {
+function bypassModals() {
+  let modalButton = $("#modalDisconnect button:contains('Ok')");
+  let modalVisible = modalButton.is(":visible");
+  if (modalVisible) {
     console.debug(prefix + "Disconnected");
-    disconnectButton.click();
+    modalButton.click();
     return true;
-  } else {
-    return false;
   }
+
+  modalButton = $("#modalKicked button:contains('Ok')");
+  modalVisible = modalButton.is(":visible");
+  if (modalVisible) {
+    console.debug(prefix + "Kicked");
+    modalButton.click();
+    return true;
+  }
+
+  return false;
 }
 
 function receiveRequest(request, sender, sendResponse) {
@@ -205,8 +213,8 @@ function receiveRequest(request, sender, sendResponse) {
           console.debug(prefix + "Waiting for players");
           var checkIfPlayersExist = setInterval(
             function() {
-              let disconnected = bypassDisconnected();
-              if (disconnected) {
+              let disconnectedOrKicked = bypassModals();
+              if (disconnectedOrKicked) {
                 sendResponse(
                   {
                     players: [],
@@ -215,7 +223,7 @@ function receiveRequest(request, sender, sendResponse) {
                 );
               }
 
-              if ($(".player").length >= 1) {
+              if ($(".player").length >= 1 && $(".player").is(":visible")) {
                 console.debug(prefix + "Players exist");
 
                 let playersArray = [];
@@ -329,17 +337,6 @@ function setPlayerObserver() {
       }
     }
   );
-}
-
-function checkKicked() {
-  let disconnectButton = $("#modalKicked button:contains('Ok')");
-  let disconnectVisible = disconnectButton.is(":visible");
-  if (disconnectVisible) {
-    console.debug(prefix + "Kicked");
-    return true;
-  } else {
-    return false;
-  }
 }
 
 console.debug(prefix + "Waiting for players");
