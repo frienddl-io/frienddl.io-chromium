@@ -963,35 +963,72 @@ document.addEventListener("DOMContentLoaded", function() {
 
       let resetValues = {};
 
+      function checkEmptyPoints(i) {
+        return (i.points !== undefined || i.totalGamePoints !== undefined);
+      }
+
       if (sectionId === "high-scores") {
-        resetValues = {
-          oneDayHighScore: 0,
-          oneDayHighScoreTime: 0,
-          sevenDayHighScore: 0,
-          sevenDayHighScoreTime: 0,
-          thirtyDayHighScore: 0,
-          thirtyDayHighScoreDate: 0,
-          allTimeHighScore: 0,
-          allTimeHighScoreTime: 0
-        }
+        chrome.storage.sync.get(
+          [
+            "pointsArray"
+          ],
+          function(response) {
+            function forEachDeleteTotalGamePoints(i) {
+              delete i.totalGamePoints;
+            }
+
+            let pointsArray = response.pointsArray;
+            pointsArray.forEach(forEachDeleteTotalGamePoints);
+            pointsArray = pointsArray.filter(checkEmptyPoints);
+
+            resetValues = {
+              pointsArray: pointsArray,
+              oneDayHighScore: 0,
+              oneDayHighScoreTime: 0,
+              sevenDayHighScore: 0,
+              sevenDayHighScoreTime: 0,
+              thirtyDayHighScore: 0,
+              thirtyDayHighScoreDate: 0,
+              allTimeHighScore: 0,
+              allTimeHighScoreTime: 0
+            }
+
+            chrome.storage.sync.set(resetValues);
+          }
+        );
 
         $("#all-time-date td").css("display", "none");
       } else if (sectionId === "total-points") {
-        resetValues = {
-          pointsArray: [],
-          oneDayPoints: 0,
-          sevenDayPoints: 0,
-          thirtyDayPoints: 0,
-          allTimePoints: 0
-        }
+        chrome.storage.sync.get(
+          [
+            "pointsArray"
+          ],
+          function(response) {
+            function forEachDeletePoints(i) {
+              delete i.points;
+            }
+
+            let pointsArray = response.pointsArray;
+            pointsArray.forEach(forEachDeletePoints);
+            pointsArray = pointsArray.filter(checkEmptyPoints);
+
+            resetValues = {
+              pointsArray: pointsArray,
+              oneDayPoints: 0,
+              sevenDayPoints: 0,
+              thirtyDayPoints: 0,
+              allTimePoints: 0
+            }
+
+            chrome.storage.sync.set(resetValues);
+          }
+        );
       }
 
       $(`#${sectionId} .last-day td`).text(0);
       $(`#${sectionId} .last-seven-days td`).text(0);
       $(`#${sectionId} .last-thirty-days td`).text(0);
       $(`#${sectionId} .all-time td`).text(0);
-
-      chrome.storage.sync.set(resetValues);
 
       $(this).addClass("btn-outline-warning");
       $(this).removeClass("btn-outline-danger");
