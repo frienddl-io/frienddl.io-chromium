@@ -15,44 +15,44 @@ let PROCESS_NEW_POINTS_QUEUE = [];
 let PROCESS_NEW_POINTS_QUEUE_INTERVAL;
 
 // Values for testing
-chrome.storage.sync.set(
-  {
-    pointsArray: [
-      {
-        time: new Date().getTime(),
-        points: 100,
-        totalGamePoints: 100
-      },
-      {
-        time: new Date().getTime() - (2 * 24 * 60 * 60 * 1000),
-        points: 200,
-        totalGamePoints: 200
-      },
-      {
-        time: new Date().getTime() - (8 * 24 * 60 * 60 * 1000),
-        points: 300,
-        totalGamePoints: 300
-      },
-      {
-        time: new Date().getTime() - (31 * 24 * 60 * 60 * 1000),
-        points: 500,
-        totalGamePoints: 500
-      },
-    ],
-    oneDayHighScore: 1000,
-    oneDayHighScoreTime: new Date().getTime() - (2 * 24 * 60 * 60 * 1000),
-    sevenDayHighScore: 1000,
-    sevenDayHighScoreTime: new Date().getTime() - (10 * 24 * 60 * 60 * 1000),
-    thirtyDayHighScore: 1000,
-    thirtyDayHighScoreTime: new Date().getTime() - (45 * 24 * 60 * 60 * 1000),
-    allTimeHighScore: 1000,
-    allTimeHighScoreTime: new Date().getTime() - (60 * 24 * 60 * 60 * 1000),
-    oneDayPoints: 1000,
-    sevenDayPoints: 1000,
-    thirtyDayPoints: 1000,
-    allTimePoints: 1000
-  }
-);
+// chrome.storage.sync.set(
+//   {
+//     pointsArray: [
+//       {
+//         time: new Date().getTime(),
+//         points: 100,
+//         totalGamePoints: 100
+//       },
+//       {
+//         time: new Date().getTime() - (2 * 24 * 60 * 60 * 1000),
+//         points: 200,
+//         totalGamePoints: 200
+//       },
+//       {
+//         time: new Date().getTime() - (8 * 24 * 60 * 60 * 1000),
+//         points: 300,
+//         totalGamePoints: 300
+//       },
+//       {
+//         time: new Date().getTime() - (31 * 24 * 60 * 60 * 1000),
+//         points: 500,
+//         totalGamePoints: 500
+//       },
+//     ],
+//     oneDayHighScore: 1000,
+//     oneDayHighScoreTime: new Date().getTime() - (2 * 24 * 60 * 60 * 1000),
+//     sevenDayHighScore: 1000,
+//     sevenDayHighScoreTime: new Date().getTime() - (10 * 24 * 60 * 60 * 1000),
+//     thirtyDayHighScore: 1000,
+//     thirtyDayHighScoreTime: new Date().getTime() - (45 * 24 * 60 * 60 * 1000),
+//     allTimeHighScore: 1000,
+//     allTimeHighScoreTime: new Date().getTime() - (60 * 24 * 60 * 60 * 1000),
+//     oneDayPoints: 1000,
+//     sevenDayPoints: 1000,
+//     thirtyDayPoints: 1000,
+//     allTimePoints: 1000
+//   }
+// );
 
 function daysAgo(now, days) {
   return new Date(now - (days * 24 * 60 * 60 * 1000)).getTime();
@@ -110,30 +110,30 @@ function calculateHighScores(updatedScoreKeeper, response, pointsArray, now) {
 }
 
 function calculateTotalPoints(updatedScoreKeeper, response, pointsArray, now) {
-  let allTimePoints = pointsArray.reduce(
-    function(previousValue, currentValue) {
+  function calculatePoints(previousValue, currentValue) {
+    if (currentValue.points === undefined) {
+      return {
+        points: (previousValue.points === undefined) ? 0 : previousValue.points
+      }
+    } else {
       return {
         points: previousValue.points + currentValue.points
       }
     }
-  ).points;
+  }
+
+  let allTimePoints = pointsArray.reduce(calculatePoints).points;
   if (allTimePoints !== response.allTimePoints) {
     updatedScoreKeeper.allTimePoints = allTimePoints;
   }
 
   // 30 days
-  let cutoff = daysAgo(now, 30)
+  let cutoff = daysAgo(now, 30);
   function checkTime(i) {
     return i.time > cutoff;
   }
 
-  let thirtyDayPoints = pointsArray.filter(checkTime).reduce(
-    function(previousValue, currentValue) {
-      return {
-        points: previousValue.points + currentValue.points
-      }
-    }
-  ).points;
+  let thirtyDayPoints = pointsArray.filter(checkTime).reduce(calculatePoints).points;
 
   console.debug(`thirtyDayPoints: ${thirtyDayPoints}`);
   if (thirtyDayPoints !== response.thirtyDayPoints) {
@@ -143,13 +143,7 @@ function calculateTotalPoints(updatedScoreKeeper, response, pointsArray, now) {
   // 7 days
   cutoff = daysAgo(now, 7);
 
-  let sevenDayPoints = pointsArray.filter(checkTime).reduce(
-    function(previousValue, currentValue) {
-      return {
-        points: previousValue.points + currentValue.points
-      }
-    }
-  ).points;
+  let sevenDayPoints = pointsArray.filter(checkTime).reduce(calculatePoints).points;
 
   console.debug(`sevenDayPoints: ${sevenDayPoints}`);
   if (sevenDayPoints !== response.sevenDayPoints) {
@@ -157,15 +151,9 @@ function calculateTotalPoints(updatedScoreKeeper, response, pointsArray, now) {
   }
 
   // 1 day
-  cutoff = daysAgo(now, 1)
+  cutoff = daysAgo(now, 1);
 
-  let oneDayPoints = pointsArray.filter(checkTime).reduce(
-    function(previousValue, currentValue) {
-      return {
-        points: previousValue.points + currentValue.points
-      }
-    }
-  ).points;
+  let oneDayPoints = pointsArray.filter(checkTime).reduce(calculatePoints).points;
 
   console.debug(`oneDayPoints: ${oneDayPoints}`);
   if (oneDayPoints !== response.oneDayPoints) {
