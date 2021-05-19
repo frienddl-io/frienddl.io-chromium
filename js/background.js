@@ -14,46 +14,6 @@ let PROCESS_NEW_POINTS_LOCK = false;
 let PROCESS_NEW_POINTS_QUEUE = [];
 let PROCESS_NEW_POINTS_QUEUE_INTERVAL;
 
-// Values for testing
-// chrome.storage.sync.set(
-//   {
-//     pointsArray: [
-//       {
-//         time: new Date().getTime(),
-//         points: 100,
-//         totalGamePoints: 100
-//       },
-//       {
-//         time: new Date().getTime() - (2 * 24 * 60 * 60 * 1000),
-//         points: 200,
-//         totalGamePoints: 200
-//       },
-//       {
-//         time: new Date().getTime() - (8 * 24 * 60 * 60 * 1000),
-//         points: 300,
-//         totalGamePoints: 300
-//       },
-//       {
-//         time: new Date().getTime() - (31 * 24 * 60 * 60 * 1000),
-//         points: 500,
-//         totalGamePoints: 500
-//       },
-//     ],
-//     oneDayHighScore: 1000,
-//     oneDayHighScoreTime: new Date().getTime() - (2 * 24 * 60 * 60 * 1000),
-//     sevenDayHighScore: 1000,
-//     sevenDayHighScoreTime: new Date().getTime() - (10 * 24 * 60 * 60 * 1000),
-//     thirtyDayHighScore: 1000,
-//     thirtyDayHighScoreTime: new Date().getTime() - (45 * 24 * 60 * 60 * 1000),
-//     allTimeHighScore: 1000,
-//     allTimeHighScoreTime: new Date().getTime() - (60 * 24 * 60 * 60 * 1000),
-//     oneDayPoints: 1000,
-//     sevenDayPoints: 1000,
-//     thirtyDayPoints: 1000,
-//     allTimePoints: 1000
-//   }
-// );
-
 function daysAgo(now, days) {
   return new Date(now - (days * 24 * 60 * 60 * 1000)).getTime();
 }
