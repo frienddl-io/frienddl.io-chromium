@@ -292,6 +292,8 @@ $(".avatarArrows").click(updatePlayerData);
 // Check for randomize button clicked
 $("#buttonAvatarCustomizerRandomize").click(updatePlayerData);
 
+updatePlayerData();
+
 function setPlayerObserver() {
   $(".player").each(
     function() {
