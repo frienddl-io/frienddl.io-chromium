@@ -1,18 +1,18 @@
 {
   "extensionName": {
-    "message": "frienddl.io - skribbl.io chercheur des amis, et marqueur"
+    "message": "frienddl.io - skribbl.io marqueur et chercheur des amis"
   },
   "extensionDescription": {
-    "message": ""
+    "message": "Un outil pour trouver vos amis dans les salons publics et suivre les meilleures scores."
   },
   "friendFinderTabName": {
-    "message": ""
+    "message": "Trouveur des amis"
   },
   "friendFinderDescription": {
     "message": "Inscrivez les noms de vos amis, puis chercher pour les trouver en skribbl.io"
   },
   "altPencil": {
-    "message": "icône de crayon"
+    "message": "Icône de crayon"
   },
   "addFriendPlaceholder": {
     "message": "Ami"
@@ -60,25 +60,25 @@
     "message": "Des amis trouvés!"
   },
   "scoreKeeperTabName": {
-    "message": ""
+    "message": "Marqueur"
   },
   "scoreKeeperAutomaticDescription": {
-    "message": ""
+    "message": "Mise à jour pendant vous jouez"
   },
   "scoreKeeperManualDescription": {
-    "message": ""
+    "message": "Cliquer pour mise à jour"
   },
   "highScores": {
-    "message": ""
+    "message": "Meilleurs scores"
   },
   "altCrown": {
-    "message": ""
+    "message": "Icône de couronne"
   },
   "totalPoints": {
-    "message": ""
+    "message": "Points totals"
   },
   "altRollingDie": {
-    "message": ""
+    "message": "Icône de dé roulant"
   },
   "scoreKeeperAutomatic": {
     "message": "Auto"
@@ -87,10 +87,10 @@
     "message": "Manuel"
   },
   "scoreKeeperUpdateButton": {
-    "message": ""
+    "message": "Synchroniser"
   },
   "updateText": {
-    "message": ""
+    "message": "Mise à jour..."
   },
   "lastDay": {
     "message": "Dernier 24h"
@@ -105,9 +105,9 @@
     "message": "De tous les temps"
   },
   "resetButton": {
-    "message": ""
+    "message": "Remettre"
   },
   "resetWarning": {
-    "message": ""
+    "message": "Cliquer encore pour supprimer des données définitivement."
   }
 }
