@@ -21,7 +21,7 @@ Chromium browsers include:
 ## Features
 
 - Clean and easy to understand user interface
-- All data is stored on your machine and stays there
+- All data is stored on your machine and isn't collected
 
 ### Friend Finder
 
