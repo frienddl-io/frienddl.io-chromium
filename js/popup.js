@@ -842,7 +842,7 @@ document.addEventListener("DOMContentLoaded", function() {
     console.log("Sending message to join new game");
     backgroundPort.postMessage(
       {
-        windowId: tabId,
+        windowId: windowId,
         tabId: tabId,
         task: "joinNewGame"
       }
