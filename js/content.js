@@ -184,71 +184,6 @@ function receiveRequest(request, sender, sendResponse) {
         }
       );
     }
-  } else if (task === "friendSearch") {
-    chrome.storage.local.get(
-      [
-        "state"
-      ],
-      function(response) {
-        if (response.state === "search") {
-          console.debug(prefix + "Waiting for play button");
-          var checkIfPlayButtonExists = setInterval(
-            function() {
-              if ($("button[type='submit']").length >= 2) {
-                console.debug(prefix + "Play button exists, clicking now");
-
-                let playButton = $("button[type='submit']")[0];
-                console.debug(prefix + "Clicking play button");
-                playButton.click();
-                clearInterval(checkIfPlayButtonExists);
-              } else {
-                console.debug(prefix + "Play button doesn't exist");
-              }
-            },
-            100
-          );
-
-          console.debug(prefix + "Waiting for players");
-          var checkIfPlayersExist = setInterval(
-            function() {
-              let disconnectedOrKicked = bypassModals();
-              if (disconnectedOrKicked) {
-                sendResponse(
-                  {
-                    players: [],
-                    tabId: request.tabId
-                  }
-                );
-              }
-
-              if ($(".player").length >= 1 && $(".player").is(":visible")) {
-                console.debug(prefix + "Players exist");
-
-                let playersArray = [];
-                $(".player").each(
-                  function() {
-                    let playerName = $(this).find(".name").html();
-                    if (playerName !== null && playerName !== "" && !(playersArray.includes(playerName))) {
-                      playersArray.push(playerName);
-                    }
-                  }
-                );
-
-                clearInterval(checkIfPlayersExist);
-                console.debug(prefix + `Sending playersArray: ${playersArray.toString()}`);
-                sendResponse(
-                  {
-                    players: playersArray,
-                    tabId: request.tabId
-                  }
-                );
-              }
-            },
-            100
-          );
-        }
-      }
-    );
   }
 
   return true;
@@ -258,6 +193,8 @@ function receiveRequest(request, sender, sendResponse) {
 chrome.runtime.onMessage.addListener(receiveRequest);
 
 function updatePlayerData() {
+  console.log('updatePlayerData');
+
   if (chrome.app !== undefined || typeof chrome.app.isInstalled !== "undefined") {
     chrome.storage.local.get(
       [
@@ -265,8 +202,8 @@ function updatePlayerData() {
         "playerAvatar"
       ],
       function(response) {
-        let currentPlayerName = $("#inputName")[0].value;
-        let currentPlayerAvatar = $("#loginAvatarCustomizeContainer").prop('outerHTML');
+        let currentPlayerName = $(".input-name")[0].value;
+        let currentPlayerAvatar = $(".avatar-customizer .container").prop('outerHTML');
         let playerDataUpdates = {};
 
         if (response.playerName !== currentPlayerName) {
@@ -291,24 +228,27 @@ function updatePlayerData() {
 }
 
 // Check for player name input change
-$("#inputName").on("propertychange input", updatePlayerData);
+$(".input-name").on("propertychange input", updatePlayerData);
 
 // Check for avatar arrows clicked
-$(".avatarArrows").click(updatePlayerData);
+const customizeArrows = $(".avatar-customizer .arrow");
+customizeArrows.click(updatePlayerData);
 
 // Check for randomize button clicked
-$("#buttonAvatarCustomizerRandomize").click(updatePlayerData);
+$(".randomize").click(updatePlayerData);
 
 updatePlayerData();
 
 function setPlayerObserver() {
-  $(".player").each(
+  const players = $(".players-list .player");
+
+  players.each(
     function() {
-      let playerName = $(this).find(".name").html();
+      let playerName = $(this).find(".player-name").html();
       if (playerName.includes("(You)")) {
         // Credit: https://forum.freecodecamp.org/t/how-can-i-detect-or-trigger-an-event-when-text-in-p-tag-is-changed/270692/4
         // Select the node that will be observed for mutations
-        var targetNode = $(this).find('.score')[0];
+        var targetNode = $(this).find('.player-score')[0];
 
         // Options for the observer (which mutations to observe)
         var config = { childList: true };
@@ -317,7 +257,7 @@ function setPlayerObserver() {
         var callback = async function(mutationsList, observer) {
           for (var mutation of mutationsList) {
             let currentPoints = parseInt(mutation.target.innerText.replace("Points: ", ""));
-            let currentRound = parseInt($("#round")[0].innerText.split(" ")[1]);
+            let currentRound = parseInt($("#game-round")[0].innerText.split(" ")[1]);
             let forceUpdate = false;
 
             await logPointsAsync(currentPoints, currentRound, forceUpdate);

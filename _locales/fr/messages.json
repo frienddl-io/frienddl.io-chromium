@@ -1,12 +1,9 @@
 {
   "extensionName": {
-    "message": "frienddl.io - marqueur et chercheur des amis"
+    "message": "frienddl.io - gardien des meilleurs scores"
   },
   "extensionDescription": {
     "message": "Un outil pour trouver vos amis dans les salons publics et suivre les meilleures scores."
-  },
-  "friendFinderTabName": {
-    "message": "Trouveur des amis"
   },
   "friendFinderDescription": {
     "message": "Inscrivez les noms de vos amis, puis chercher pour les trouver en skribbl.io"

@@ -20,9 +20,6 @@ chrome.storage.local.get(
 );
 
 // Load translations
-$("#friend-finder-tab").text(chrome.i18n.getMessage("friendFinderTabName"));
-$("#friend-finder .description").text(chrome.i18n.getMessage("friendFinderDescription"));
-$("#friend-input").attr("placeholder", chrome.i18n.getMessage("addFriendPlaceholder"));
 $("#pencil").attr("alt", chrome.i18n.getMessage("altPencil"));
 $("#add-friend-button").text(chrome.i18n.getMessage("addFriendButton"));
 $("#minimized-text").text(chrome.i18n.getMessage("windowMinimized"));
@@ -76,11 +73,6 @@ chrome.storage.onChanged.addListener(
     for (let key in changes) {
       let storageChange = changes[key];
       switch(key) {
-        case "friendsFound":
-          if (storageChange.newValue.length > 0) {
-            foundFriend(storageChange.newValue);
-          }
-          break;
         case "gamesJoined":
           $("#games-joined td").text(storageChange.newValue.toLocaleString());
           break;
@@ -135,141 +127,6 @@ let language = chrome.i18n.getUILanguage().split("-")[0];
 console.log(`Using language: ${language}`);
 if (language === "fr") {
   $("#score-keeper th").css("width", "70%");
-}
-
-// Steps to take when one or more friends are found
-function foundFriend(friendsArray) {
-  updatePopupAndBadge("success");
-  updateDisabledPropOfForm(false);
-
-  if (friendsArray.length > 1) {
-    $("#found-friend-title").text(chrome.i18n.getMessage("foundFriendPlural"));
-  }
-  $("#found-friend-p").text(friendsArray.join(", "));
-
-  chrome.storage.local.get(
-    [
-      "runTime"
-    ],
-    function(response) {
-      $("#run-time td").text(msToTime(response.runTime));
-    }
-  );
-
-  $("#found-friend").removeClass("hidden");
-}
-
-// Steps to take when searching has been stopped
-function searchIsStopped() {
-  updatePopupAndBadge("stop");
-  updateDisabledPropOfForm(false);
-}
-
-// Updates the popup to a predefined HTML file
-function updatePopupAndBadge(state) {
-  let found = false;
-
-  console.log(`Making popup & badge updates for: ${state}`)
-  switch(state) {
-    case "search":
-      chrome.browserAction.setBadgeBackgroundColor(
-        {
-          color: SEARCH_BADGE_COLOR
-        }
-      );
-      found = true;
-      break;
-    case "pause":
-      chrome.browserAction.setBadgeBackgroundColor(
-        {
-          color: PAUSE_BADGE_COLOR
-        }
-      );
-      found = true;
-      break;
-    case "stop":
-      chrome.browserAction.setBadgeText(
-        {
-          text: ""
-        }
-      );
-      chrome.browserAction.setBadgeBackgroundColor(
-        {
-          color: STOP_BADGE_COLOR
-        }
-      );
-      found = true;
-      break;
-    case "success":
-      chrome.browserAction.setBadgeText(
-        {
-          text: SUCCESS_BADGE_TEXT
-        }
-      );
-      chrome.browserAction.setBadgeBackgroundColor(
-        {
-          color: SUCCESS_BADGE_COLOR
-        }
-      );
-      found = true;
-      break;
-  }
-
-  if (found) {
-    let states = [
-      "search",
-      "pause",
-      "stop",
-      "success"
-    ];
-
-    // Credit: https://stackoverflow.com/questions/3954438/how-to-remove-item-from-array-by-value
-    Array.prototype.remove = function() {
-      var what, a = arguments, L = a.length, ax;
-      while (L && this.length) {
-        what = a[--L];
-        while ((ax = this.indexOf(what)) !== -1) {
-            this.splice(ax, 1);
-        }
-      }
-      return this;
-    };
-
-    states.remove(state);
-
-    let statesAsClasses = states.map(
-      function(element) {
-        return "." + element + "-hidden";
-      }
-    ).join(", ");
-
-    console.log(`Remove hidden elements for other states: ${statesAsClasses}`);
-    $(statesAsClasses).removeClass("hidden");
-
-    let hiddenStateClass = `.${state}-hidden`;
-    console.log(`Hiding elements based on the state: ${hiddenStateClass}`);
-    $(hiddenStateClass).addClass("hidden");
-  } else {
-    console.error(`State to update popup invalid: ${state}`);
-  }
-}
-
-// Updates all form elements to be either enabled or disabled
-function updateDisabledPropOfForm(state, pause = false) {
-  $("#friend-input").prop("disabled", state);
-  $("#add-friend-button").prop("disabled", state);
-  $("#friends button").prop("disabled", state);
-
-  if (!pause) {
-    $("#minimized-toggle").prop("disabled", state);
-    $("#audio-alert-toggle").prop("disabled", state);
-  }
-
-  if (state) {
-    $("#friends button").removeClass("enabled-friend-button");
-  } else {
-    $("#friends button").addClass("enabled-friend-button");
-  }
 }
 
 // Converts ms to a readable time format (MM:SS.M)
@@ -415,10 +272,6 @@ document.addEventListener("DOMContentLoaded", function() {
         $("#run-time td").text(msToTime(runtime));
       }
 
-      if (response.friendsFound !== undefined && response.friendsFound.length > 0) {
-        foundFriend(response.friendsFound)
-      }
-
       $("#playerName").text(response.playerName);
 
       let playerAvatar = response.playerAvatar;
@@ -500,17 +353,6 @@ document.addEventListener("DOMContentLoaded", function() {
       tab.css("display", "block");
     }
   }
-
-  // Check for enter press on friend input
-  $("#friend-input").keypress(
-    function(event) {
-      let keycode = (event.keyCode ? event.keyCode : event.which);
-      if (keycode == "13") {
-        console.log("Enter was pressed on input");
-        addFriend();
-      }
-    }
-  );
 
   // Listen for button that adds a friend
   $("#add-friend-button").bind("click", addFriend);
@@ -626,192 +468,6 @@ document.addEventListener("DOMContentLoaded", function() {
     );
   }
 
-  // Listen for audio alert toggle
-  $("#audio-alert-toggle").bind("click", audioAlertToggled);
-
-  function audioAlertToggled() {
-    let checked = $(this).is(":checked");
-    console.log(`Setting audioAlert to ${checked}`);
-    chrome.storage.local.set(
-      {
-        "audioAlert": checked
-      }
-    );
-  }
-
-  // Listen for button that starts search
-  $("#start-button").bind("click", startSearch);
-
-  // Steps to take when searching needs to be started
-  function startSearch() {
-    this.blur();
-    console.log("User wants to start search");
-
-    $("#character-error").hide();
-    $("#duplicate-error").hide();
-
-    let friendsArray = getFriendsEntered();
-
-    if (friendsArray.length === 0) {
-      $("#friend-error").show();
-    } else {
-      console.log("Starting search");
-      updatePopupAndBadge("search");
-      $("#stats").show();
-      chrome.storage.local.set(
-        {
-          "friends": friendsArray,
-          "state": "search",
-          "gamesJoined": 0,
-          "endTime": -1,
-          "runTime": -1,
-          "playersFound": [],
-          "friendsFound": []
-        },
-        function() {
-          $("#friend-error").hide();
-          updateDisabledPropOfForm(true);
-
-          $("#players-found td").text(0);
-          $("#games-joined td").text(0);
-          $("#run-time td").text("00:00.0");
-
-          chrome.storage.local.get(
-            [
-              "totalTimesSearched"
-            ],
-            function(response) {
-              let newTotalTimesSearched = 1;
-
-              if (response.totalTimesSearched !== undefined) {
-                newTotalTimesSearched += response.totalTimesSearched;
-              }
-
-              chrome.storage.local.set(
-                {
-                  "totalTimesSearched": newTotalTimesSearched
-                }
-              );
-            }
-          );
-
-          let windowSettings = {};
-          let minimizeChecked = $("#minimized-toggle").is(":checked");
-          if (minimizeChecked) {
-            console.log("Setting window to minimized");
-            windowSettings["state"] = "minimized";
-          }
-
-          chrome.windows.create(
-            windowSettings,
-            function(window) {
-              let currentTime = new Date().getTime();
-              chrome.storage.local.set(
-                {
-                  "windowId": window.id,
-                  "startTime": currentTime
-                },
-                function() {
-                  joinNewGame(window.id, window.tabs[0].id);
-                }
-              );
-            }
-          );
-        }
-      );
-    }
-  }
-
-  // Listen for button that pauses search
-  $("#pause-button").bind("click", pauseSearch);
-
-  // Steps to take when searching needs to be paused
-  function pauseSearch() {
-    console.log("Pausing search");
-
-    this.blur();
-    updatePopupAndBadge("pause");
-
-    chrome.storage.local.set(
-      {
-        "state": "pause"
-      },
-      function() {
-        updateDisabledPropOfForm(false, true);
-
-        chrome.storage.local.get(
-          [
-            "startTime"
-          ],
-          function(response) {
-            let currentTime = new Date().getTime();
-            chrome.storage.local.set(
-              {
-                "endTime": currentTime,
-                "runTime": getCurrentRunTime(response.startTime, currentTime)
-              }
-            );
-          }
-        );
-      }
-    );
-  }
-
-  // Listen for button that resumes search
-  $("#resume-button").bind("click", resumeSearch);
-
-  // Steps to take when searching needs to be resumed
-  function resumeSearch() {
-    console.log("Resuming search");
-
-    this.blur();
-    updatePopupAndBadge("search");
-    chrome.storage.local.set(
-      {
-        "state": "search"
-      },
-      function() {
-        updateDisabledPropOfForm(true)
-
-        $("#character-error").hide();
-        $("#duplicate-error").hide();
-
-        let friendsArray = getFriendsEntered();
-
-        if (friendsArray === 0) {
-          $("#friend-error").show();
-        } else {
-          chrome.storage.local.set(
-            {
-              "friends": friendsArray
-            },
-            function() {
-              $("#friend-error").hide();
-
-              chrome.storage.local.get(
-                [
-                  "windowId"
-                ],
-                function(response) {
-                  chrome.windows.get(
-                    response.windowId,
-                    {
-                      "populate": true
-                    },
-                    function(window) {
-                      let tabId = window.tabs[0].id;
-                      joinNewGame(window.id, tabId);
-                    }
-                  );
-                }
-              );
-            }
-          );
-        }
-      }
-    );
-  }
-
   // Extracts the name of a friend from a button
   function getFriendNameFromButton(element) {
     return element.innerText.split(" ").slice(0, -1).join(" ");
@@ -845,49 +501,6 @@ document.addEventListener("DOMContentLoaded", function() {
         windowId: windowId,
         tabId: tabId,
         task: "joinNewGame"
-      }
-    );
-  }
-
-  // Listen for button that pauses search
-  $("#stop-button").bind("click", stopSearch);
-
-  // Steps to take when searching needs to be stopped
-  function stopSearch() {
-    console.log("Stopping search");
-
-    this.blur();
-
-    chrome.storage.local.get(
-      [
-        "state",
-        "startTime",
-        "windowId"
-      ],
-      function(response) {
-        let state = response.state;
-        chrome.storage.local.set(
-          {
-            "state": "stop"
-          },
-          function() {
-            searchIsStopped();
-
-            let currentTime = new Date().getTime();
-            let storageUpdate = {
-              "endTime": currentTime
-            };
-            if (state !== "pause") {
-              console.log("Updating runTime");
-              storageUpdate["runTime"] = getCurrentRunTime(response.startTime, currentTime)
-            } else {
-              console.log("Not updating runTime due to previous pause state");
-            }
-            chrome.storage.local.set(storageUpdate);
-
-            chrome.windows.remove(response.windowId);
-          }
-        );
       }
     );
   }

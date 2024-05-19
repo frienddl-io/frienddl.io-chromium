@@ -174,13 +174,6 @@ svg
   margin-right: 10px;
 }
 
-#friend-input
-{
-  border-radius: .25rem;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
 #start-button,
 #resume-button,
 #pause-button,
@@ -188,12 +181,6 @@ svg
 {
   margin-bottom: 15px;
 }
-
-#friend-finder .spinner
-{
-  padding: 5px 0 15px 0;
-}
-
 
 #friends button
 {
@@ -325,7 +312,7 @@ label
 .toggle
 {
   position: absolute;
-  top: 121px;
+  top: 65px;
   font-size: 17px;
   font-weight: bold;
 }
@@ -387,14 +374,22 @@ label
   justify-content: center;
 }
 
-.avatar
-{
+.avatar.fit {
+  width: 100%;
+  height: 100%;
+}
+
+.avatar {
   pointer-events: none;
   user-select: none;
   position: relative;
   flex: 0 0 auto;
-  height: 48px;
-  width: 48px;
+  height: 100%;
+  width: 100%;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;
+  image-rendering: pixelated;
 }
 
 .avatar .color,
@@ -409,22 +404,28 @@ label
 .avatar .color
 {
   position: absolute;
+  width: 100%;
+  height: 100%;
   background-image: url("../img/color_atlas.gif");
-  background-repeat: no-repeat;
+  background-size: 1000% 1000%;
 }
 
 .avatar .eyes
 {
   position: absolute;
+  width: 100%;
+  height: 100%;
   background-image: url("../img/eyes_atlas.gif");
-  background-repeat: no-repeat;
+  background-size: 1000% 1000%;
 }
 
 .avatar .mouth
 {
   position: absolute;
+  width: 100%;
+  height: 100%;
   background-image: url("../img/mouth_atlas.gif");
-  background-repeat: no-repeat;
+  background-size: 1000% 1000%;
 }
 
 .avatar .special
@@ -435,5 +436,28 @@ label
   width: 166%;
   height: 166%;
   background-image: url("../img/special_atlas.gif");
-  background-repeat: no-repeat;
+  background-size: 1000% 1000%;
+}
+
+.avatar .owner
+{
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  left: -5%;
+  top: -22%;
+  z-index: 2;
+  background-image: url("../img/crown.gif");
+  background-position: center;
+  background-size: contain;
+}
+
+.container
+{
+  width: 96px;
+  height: 96px;
+  padding-right: 0px !important;
+  padding-left: 0px !important;
+  margin-right: 0px !important;
+  margin-left: 0px !important;
 }

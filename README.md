@@ -5,9 +5,9 @@
 [![](https://img.shields.io/chrome-web-store/v/bmadghlcpopfbnfcpmicdoafognfbhmm?color=6778C6)](https://github.com/frienddl-io/frienddl.io-chrome/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/frienddl-io/frienddl.io-chrome/blob/main/LICENSE.md)
 
-frienddl.io is a browser extension for [skribbl.io](https://skribbl.io/), a free online multiplayer drawing & guessing game. It aims to make playing more enjoyable by helping friends find each other in public lobbies and to keep track of scores.
+frienddl.io is a browser extension for [skribbl.io](https://skribbl.io/), a free online multiplayer drawing & guessing game. It aims to make playing more enjoyable by keeping track of your scores.
 
-Download it now for [Chromium browsers](https://chrome.google.com/webstore/detail/frienddlio/bmadghlcpopfbnfcpmicdoafognfbhmm) or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/frienddlio/)!
+Download it now for [Chromium browsers](https://chrome.google.com/webstore/detail/frienddlio/bmadghlcpopfbnfcpmicdoafognfbhmm)!
 
 This is the codebase for the Chromium version, but the goal is for all versions to have nearly identical code and feature parity.
 
@@ -22,22 +22,6 @@ Chromium browsers include:
 
 - Clean and easy to understand user interface
 - All data is stored on your machine and isn't collected
-
-### Friend Finder
-
-- Works in the background so you can focus on other things while waiting
-- Saves your friends so you don't have to type them in repeatedly
-- Pause to add more friends and continue searching
-- Stop to close out the search window
-- Option to play audio when a friend has been found
-- Option to open the search window minimized
-- Keeps track of search stats
-- Updates badge to show how many games have been joined
-- Handles disconnect errors cleanly to keep the search running
-- Use with an ad blocker for best results; I recommend [Privacy Badger](https://privacybadger.org/)
-
-### Score Keeper
-
 - Monitors your score as you earn points in games
 - Switch to manual mode to update it yourself
 - Shows your all-time high score as well as 1, 7, and 30 day high scores

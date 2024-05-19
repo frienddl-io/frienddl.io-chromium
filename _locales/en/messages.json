@@ -1,12 +1,9 @@
 {
   "extensionName": {
-    "message": "frienddl.io - friend finder & score keeper"
+    "message": "frienddl.io - score keeper"
   },
   "extensionDescription": {
     "message": "Tool to find friends in public rooms on skribbl.io and keep track of high scores"
-  },
-  "friendFinderTabName": {
-    "message": "Friend Finder"
   },
   "friendFinderDescription": {
     "message": "Enter your friends then search to find them on skribbl.io"
