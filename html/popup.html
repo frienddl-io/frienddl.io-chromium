@@ -7,9 +7,10 @@
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/custom.css" rel="stylesheet">
   </head>
+
   <body>
     <div class="container-fluid">
-      <div  id="title" class="center">
+      <div id="title" class="center">
         <img src="../img/title.gif" alt="frienddl.io">
       </div>
 
@@ -18,16 +19,8 @@
           <div id="score-keeper-toggle">
             <span id="manual-toggle-text" class="toggle"></span>
             <div id="score-keeper-type-option" class="custom-control custom-switch center">
-              <input
-                id="score-keeper-type"
-                type="checkbox"
-                class="custom-control-input"
-                checked
-              >
-              <label
-                class="custom-control-label"
-                for="score-keeper-type"
-              >
+              <input id="score-keeper-type" type="checkbox" class="custom-control-input" checked>
+              <label class="custom-control-label" for="score-keeper-type">
               </label>
             </div>
             <span id="automatic-toggle-text" class="toggle"></span>
@@ -35,16 +28,26 @@
           <p class="description"></p>
 
           <button id="manual-update-button" class="btn btn-success">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
-              <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
-              <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-arrow-repeat"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"
+              />
+              <path
+                fill-rule="evenodd"
+                d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"
+              />
             </svg>
             &nbsp;<span></span>
           </button>
 
-          <div
-            class="center spinner hidden"
-          >
+          <div class="center spinner hidden">
             <img class="spinner-icon" src="../img/spinner.gif">
             &nbsp;<span class="spinner-text"></span>
           </div>
@@ -72,7 +75,7 @@
           <h2 id="high-scores-header" class="h2">
             <img id="crown" src="../img/crown.gif">&nbsp;<span></span>
           </h2>
-          <table class="table table-borderless" >
+          <table class="table table-borderless">
             <tbody>
               <tr class="last-day">
                 <th scope="row"></th>
@@ -101,9 +104,21 @@
             class="reset btn btn-outline-warning"
             type="submit"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
-              <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-arrow-counterclockwise"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"
+              />
+              <path
+                d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"
+              />
             </svg>
             &nbsp;<span></span>
           </button>
@@ -116,7 +131,7 @@
           <h2 id="total-points-header" class="h2">
             <img id="rolling-die" src="../img/die.gif">&nbsp;<span></span>
           </h2>
-          <table class="table table-borderless" >
+          <table class="table table-borderless">
             <tbody>
               <tr class="last-day">
                 <th scope="row"></th>
@@ -142,9 +157,21 @@
             class="reset btn btn-outline-warning"
             type="submit"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
-              <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-arrow-counterclockwise"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"
+              />
+              <path
+                d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"
+              />
             </svg>
             &nbsp;<span></span>
           </button>
@@ -152,62 +179,62 @@
         </div>
       </div>
 
-      <div id="logoAvatarContainer" class="row">
+      <div id="logoAvatarContainer" class="avatar-container">
         <div class="avatar">
-          <div class="sprite color" style="background-size: 480px 480px; background-position: 0px 0px;"></div>
-          <div class="sprite eyes" style="background-size: 480px 480px; background-position: -192px 0px;"></div>
-          <div class="sprite mouth" style="background-size: 480px 480px; background-position: -240px 0px;"></div>
-          <div class="sprite special" style="background-size: 800px 800px; background-position: 0px 0px;"></div>
-          <div class="sprite owner" style="display: none;"></div>
+          <div class="color" style="background-position: 0% 0%;"></div>
+          <div class="eyes" style="background-position: -100% -300%;"></div>
+          <div class="mouth" style="background-position: -800% -400%;"></div>
+          <div class="special" style="display: none;"></div>
+          <div class="owner" style="display: none;"></div>
         </div>
         <div class="avatar">
-          <div class="sprite color" style="background-size: 480px 480px; background-position: -48px 0px;"></div>
-          <div class="sprite eyes" style="background-size: 480px 480px; background-position: -336px -48px;"></div>
-          <div class="sprite mouth" style="background-size: 480px 480px; background-position: -288px 0px;"></div>
-          <div class="sprite special" style="display: none;"></div>
-          <div class="sprite owner" style="display: none;"></div>
+          <div class="color" style="background-position: -100% 0%;"></div>
+          <div class="eyes" style="background-position: -900% 0%;"></div>
+          <div class="mouth" style="background-position: -200% -400%;"></div>
+          <div class="special" style="display: none;"></div>
+          <div class="owner" style="display: none;"></div>
         </div>
         <div class="avatar">
-          <div class="sprite color" style="background-size: 480px 480px; background-position: -96px 0px;"></div>
-          <div class="sprite eyes" style="background-size: 480px 480px; background-position: 0px -48px;"></div>
-          <div class="sprite mouth" style="background-size: 480px 480px; background-position: -384px 0px;"></div>
-          <div class="sprite special" style="display: none;"></div>
-          <div class="sprite owner" style="display: none;"></div>
+          <div class="color" style="background-position: -200% 0%;"></div>
+          <div class="eyes" style="background-position: -100% 0%;"></div>
+          <div class="mouth" style="background-position: -400% -100%;"></div>
+          <div class="special" style="display: none;"></div>
+          <div class="owner" style="display: none;"></div>
         </div>
         <div class="avatar">
-          <div class="sprite color" style="background-size: 480px 480px; background-position: -144px 0px;"></div>
-          <div class="sprite eyes" style="background-size: 480px 480px; background-position: -96px -48px;"></div>
-          <div class="sprite mouth" style="background-size: 480px 480px; background-position: -192px 0px;"></div>
-          <div class="sprite special" style="display: none;"></div>
-          <div class="sprite owner" style="display: none;"></div>
+          <div class="color" style="background-position: -300% 0%;"></div>
+          <div class="eyes" style="background-position: -700% -200%;"></div>
+          <div class="mouth" style="background-position: -200% -300%;"></div>
+          <div class="special" style="display: none;"></div>
+          <div class="owner" style="display: none;"></div>
         </div>
         <div class="avatar">
-          <div class="sprite color" style="background-size: 480px 480px; background-position: -192px 0px;"></div>
-          <div class="sprite eyes" style="background-size: 480px 480px; background-position: -192px -96px;"></div>
-          <div class="sprite mouth" style="background-size: 480px 480px; background-position: -96px 0px;"></div>
-          <div class="sprite special" style="display: none;"></div>
-          <div class="sprite owner" style="display: none;"></div>
+          <div class="color" style="background-position: -400% 0%;"></div>
+          <div class="eyes" style="background-position: -200% -200%;"></div>
+          <div class="mouth" style="background-position: -100% -300%;"></div>
+          <div class="special" style="display: none;"></div>
+          <div class="owner" style="display: block;"></div>
         </div>
         <div class="avatar">
-          <div class="sprite color" style="background-size: 480px 480px; background-position: -240px 0px;"></div>
-          <div class="sprite eyes" style="background-size: 480px 480px; background-position: -96px -48px;"></div>
-          <div class="sprite mouth" style="background-size: 480px 480px; background-position: -144px -96px;"></div>
-          <div class="sprite special" style="display: none;"></div>
-          <div class="sprite owner"></div>
+          <div class="color" style="background-position: -500% 0%;"></div>
+          <div class="eyes" style="background-position: -900% -200%;"></div>
+          <div class="mouth" style="background-position: -200% -100%;"></div>
+          <div class="special" style="display: none;"></div>
+          <div class="owner" style="display: none;"></div>
         </div>
         <div class="avatar">
-          <div class="sprite color" style="background-size: 480px 480px; background-position: -288px 0px;"></div>
-          <div class="sprite eyes" style="background-size: 480px 480px; background-position: -192px 0px;"></div>
-          <div class="sprite mouth" style="background-size: 480px 480px; background-position: -144px -48px;"></div>
-          <div class="sprite special" style="display: none;"></div>
-          <div class="sprite owner" style="display: none;"></div>
+          <div class="color" style="background-position: -600% 0%;"></div>
+          <div class="eyes" style="background-position: -900% -200%;"></div>
+          <div class="mouth" style="background-position: -400% -200%;"></div>
+          <div class="special" style="display: none;"></div>
+          <div class="owner" style="display: none;"></div>
         </div>
         <div class="avatar">
-          <div class="sprite color" style="background-size: 480px 480px; background-position: -336px 0px;"></div>
-          <div class="sprite eyes" style="background-size: 480px 480px; background-position: -288px -48px;"></div>
-          <div class="sprite mouth" style="background-size: 480px 480px; background-position: -144px 0px;"></div>
-          <div class="sprite special" style="display: none;"></div>
-          <div class="sprite owner" style="display: none;"></div>
+          <div class="color" style="background-position: -700% 0%;"></div>
+          <div class="eyes" style="background-position: -900% -100%;"></div>
+          <div class="mouth" style="background-position: -600% 0%;"></div>
+          <div class="special" style="background-position: -700% 0%;"></div>
+          <div class="owner" style="display: none;"></div>
         </div>
       </div>
 

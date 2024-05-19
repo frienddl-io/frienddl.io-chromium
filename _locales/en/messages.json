@@ -3,61 +3,16 @@
     "message": "frienddl.io - score keeper"
   },
   "extensionDescription": {
-    "message": "Tool to find friends in public rooms on skribbl.io and keep track of high scores"
-  },
-  "friendFinderDescription": {
-    "message": "Enter your friends then search to find them on skribbl.io"
-  },
-  "altPencil": {
-    "message": "pencil icon"
+    "message": "Tool to keep track of high scores on skribbl.io"
   },
   "addFriendPlaceholder": {
     "message": "Friend"
   },
-  "addFriendButton": {
-    "message": "Add"
-  },
   "windowMinimized": {
     "message": "Open search window minimized"
   },
-  "audioAlert": {
-    "message": "Play audio message when found"
-  },
-  "characterError": {
-    "message": "Please enter at least one character."
-  },
-  "duplicateError": {
-    "message": "Friend already added."
-  },
-  "friendError": {
-    "message": "Please add at least one friend."
-  },
-  "pauseInstruction": {
-    "message": "Pause the search to add or remove a friend."
-  },
   "altSpinner": {
     "message": "spinner"
-  },
-  "searchText": {
-    "message": "Searching..."
-  },
-  "gamesJoined": {
-    "message": "Games Joined"
-  },
-  "playersFound": {
-    "message": "Players Found"
-  },
-  "runTime": {
-    "message": "Run Time"
-  },
-  "foundFriendSingular": {
-    "message": "Found Friend!"
-  },
-  "foundFriendPlural": {
-    "message": "Found Friends!"
-  },
-  "scoreKeeperTabName": {
-    "message": "Score Keeper"
   },
   "scoreKeeperAutomaticDescription": {
     "message": "Updates as you earn points"

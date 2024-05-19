@@ -20,24 +20,10 @@ chrome.storage.local.get(
 );
 
 // Load translations
-$("#pencil").attr("alt", chrome.i18n.getMessage("altPencil"));
-$("#add-friend-button").text(chrome.i18n.getMessage("addFriendButton"));
 $("#minimized-text").text(chrome.i18n.getMessage("windowMinimized"));
-$("#audio-alert-text").text(chrome.i18n.getMessage("audioAlert"));
-
-$("#character-error").text(chrome.i18n.getMessage("characterError"));
-$("#duplicate-error").text(chrome.i18n.getMessage("duplicateError"));
-$("#friend-error").text(chrome.i18n.getMessage("friendError"));
-$("#pause-instruction").text(chrome.i18n.getMessage("pauseInstruction"));
 
 $(".spinner-icon").attr("alt", chrome.i18n.getMessage("altSpinner"));
-$("#friend-finder .spinner-text").text(chrome.i18n.getMessage("searchText"));
-$("#games-joined th").text(chrome.i18n.getMessage("gamesJoined"));
-$("#players-found th").text(chrome.i18n.getMessage("playersFound"));
-$("#run-time th").text(chrome.i18n.getMessage("runTime"));
-$("#found-friend-title").text(chrome.i18n.getMessage("foundFriendSingular"));
 
-$("#score-keeper-tab").text(chrome.i18n.getMessage("scoreKeeperTabName"));
 $("#automatic-toggle-text").text(chrome.i18n.getMessage("scoreKeeperAutomatic"));
 $("#manual-toggle-text").text(chrome.i18n.getMessage("scoreKeeperManual"));
 $("#manual-update-button span").text(chrome.i18n.getMessage("scoreKeeperUpdateButton"));
@@ -56,16 +42,7 @@ $(".all-time th").text(chrome.i18n.getMessage("allTime"));
 $("button.reset span").text(chrome.i18n.getMessage("resetButton"));
 $(".reset-warning").text(chrome.i18n.getMessage("resetWarning"));
 
-// Text for badge
-const SUCCESS_BADGE_TEXT = "!";
-
-// Colors for badge
-const SEARCH_BADGE_COLOR = "#28a745";
-const PAUSE_BADGE_COLOR = "#ffc107";
-const STOP_BADGE_COLOR = "#dc3545";
-const SUCCESS_BADGE_COLOR = "#17A2B8";
-
-const DEFAULT_AVATAR = "<div id=\"loginAvatarCustomizeContainer\"><div id=\"buttonAvatarCustomizerRandomize\"></div><div class=\"avatarArrows\" id=\"loginAvatarArrowsLeft\"><div class=\"avatarArrow avatarArrowLeft\" data-avatarindex=\"1\"></div><div class=\"avatarArrow avatarArrowLeft\" data-avatarindex=\"2\"></div><div class=\"avatarArrow avatarArrowLeft\" data-avatarindex=\"0\"></div></div><div class=\"avatarContainer\"><div class=\"avatar avatar-fit\" id=\"loginAvatar\"><div class=\"color\" style=\"background-size: 960px 960px; background-position: -576px 0px;\"></div><div class=\"eyes\" style=\"background-size: 960px 960px; background-position: -864px -96px;\"></div><div class=\"mouth\" style=\"background-size: 960px 960px; background-position: -672px 0px;\"></div><div class=\"special\" style=\"display: none;\"></div></div></div><div class=\"avatarArrows\" id=\"loginAvatarArrowsLeft\"><div class=\"avatarArrow avatarArrowRight\" data-avatarindex=\"1\"></div><div class=\"avatarArrow avatarArrowRight\" data-avatarindex=\"2\"></div><div class=\"avatarArrow avatarArrowRight\" data-avatarindex=\"0\"></div></div></div>";
+const DEFAULT_AVATAR = '<div class="container"><div class="avatar fit"><div class="color bounce" style="background-position: -200% 0%;"></div><div class="eyes bounce" style="background-position: -500% 0%;"></div><div class="mouth bounce" style="background-position: -200% 0%;"></div><div class="special" style="display: none;"></div><div class="owner" style="display: none;"></div></div></div>';
 
 // Listen for changes to storage
 chrome.storage.onChanged.addListener(
@@ -73,9 +50,6 @@ chrome.storage.onChanged.addListener(
     for (let key in changes) {
       let storageChange = changes[key];
       switch(key) {
-        case "gamesJoined":
-          $("#games-joined td").text(storageChange.newValue.toLocaleString());
-          break;
         case "playerName":
           $("#playerName").text(storageChange.newValue);
           break;
@@ -87,31 +61,13 @@ chrome.storage.onChanged.addListener(
             $("#playerAvatar").html(playerAvatar.toString());
           }
           break;
-        case "playersFound":
-          $("#players-found td").text(storageChange.newValue.length.toLocaleString());
-          break;
-        case "runTime":
-          $("#run-time td").text(msToTime(storageChange.newValue));
-          break;
         case "scoreKeeperSpinner":
           $("#score-keeper .spinner").addClass("hidden");
           $("#manual-update-button").prop("disabled", false);
           break;
         case "state":
-          if (storageChange.newValue === "stop") {
-            searchIsStopped();
-          }
-          break;
-        case "audioAlert":
-        case "currentTab":
         case "endTime":
-        case "friends":
-        case "totalFriendsFound":
-        case "totalGamesJoined":
         case "startTime":
-        case "totalPlayersSeen":
-        case "totalRunTime":
-        case "totalTimesSearched":
         case "windowId":
         case "windowMinimized":
           break;
@@ -201,75 +157,21 @@ function updateScoreKeeperValues() {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-  // Set values of friends and stats from storage on popup startup
+  // Set values of stats from storage on popup startup
   chrome.storage.local.get(
     [
-      "friendsFound",
-      "friends",
-      "gamesJoined",
-      "playersFound",
       "state",
       "startTime",
-      "runTime",
       "windowMinimized",
-      "audioAlert",
-      "currentTab",
       "playerName",
       "playerAvatar"
     ],
     function(response) {
-      if (response.currentTab === undefined || response.currentTab !== "score-keeper") {
-        openTab("friend-finder");
-      } else {
-        openTab(response.currentTab);
-      }
-
-      let currentlySearching = response.state === "search";
-      let friendsArray = response.friends;
-      if (friendsArray !== undefined) {
-        friendsArray.forEach(
-          function(friendName) {
-            let id = `${friendName}-entered`;
-            addFriendButton(id, friendName);
-          }
-        );
-
-        if (currentlySearching) {
-          updateDisabledPropOfForm(true);
-        }
-      }
-
       if (response.windowMinimized !== undefined && response.windowMinimized === false) {
         console.log("Changing minimized toggle to unchecked");
         $("#minimized-toggle").prop("checked", false);
       } else {
         console.log("Keeping minimized toggle checked");
-      }
-
-      if (response.audioAlert !== undefined && response.audioAlert === false) {
-        console.log("Changing audio alert toggle to unchecked");
-        $("#audio-alert-toggle").prop("checked", false);
-      } else {
-        console.log("Keeping audio alert toggle checked");
-      }
-
-      if (response.gamesJoined !== undefined) {
-        $("#games-joined td").text(response.gamesJoined);
-      }
-
-      if (response.gamesJoined !== undefined) {
-        $("#players-found td").text(response.playersFound.length);
-      }
-
-      let runtime = "";
-      if (currentlySearching) {
-        runtime = getCurrentRunTime(response.startTime);
-      } else if (response.state === "pause") {
-        runtime = response.runTime;
-      }
-
-      if (runtime !== "") {
-        $("#run-time td").text(msToTime(runtime));
       }
 
       $("#playerName").text(response.playerName);
@@ -309,152 +211,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   );
 
-  $(".tablinks").bind("click", openTab);
-
-  function openTab(tabName) {
-    console.log(`Opening tab: ${tabName}`);
-    if (typeof tabName !== "string") {
-      tabName = this.name;
-
-      $("#tabs label").each(
-        function() {
-          $(this).removeClass("active");
-        }
-      );
-
-      $(this).parent().addClass("active");
-
-      chrome.storage.local.set(
-        {
-          "currentTab": tabName
-        },
-        function() {
-          $(".tabContent").each(
-            function() {
-              $(this).css("display", "none");
-            }
-          );
-
-          let tab = $(`#${tabName}`);
-          tab.css("display", "block");
-        }
-      );
-    } else {
-      let label = $(`input[name="${tabName}"]`).parent();
-      label.addClass("active");
-
-      $(".tabContent").each(
-        function() {
-          $(this).css("display", "none");
-        }
-      );
-
-      let tab = $(`#${tabName}`);
-      tab.css("display", "block");
-    }
-  }
-
-  // Listen for button that adds a friend
-  $("#add-friend-button").bind("click", addFriend);
-
-  // Steps to take when a friend is to be added
-  function addFriend() {
-    this.blur();
-    console.log("User wants to add friend");
-    $("#friend-error").hide();
-
-    let friendName = $("#friend-input").val();
-    if (friendName === "") {
-      $("#character-error").show();
-    } else {
-      $("#character-error").hide();
-      $("#friend-input").val("");
-
-      friendName = friendName.replace(",", "");
-
-      let id = `${friendName}-entered`;
-      let exists = $(`#${id}`).length !== 0;
-
-      if (!exists) {
-        $("#duplicate-error").hide();
-        console.log(`Adding friend: ${friendName}`);
-
-        chrome.storage.local.get(
-          [
-            "friends"
-          ],
-          function(response) {
-            let friendsArray = [];
-            if (response.friends !== undefined) {
-              friendsArray = friendsArray.concat(response.friends);
-            }
-
-            friendsArray.push(friendName);
-            chrome.storage.local.set(
-              {
-                "friends": friendsArray
-              },
-              function() {
-                addFriendButton(id, friendName);
-              }
-            );
-          }
-        );
-      } else {
-        console.log(`Friend has already been added: ${friendName}`);
-        $("#duplicate-error").show();
-      }
-    }
-  }
-
-  // Creates a button for a friend
-  function addFriendButton(id, friendName) {
-    let btn = document.createElement("BUTTON");
-
-    btn.id = id;
-    btn.type = "button";
-    btn.classList.add("btn");
-    btn.classList.add("rounded");
-    btn.classList.add("btn-outline-danger");
-    btn.classList.add("friend-button");
-    btn.classList.add("enabled-friend-button");
-
-    btn.innerHTML = friendName + " <span aria-hidden='true'>&times;</span>";
-    btn.onclick = removeFriend;
-
-    console.log(`Adding friend button: ${friendName}`);
-    document.querySelector("#friends").append(btn);
-  }
-
-  // Removes a button for a friend and updates storage
-  function removeFriend() {
-    let friendName = getFriendNameFromButton(this);
-    console.log(`Removing friend: ${friendName}`);
-    this.parentElement.removeChild(this);
-
-    chrome.storage.local.get(
-      [
-        "friends"
-      ],
-      function(response) {
-        let friendsArray = response.friends;
-        let newFriendsArray = [];
-
-        for(let i = 0; i < friendsArray.length; i++) {
-          if (friendsArray[i] !== friendName) {
-            newFriendsArray.push(friendsArray[i])
-          }
-        }
-
-        chrome.storage.local.set(
-          {
-            "friends": newFriendsArray
-          }
-        )
-      }
-    );
-  }
-
   // Listen for minimized toggle
   $("#minimized-toggle").bind("click", minimizeToggled);
 
@@ -466,51 +222,6 @@ document.addEventListener("DOMContentLoaded", function() {
         "windowMinimized": checked
       }
     );
-  }
-
-  // Extracts the name of a friend from a button
-  function getFriendNameFromButton(element) {
-    return element.innerText.split(" ").slice(0, -1).join(" ");
-  }
-
-  // Retrieves the friends entered
-  function getFriendsEntered() {
-    let friendsArray = []
-    Array.from(document.querySelector("#friends").children).forEach(
-      (element, index) => {
-        let friend = getFriendNameFromButton(element);
-        friendsArray.push(friend);
-      }
-    )
-
-    return friendsArray;
-  }
-
-  // Steps to take when a new game needs to be joined
-  function joinNewGame(windowId, tabId) {
-    // Create port to send messages to background
-    let backgroundPort = chrome.runtime.connect(
-      {
-        name: "p2b"
-      }
-    );
-
-    console.log("Sending message to join new game");
-    backgroundPort.postMessage(
-      {
-        windowId: windowId,
-        tabId: tabId,
-        task: "joinNewGame"
-      }
-    );
-  }
-
-  // Returns the current run time
-  function getCurrentRunTime(startTime, currentTime = undefined) {
-    if (currentTime === undefined) {
-      currentTime = new Date().getTime();
-    }
-    return currentTime - startTime;
   }
 
   // Listen for score keeper type toggle

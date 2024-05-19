@@ -3,61 +3,16 @@
     "message": "frienddl.io - gardien des meilleurs scores"
   },
   "extensionDescription": {
-    "message": "Un outil pour trouver vos amis dans les salons publics et suivre les meilleures scores."
-  },
-  "friendFinderDescription": {
-    "message": "Inscrivez les noms de vos amis, puis chercher pour les trouver en skribbl.io"
-  },
-  "altPencil": {
-    "message": "Icône de crayon"
+    "message": "Outil pour suivre les meilleurs scores sur skribbl.io"
   },
   "addFriendPlaceholder": {
     "message": "Ami"
   },
-  "addFriendButton": {
-    "message": "Ajouter"
-  },
   "windowMinimized": {
     "message": "Une fenêtre chercheuse est ouverte et réduit"
   },
-  "audioAlert": {
-    "message": "Jouer un message audio lorsqu'un ami est trouvé"
-  },
-  "characterError": {
-    "message": "S'il vous plaît, inscrivez au moins un caractère. "
-  },
-  "duplicateError": {
-    "message": "Cet ami deja ajouté."
-  },
-  "friendError": {
-    "message": "S'il vous plaît, ajouter au moins un ami."
-  },
-  "pauseInstruction": {
-    "message": "Mettez en pause pour ajouter ou enlever un nom d’ami. "
-  },
   "altSpinner": {
     "message": "girouette"
-  },
-  "searchText": {
-    "message": "Cherchant..."
-  },
-  "gamesJoined": {
-    "message": "Jeux Entré"
-  },
-  "playersFound": {
-    "message": "Joueurs Trouvés"
-  },
-  "runTime": {
-    "message": "Durée d'exécution"
-  },
-  "foundFriendSingular": {
-    "message": "Un ami Trouvé!"
-  },
-  "foundFriendPlural": {
-    "message": "Des amis trouvés!"
-  },
-  "scoreKeeperTabName": {
-    "message": "Marqueur"
   },
   "scoreKeeperAutomaticDescription": {
     "message": "Mise à jour pendant vous jouez"

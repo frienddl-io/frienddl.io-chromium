@@ -100,8 +100,7 @@ label,
   border-color: #E90821;
 }
 
-#title,
-#friend-error
+#title
 {
   margin-bottom: 5px;
 }
@@ -123,11 +122,6 @@ svg
   width: 100%;
 }
 
-#tabs
-{
-  margin: 10px 0 15px 0;
-}
-
 #all-time-date
 {
   font-size: 13px;
@@ -138,73 +132,11 @@ svg
   padding: 0;
 }
 
-#new-badge
-{
-  font-size: 10px;
-  position: absolute;
-  z-index: 10;
-  top: 102px;
-  left: 200px;
-  background-color: #23C7E8;
-  color: #000000;
-
-  /* background: rgb(233,8,33);
-  background: linear-gradient(90deg, rgba(233,8,33,1) 0%, rgba(243,105,11,1) 20%, rgba(242,255,21,1) 40%, rgba(30,191,56,1) 60%, rgba(39,22,241,1) 80%, rgba(198,9,237,1) 100%); */
-
-  /* -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: #000000; */
-  /* text-shadow: -1px 1px 0 #000,
-              1px 1px 0 #000,
-              1px -1px 0 #000;
-              -1px -1px 0 #000; */
-  /* -webkit-text-stroke: 1px #282828;
-  text-shadow: 0px 4px 4px #282828; */
-}
-
 .description
 {
   text-align: center;
   margin-bottom: 10px;
 }
-
-/* Friend Finder */
-#pencil
-{
-  height: 38px;
-  margin-right: 10px;
-}
-
-#start-button,
-#resume-button,
-#pause-button,
-#stop-button
-{
-  margin-bottom: 15px;
-}
-
-#friends button
-{
-  margin: 0 10px 10px 0;
-}
-
-.friend-button
-{
-  color: #FFFFFF !important;
-  border-color: #FFFFFF !important;
-}
-
-.enabled-friend-button:hover
-{
-  color: #FFFFFF !important;
-  background-color: #c82333 !important;
-  border-color: #bd2130 !important;
-}
-
-#friend-finder .custom-control.custom-switch
-{
-  margin-bottom: 10px;
-}
-
 label
 {
   font-size: 14px;
@@ -368,10 +300,22 @@ label
 
 #logoAvatarContainer
 {
-  margin-top: 17px;
+  margin-top: 25px;
   padding-bottom: 10px;
+}
+
+.avatar-container {
+  height: 48px;
   display: flex;
   justify-content: center;
+  filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, .25));
+}
+
+.avatar-container .avatar {
+  cursor: pointer;
+  pointer-events: all;
+  width: 30px;
+  height: 30px;
 }
 
 .avatar.fit {
